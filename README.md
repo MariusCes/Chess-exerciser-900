@@ -15,17 +15,23 @@ With cutting-edge technology, Chess Exerciser 9000 is the ultimate tool to train
 Play it now and say goodbye to blunders!
 🎉 Master chess—one move at a time!
 
+// Doing it with C# and react
 ## List of functionalities:
 # Alpha:
   1. Basic play section version:
-     1. Visible chess board, but every 3rd move it will be hidden
-     2. If user enters wrong move, game over
-     3. No difficulty selection for this phase
-  2. If user wins/loses, status screen:
-     1. How many moves
-     2. Time
-     3. Move list
-  3. Navbar with title page
+     1. Visible chess board
+       1. Back work - Audrius
+       2. Front work - Dovydas
+     2. Every 3rd move it will be hidden - 
+     3. If user enters wrong move, game over -
+     4. No difficulty selection for this phase -
+  2. If user wins/loses, status screen: 
+     1. How many moves -
+     2. Time -
+     3. Move list -
+  3. Navbar with title page -
+  4. Logo -
+  5. Log in icon -
 
 # Beta:
   1. Database integration:
