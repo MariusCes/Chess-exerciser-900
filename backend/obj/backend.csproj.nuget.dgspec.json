@@ -1,28 +1,24 @@
 {
   "format": 1,
   "restore": {
-    "C:\\VU\\Chess-exerciser-900\\backend\\backend.csproj": {}
+    "C:\\Users\\krali\\OneDrive\\Dokumentai\\UNI_II\\NET\\BnW\\Chess-exerciser-900\\backend\\backend.csproj": {}
   },
   "projects": {
-    "C:\\VU\\Chess-exerciser-900\\backend\\backend.csproj": {
+    "C:\\Users\\krali\\OneDrive\\Dokumentai\\UNI_II\\NET\\BnW\\Chess-exerciser-900\\backend\\backend.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\VU\\Chess-exerciser-900\\backend\\backend.csproj",
+        "projectUniqueName": "C:\\Users\\krali\\OneDrive\\Dokumentai\\UNI_II\\NET\\BnW\\Chess-exerciser-900\\backend\\backend.csproj",
         "projectName": "backend",
-        "projectPath": "C:\\VU\\Chess-exerciser-900\\backend\\backend.csproj",
-        "packagesPath": "C:\\Users\\makal\\.nuget\\packages\\",
-        "outputPath": "C:\\VU\\Chess-exerciser-900\\backend\\obj\\",
+        "projectPath": "C:\\Users\\krali\\OneDrive\\Dokumentai\\UNI_II\\NET\\BnW\\Chess-exerciser-900\\backend\\backend.csproj",
+        "packagesPath": "C:\\Users\\krali\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\krali\\OneDrive\\Dokumentai\\UNI_II\\NET\\BnW\\Chess-exerciser-900\\backend\\obj\\",
         "projectStyle": "PackageReference",
-        "fallbackFolders": [
-          "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
-        ],
         "configFilePaths": [
-          "C:\\Users\\makal\\AppData\\Roaming\\NuGet\\NuGet.Config",
-          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
+          "C:\\Users\\krali\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
-          "net7.0"
+          "net8.0"
         ],
         "sources": {
           "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
@@ -30,8 +26,8 @@
           "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
-          "net7.0": {
-            "targetAlias": "net7.0",
+          "net8.0": {
+            "targetAlias": "net8.0",
             "projectReferences": {}
           }
         },
@@ -47,16 +43,12 @@
         }
       },
       "frameworks": {
-        "net7.0": {
-          "targetAlias": "net7.0",
+        "net8.0": {
+          "targetAlias": "net8.0",
           "dependencies": {
             "Microsoft.AspNetCore.OpenApi": {
               "target": "Package",
-              "version": "[7.0.0, )"
-            },
-            "Stockfish.NET": {
-              "target": "Package",
-              "version": "[1.0.7, )"
+              "version": "[8.0.2, )"
             },
             "Swashbuckle.AspNetCore": {
               "target": "Package",
@@ -82,7 +74,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.400\\RuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.400/PortableRuntimeIdentifierGraph.json"
         }
       }
     }
