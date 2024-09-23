@@ -1,7 +1,7 @@
 .navbar {
-    background-color: #343a40; /* Dark background */
+    background-color: #343a40;
     padding: 1rem;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
 .navbar-brand {
@@ -12,7 +12,7 @@
 }
 
 .navbar .navbar-brand:hover {
-    color: #fc9595; /* Red hover effect */
+    color: #ff0000;
 }
 
 .navbar .chess-game-title {
@@ -34,17 +34,16 @@
 }
 
 .navbar .nav-link {
-    color: #f8f9fa; /* Text color */
+    color: #f8f9fa;
     margin-left: 1.5rem;
     font-size: 1.1rem;
     transition: color 0.3s ease;
 }
 
 .navbar .nav-link:hover {
-    color: #fc4040; /* Red hover effect for links */
+    color: #7ccdee;
 }
 
-/* Mobile responsiveness */
 @media (max-width: 768px) {
     .navbar-nav {
         flex-direction: column;
