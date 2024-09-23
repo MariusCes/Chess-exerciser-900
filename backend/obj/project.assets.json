@@ -45,6 +45,15 @@
           }
         }
       },
+      "Stockfish.NET/1.0.7": {
+        "type": "package",
+        "compile": {
+          "lib/netcoreapp3.1/Stockfish.NET.dll": {}
+        },
+        "runtime": {
+          "lib/netcoreapp3.1/Stockfish.NET.dll": {}
+        }
+      },
       "Swashbuckle.AspNetCore/6.4.0": {
         "type": "package",
         "dependencies": {
@@ -371,6 +380,18 @@
         "microsoft.openapi.nuspec"
       ]
     },
+    "Stockfish.NET/1.0.7": {
+      "sha512": "q9qZkGfgX+AbMmcuDh5MGM8wDMbf5eU8MSWRX6eyRjO1HNQ4V7WFtGV0LJriuknwGB0L3CWmNNLusf8GPLrRwA==",
+      "type": "package",
+      "path": "stockfish.net/1.0.7",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "lib/netcoreapp3.1/Stockfish.NET.dll",
+        "stockfish.net.1.0.7.nupkg.sha512",
+        "stockfish.net.nuspec"
+      ]
+    },
     "Swashbuckle.AspNetCore/6.4.0": {
       "sha512": "eUBr4TW0up6oKDA5Xwkul289uqSMgY0xGN4pnbOIBqCcN9VKGGaPvHX3vWaG/hvocfGDP+MGzMA0bBBKz2fkmQ==",
       "type": "package",
@@ -456,23 +477,29 @@
   "projectFileDependencyGroups": {
     "net8.0": [
       "Microsoft.AspNetCore.OpenApi >= 8.0.2",
+      "Stockfish.NET >= 1.0.7",
       "Swashbuckle.AspNetCore >= 6.4.0"
     ]
   },
   "packageFolders": {
-    "C:\\Users\\dovyd\\.nuget\\packages\\": {}
+    "C:\\Users\\makal\\.nuget\\packages\\": {},
+    "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\dovyd\\Desktop\\all\\UNIVERAS\\vsc\\Chess-exerciser-900\\backend\\backend.csproj",
+      "projectUniqueName": "C:\\VU\\Chess-exerciser-900\\backend\\backend.csproj",
       "projectName": "backend",
-      "projectPath": "C:\\Users\\dovyd\\Desktop\\all\\UNIVERAS\\vsc\\Chess-exerciser-900\\backend\\backend.csproj",
-      "packagesPath": "C:\\Users\\dovyd\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\dovyd\\Desktop\\all\\UNIVERAS\\vsc\\Chess-exerciser-900\\backend\\obj\\",
+      "projectPath": "C:\\VU\\Chess-exerciser-900\\backend\\backend.csproj",
+      "packagesPath": "C:\\Users\\makal\\.nuget\\packages\\",
+      "outputPath": "C:\\VU\\Chess-exerciser-900\\backend\\obj\\",
       "projectStyle": "PackageReference",
+      "fallbackFolders": [
+        "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
+      ],
       "configFilePaths": [
-        "C:\\Users\\dovyd\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Users\\makal\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
       "originalTargetFrameworks": [
@@ -480,6 +507,7 @@
       ],
       "sources": {
         "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
+        "C:\\Program Files\\dotnet\\library-packs": {},
         "https://api.nuget.org/v3/index.json": {}
       },
       "frameworks": {
@@ -507,6 +535,10 @@
             "target": "Package",
             "version": "[8.0.2, )"
           },
+          "Stockfish.NET": {
+            "target": "Package",
+            "version": "[1.0.7, )"
+          },
           "Swashbuckle.AspNetCore": {
             "target": "Package",
             "version": "[6.4.0, )"
@@ -531,7 +563,7 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.200/PortableRuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.400/PortableRuntimeIdentifierGraph.json"
       }
     }
   }
