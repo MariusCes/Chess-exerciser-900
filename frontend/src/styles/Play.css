@@ -1,0 +1,41 @@
+.play-screen {
+    text-align: center;
+    margin: 20px auto;
+  }
+  
+  .chess-board {
+    max-width: 100%;
+    height: auto;
+    margin-bottom: 20px;
+  }
+  
+  .move-form {
+    margin-top: 20px;
+  }
+  
+  .move-form input {
+    padding: 10px;
+    font-size: 1.1rem;
+    width: 200px;
+  }
+  
+  .move-form button {
+    padding: 10px 15px;
+    font-size: 1.1rem;
+    margin-left: 10px;
+    cursor: pointer;
+  }
+  
+  .move-form button:hover {
+    background-color: #5a6268;
+    color: white;
+  }
+
+  .chess-board-image {
+    max-width: 50%;  /* Set a more specific width for the chessboard */
+    height: auto;
+    margin-bottom: 20px;
+    border-radius: 8px; /* Add some border radius to soften the corners */
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2); /* Add subtle shadow for depth */
+}
+  
