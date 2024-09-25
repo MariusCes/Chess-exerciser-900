@@ -23,18 +23,29 @@ class ChessConsoleApp
             
             if (move.ToLower() == "exit") break;
 
-            if (!string.IsNullOrEmpty(move))
+           if (!string.IsNullOrEmpty(move))
             {
-                ProcessMove(stockfishService, move);
+                //CHECK IF LEGAL!!! (chess refrence)
+                if (stockfishService.IsMoveCorrect(currentPOS, move))
+                {
+                    ProcessMove(stockfishService, move);
+                }
+                else
+                {
+                    Console.WriteLine("Illegal move!\n");
+                }
             }
         }
     }
+
+
+
 
     static void ProcessMove(StockfishService stockfishService, string move)
     {
         stockfishService.SetPosition(currentPOS, move);
         currentPOS += $" {move}";
-        //pwhat board after user
+        //what board is after user
 
         var bestMove = stockfishService.GetBestMove();
         stockfishService.SetPosition(currentPOS.Trim(), bestMove);
@@ -44,6 +55,6 @@ class ChessConsoleApp
 
         Console.WriteLine($"\nCurrent Position: {currentPOS} \n");
         Console.WriteLine($"Bot's Best Move: {bestMove}");
-        //Console.WriteLine($"Evaluation: {evaluation}"); not working error
+        //Console.WriteLine($"Evaluation:\n {evaluation}"); NOT WORKING
     }
 }

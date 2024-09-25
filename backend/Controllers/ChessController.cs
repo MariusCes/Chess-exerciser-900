@@ -34,7 +34,7 @@ namespace CHESSPROJ.Controllers
             currentPOS += $" {move}";
 
 
-            var bestMove = _stockfishService.GetBestMove(); //gets best move for bot, maybe can be not the best move
+            var bestMove = _stockfishService.GetBestMove(); //gets best move for bot, need to find how to make it not the best move
 
             _stockfishService.SetPosition(currentPOS.Trim(), bestMove); //this would be for the bot, it would make the best move
             currentPOS += $" {bestMove}";

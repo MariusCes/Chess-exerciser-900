@@ -29,5 +29,14 @@ namespace CHESSPROJ.Services
             //it outputs Stockfish.NET.Models.Evaluation"???
         }
 
+
+
+        public bool IsMoveCorrect(string currentPosition, string move)
+        {
+            
+            _stockfish.SetPosition(currentPosition);
+            return _stockfish.IsMoveCorrect(move);
+        }
+
     }
 }
