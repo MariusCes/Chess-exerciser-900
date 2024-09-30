@@ -1,0 +1,53 @@
+.home {
+    margin-top: 50px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh; /* Full screen height */
+    animation: colorChange 10s infinite; /* Color-changing background */
+}
+
+@keyframes colorChange {
+    0% {
+        background-color: #ff416c; /* Start color */
+    }
+    25% {
+        background-color: #ff4b2b; /* Transition color */
+    }
+    50% {
+        background-color: #ffcc00; /* Midpoint color */
+    }
+    75% {
+        background-color: #ff69b4; /* Transition color */
+    }
+    100% {
+        background-color: #ff416c; /* End color (same as start) */
+    }
+}
+
+.home-logo {
+    width: 350px;  /* Adjust size */
+    border: 10px solid transparent;
+    border-radius: 50%;
+    box-shadow: 0 10px 20px rgba(255, 65, 108, 0.8), 0 6px 20px rgba(255, 75, 43, 0.7); /* Strong neon shadow */
+    transition: transform 0.5s ease, box-shadow 0.5s ease;
+    animation: pulse 2s infinite; /* Pulsing animation */
+}
+
+.home-logo:hover {
+    transform: scale(1.2) rotate(15deg);  /* Rotate more on hover */
+    box-shadow: 0 30px 60px rgba(255, 65, 108, 0.9), 0 15px 45px rgba(255, 75, 43, 0.8); /* Increased shadow on hover */
+}
+
+/* Pulsing neon effect */
+@keyframes pulse {
+    0% {
+        box-shadow: 0 0 10px rgba(255, 65, 108, 0.6), 0 0 20px rgba(255, 75, 43, 0.6);
+    }
+    50% {
+        box-shadow: 0 0 20px rgba(255, 65, 108, 1), 0 0 40px rgba(255, 75, 43, 1);
+    }
+    100% {
+        box-shadow: 0 0 10px rgba(255, 65, 108, 0.6), 0 0 20px rgba(255, 75, 43, 0.6);
+    }
+}
