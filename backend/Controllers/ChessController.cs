@@ -24,6 +24,7 @@ namespace CHESSPROJ.Controllers
             Game game = new Game();
             game.Id = Guid.NewGuid();
             game.MovesArray = new List<string>();
+            game.Lives = 3;
             games.Add(game);
             return Ok(new { GameId = game.Id}); 
         }
@@ -40,14 +41,18 @@ namespace CHESSPROJ.Controllers
 
             if (true) // in game logic need to validate moveNotation.move if its a good move (FUNCTION FOR IGNAS)
             {
-                Game game;
-                //Process the move via a service that handles game logic (FUNCTION FOR IGNAS)
-
-                return Ok(result.GameState);
+                string botMove; //= Process the move via a service that handles game logic (FUNCTION FOR IGNAS)
             }
             else
             {
-                return BadRequest(result.ErrorMessage);
+                foreach(Game game in games)
+                {
+                    if (gameId == game.Id.ToString())
+                    {
+                        --game.Lives;
+                        return Ok(new {wrongMove = true, lives = game.Lives}); 
+                    }
+                }
             }
         }
 
