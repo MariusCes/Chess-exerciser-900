@@ -5,6 +5,7 @@ using backend.DTOs;
 using backend.Models.Domain;
 using System;
 using System.Collections.Generic;
+using System.Text.Json;
 
 namespace CHESSPROJ.Controllers
 {
@@ -31,6 +32,30 @@ namespace CHESSPROJ.Controllers
             game.Lives = 3;
             games.Add(game);
             return Ok(new { GameId = game.Id}); 
+        }
+        // GET: api/chess/{gameId}/moves
+        [HttpGet("{gameId}/moves")]
+        public IActionResult GetMovesHistory(string gameId)
+        {
+            var game = games.FirstOrDefault(g => g.Id.ToString() == gameId);
+            if (game == null)
+            {
+                return NotFound("Game not found.");
+            }
+            var moves = game.MovesArray;
+            if (game.MovesArray == null || !game.MovesArray.Any())
+            {
+                return Ok(new List<string>()); // Return an empty list if there are no moves
+            }
+            string jsonMoves = JsonSerializer.Serialize(moves);
+            MemoryStream memoryStream = new MemoryStream();
+            using (StreamWriter writer = new StreamWriter(memoryStream))
+            {
+                writer.Write(jsonMoves);
+                writer.Flush();
+            }
+            memoryStream.Position = 0;
+            return new FileStreamResult(memoryStream, "application/json");
         }
 
         // POST: api/chessgame/{gameId}/move
@@ -62,13 +87,10 @@ namespace CHESSPROJ.Controllers
 
             string currentPosition = string.Join(" ", game.MovesArray);
 
-            if (_stockfishService.IsMoveCorrect(currentPosition, move)) // in game logic need to validate moveNotation.move if its a good move (FUNCTION FOR IGNAS)
+            if (_stockfishService.IsMoveCorrect(currentPosition, move)) 
             {
-                //player move
                 _stockfishService.SetPosition(currentPosition, move);
-                game.MovesArray.Add(move); //add the move done
-
-                //bot move
+                game.MovesArray.Add(move);
                 string botMove = _stockfishService.GetBestMove();
                 _stockfishService.SetPosition(string.Join(" ", game.MovesArray), botMove);
                 game.MovesArray.Add(botMove);
@@ -76,9 +98,6 @@ namespace CHESSPROJ.Controllers
                 currentPosition = string.Join(" ", game.MovesArray);
 
                 return Ok(new { wrongMove = false, botMove, currentPosition = currentPosition });
-           
-
-                //string botMove; //= Process the move via a service that handles game logic (FUNCTION FOR IGNAS)
             }
             else
             {
