@@ -5,6 +5,7 @@ using backend.DTOs;
 using backend.Models.Domain;
 using System;
 using System.Collections.Generic;
+using backend.Errors;
 
 namespace CHESSPROJ.Controllers
 {
@@ -14,6 +15,8 @@ namespace CHESSPROJ.Controllers
     {
         private readonly StockfishService _stockfishService;
         private static List<Game> games = new List<Game>();
+        private static ErrorMessages gameNotFound = ErrorMessages.Game_not_found;
+        private static ErrorMessages badMove = ErrorMessages.Move_notation_cannot_be_empty;
 
         private static string currentPOS = "";
         public ChessController(IConfiguration configuration)
@@ -50,14 +53,14 @@ namespace CHESSPROJ.Controllers
             }
             if (game == null)
             {
-                return NotFound("Game not found.");
+                return NotFound(gameNotFound);
             }               
 
             string move = moveNotation.move;
             // Validate move input
             if (string.IsNullOrEmpty(move))
             {
-                return BadRequest("Move notation cannot be empty.");
+                return BadRequest(badMove);
             }
 
             string currentPosition = string.Join(" ", game.MovesArray);
