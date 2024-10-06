@@ -1,7 +1,7 @@
 
-<!-- <Project Sdk="Microsoft.NET.Sdk.Web"> -->
+<Project Sdk="Microsoft.NET.Sdk.Web">
 <!-- čia for api -->
-<Project Sdk="Microsoft.NET.Sdk">
+<!-- <Project Sdk="Microsoft.NET.Sdk"> -->
 
   <PropertyGroup>
     <OutputType>Exe</OutputType> 
@@ -11,7 +11,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <!--<PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="7.0.0" /> -->
+    <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="7.0.0" />
     <PackageReference Include="Stockfish.NET" Version="1.0.7" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.4.0" />
   </ItemGroup>
