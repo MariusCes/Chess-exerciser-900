@@ -30,6 +30,7 @@ namespace CHESSPROJ.Controllers
             game.Id = Guid.NewGuid();
             game.MovesArray = new List<string>();
             game.Lives = 3;
+            game.IsRunning = true;
             games.Add(game);
             return Ok(new { GameId = game.Id}); 
         }
@@ -102,7 +103,11 @@ namespace CHESSPROJ.Controllers
             else
             {
                 game.Lives--; //minus life
-                return Ok(new { wrongMove = true, lives = game.Lives });
+                if (game.Lives == 0)
+                {
+                    game.IsRunning = false;
+                }
+                return Ok(new { wrongMove = true, lives = game.Lives, game.IsRunning });
             }
         }
     
