@@ -1,28 +1,68 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import "../styles/Play.css";
 
 function Play() {
-  const [move, setMove] = useState("");
+  const [move, setMove] = useState(""); // labelis tam judesiui kuri useris submittina
   const [moveList, setMoveList] = useState([]);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(false); // loading screen...? ar kazkur status update
+  const [isGameCreated, setIsGameCreated] = useState(false); // jei nesukurtas zaidimas negali submittinti judesiu
+  const [gameID, setGameID] = useState(""); // tas ID kuri atsiuncia
+
+  const createGame = async () => {
+    setMoveList([]);
+    const response = await fetch(
+      "http://localhost:5030/api/chess/create-game",
+      {
+        method: "POST",
+        headers: {
+          "Content-type": "application/json; charset=UTF-8",
+        },
+      }
+    );
+    const data = await response.json();
+    setGameID(data.gameId);
+    setIsGameCreated(true);
+  };
 
   const postMove = async (userMove) => {
-    try {
-      setLoading(true);
-      /*
+    const response = await fetch(
+      "http://localhost:5030/api/chess/" + gameID + "/move",
       {
-      gameId: "12345"
-      "playerMove": "e2e4"
+        method: "POST",
+        body: JSON.stringify({
+          move: userMove,
+          id: gameID,
+        }),
+        headers: {
+          "Content-type": "application/json; charset=UTF-8",
+        },
       }
-      */
-    } catch (error) {
-      setLoading(false);
-      console.error("Error");
+    );
+
+    const data = await response.json();
+    if (data.wrongMove === false) {
+      setMoveList((prevMoves) => [...prevMoves, userMove, data.botMove]);
+    } else {
+      setMove("Bad move!");
     }
   };
 
+  // atskiras component kuris butu uzloadinamas jei zaidimas sukurtas ir ten ir vyktu visas zaidimas, o siaip tai "create game" button ir vsio (checkai su "isGameCreated" butu)
+
   return (
     <div className="play-screen">
+      <button
+        type="submit"
+        onClick={(e) => {
+          e.preventDefault();
+          createGame();
+        }}
+      >
+        Create Game
+      </button>
+
+      <label>game ID: {gameID}</label>
+
       <form className="move-form">
         <input
           type="text"
@@ -43,8 +83,10 @@ function Play() {
       </form>
 
       <ul>
+        {" "}
+        {/* po kolkas taip isveda judesius */}
         {moveList.map((move) => {
-          <li>move</li>;
+          return <li>{move}</li>;
         })}
       </ul>
     </div>
