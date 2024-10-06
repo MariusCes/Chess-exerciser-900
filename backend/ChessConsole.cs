@@ -1,3 +1,4 @@
+/*
 using Microsoft.Extensions.Configuration;
 using CHESSPROJ.Services;
 
@@ -58,3 +59,4 @@ class ChessConsoleApp
         //Console.WriteLine($"Evaluation:\n {evaluation}"); NOT WORKING
     }
 }
+*/
