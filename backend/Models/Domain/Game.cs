@@ -11,5 +11,5 @@ public class Game
     public int BotRating { get; set; }
     public TimeOnly StartOfGame { get; set; }
     public TimeOnly EndOfGame { get; set; }
-     public int WLD { get; set; } //Win - 1 Lose - 0 Draw - 2
+    public int WLD { get; set; } //Win - 1 Lose - 0 Draw - 2
 }
