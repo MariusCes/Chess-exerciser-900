@@ -28,12 +28,11 @@ namespace CHESSPROJ.Controllers
         [HttpPost("create-game")]
         public IActionResult CreateGame()
         {
-            Game game = new Game();
-            game.Id = Guid.NewGuid();
+            Game game = new Game(Guid.NewGuid(), 1, 1);
             game.MovesArray = new List<string>();
             game.Lives = 3;
             games.Add(game);
-            return Ok(new { GameId = game.Id}); 
+            return Ok(new { GameId = game.GameId}); 
         }
 
         // POST: api/chessgame/{gameId}/move
@@ -45,7 +44,7 @@ namespace CHESSPROJ.Controllers
 
             foreach (var g in games)
 {
-                if (g.Id.ToString() == gameId) 
+                if (g.GameId.ToString() == gameId) 
                 {
                     game = g; 
                     break;
