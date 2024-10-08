@@ -11,6 +11,7 @@ public class Game
     public int BotRating => gameStartStruct.BotRating;
     public List<string>? MovesArray { get; set; }
     public int Lives { get; set; }
+    public Boolean IsRunning { get; set; }
     public TimeOnly StartOfGame { get; set; }
     public TimeOnly EndOfGame { get; set; }
     public int WLD { get; set; } //Win - 1 Lose - 0 Draw - 2
