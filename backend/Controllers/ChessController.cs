@@ -53,14 +53,14 @@ namespace CHESSPROJ.Controllers
             }
             if (game == null)
             {
-                return NotFound(gameNotFound);
+                return NotFound($"{gameNotFound.ToString()}");
             }               
 
             string move = moveNotation.move;
             // Validate move input
             if (string.IsNullOrEmpty(move))
             {
-                return BadRequest(badMove);
+                return BadRequest($"{badMove.ToString()}");
             }
 
             string currentPosition = string.Join(" ", game.MovesArray);
