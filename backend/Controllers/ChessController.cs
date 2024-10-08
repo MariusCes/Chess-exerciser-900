@@ -5,6 +5,7 @@ using backend.DTOs;
 using backend.Models.Domain;
 using System;
 using System.Collections.Generic;
+using backend.Errors;
 using System.Text.Json;
 
 namespace CHESSPROJ.Controllers
@@ -15,6 +16,8 @@ namespace CHESSPROJ.Controllers
     {
         private readonly StockfishService _stockfishService;
         private static List<Game> games = new List<Game>();
+        private static ErrorMessages gameNotFound = ErrorMessages.Game_not_found;
+        private static ErrorMessages badMove = ErrorMessages.Move_notation_cannot_be_empty;
 
         private static string currentPOS = "";
         public ChessController(IConfiguration configuration)
@@ -26,37 +29,12 @@ namespace CHESSPROJ.Controllers
         [HttpPost("create-game")]
         public IActionResult CreateGame()
         {
-            Game game = new Game();
-            game.Id = Guid.NewGuid();
+            Game game = new Game(Guid.NewGuid(), 1, 1);
             game.MovesArray = new List<string>();
             game.Lives = 3;
             game.IsRunning = true;
             games.Add(game);
-            return Ok(new { GameId = game.Id}); 
-        }
-        // GET: api/chess/{gameId}/moves
-        [HttpGet("{gameId}/moves")]
-        public IActionResult GetMovesHistory(string gameId)
-        {
-            var game = games.FirstOrDefault(g => g.Id.ToString() == gameId);
-            if (game == null)
-            {
-                return NotFound("Game not found.");
-            }
-            var moves = game.MovesArray;
-            if (game.MovesArray == null || !game.MovesArray.Any())
-            {
-                return Ok(new List<string>()); // Return an empty list if there are no moves
-            }
-            string jsonMoves = JsonSerializer.Serialize(moves);
-            MemoryStream memoryStream = new MemoryStream();
-            using (StreamWriter writer = new StreamWriter(memoryStream))
-            {
-                writer.Write(jsonMoves);
-                writer.Flush();
-            }
-            memoryStream.Position = 0;
-            return new FileStreamResult(memoryStream, "application/json");
+            return Ok(new { GameId = game.GameId}); 
         }
 
         // POST: api/chessgame/{gameId}/move
@@ -68,7 +46,7 @@ namespace CHESSPROJ.Controllers
 
             foreach (var g in games)
 {
-                if (g.Id.ToString() == gameId) 
+                if (g.GameId.ToString() == gameId) 
                 {
                     game = g; 
                     break;
@@ -76,14 +54,14 @@ namespace CHESSPROJ.Controllers
             }
             if (game == null)
             {
-                return NotFound("Game not found.");
+                return NotFound($"{gameNotFound.ToString()}");
             }               
 
             string move = moveNotation.move;
             // Validate move input
             if (string.IsNullOrEmpty(move))
             {
-                return BadRequest("Move notation cannot be empty.");
+                return BadRequest($"{badMove.ToString()}");
             }
 
             string currentPosition = string.Join(" ", game.MovesArray);
