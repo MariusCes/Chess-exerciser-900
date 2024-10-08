@@ -22,20 +22,15 @@ namespace CHESSPROJ.Services
             _stockfish.SetPosition(movesMade, move);
         }
 
+        public void GetFen() //in future maybe some way to see mate 
+        {
+            _stockfish.GetFenPosition();
+        }
+
         public string GetBestMove()
         {
             return _stockfish.GetBestMove();
         }
-
-        public string GetEvaluation()
-        {
-            var evaluation = _stockfish.GetEvaluation();
-            return evaluation.ToString(); //idk how to get eval here
-
-            //it outputs Stockfish.NET.Models.Evaluation"???
-        }
-
-
 
         public bool IsMoveCorrect(string currentPosition, string move)
         {
