@@ -6,9 +6,15 @@ namespace CHESSPROJ.Services
     {
         private readonly IStockfish _stockfish;
 
-        public StockfishService(string stockfishPath)
+        public StockfishService(string stockfishPath) //if no parameter used, level will be 5
         {
            _stockfish = new Stockfish.NET.Stockfish(stockfishPath);
+
+        }
+
+        public void SetLevel(int level) 
+        {
+            _stockfish.SkillLevel = level;
         }
 
         public void SetPosition(string movesMade, string move) 
