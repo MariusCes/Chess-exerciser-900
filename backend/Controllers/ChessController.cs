@@ -25,7 +25,7 @@ namespace CHESSPROJ.Controllers
             _stockfishService = new StockfishService(stockfishPath);
         }
 
-        [HttpPost("create-game")]
+        [HttpGet("create-game")]
         public IActionResult CreateGame()
         {
             Game game = new Game(Guid.NewGuid(), 1, 1);
@@ -43,7 +43,7 @@ namespace CHESSPROJ.Controllers
             Game game = null;
 
             foreach (var g in games)
-{
+            {
                 if (g.GameId.ToString() == gameId) 
                 {
                     game = g; 
