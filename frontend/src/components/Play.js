@@ -11,7 +11,7 @@ function Play() {
   const createGame = async () => {
     setMoveList([]);
     const response = await fetch("http://localhost:5030/api/chess/create-game");
-    const data = await response.json();
+    const data = await response.json(); // unboxing
     setGameID(data.gameId);
     setIsGameCreated(true);
   };
