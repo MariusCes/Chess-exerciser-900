@@ -12,7 +12,7 @@ namespace CHESSPROJ.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class ChessController : ControllerBase
+    public class ChessController : ControllerBase, IEnumerable<Game>
     {
         private readonly StockfishService _stockfishService;
         private static List<Game> games = new List<Game>();
@@ -37,7 +37,7 @@ namespace CHESSPROJ.Controllers
             game.Lives = 3;
             game.IsRunning = true;
             games.Add(game);
-            return Ok(new { GameId = game.GameId}); 
+            return Ok(new { GameId = game.GameId });
         }
 
         // POST: api/chessgame/{gameId}/move
@@ -48,17 +48,17 @@ namespace CHESSPROJ.Controllers
             Game game = null;
 
             foreach (var g in games)
-{
-                if (g.GameId.ToString() == gameId) 
+            {
+                if (g.GameId.ToString() == gameId)
                 {
-                    game = g; 
+                    game = g;
                     break;
                 }
             }
             if (game == null)
             {
                 return NotFound($"{gameNotFound.ToString()}");
-            }               
+            }
 
             string move = moveNotation.move;
             // Validate move input
@@ -91,6 +91,22 @@ namespace CHESSPROJ.Controllers
                 return Ok(new { wrongMove = true, lives = game.Lives, game.IsRunning });
             }
         }
-    
+
+        // Return the list of games
+        [HttpGet("games")]
+        public IActionResult GetAllGames()
+        {
+            return Ok(games);
+        }
+
+        public IEnumerator<Game> GetEnumerator()
+        {
+            return games.GetEnumerator(); // Use List<Game>'s built-in enumerator
+        }
+
+        System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
+        {
+            return GetEnumerator();
+        }
     }
 }
