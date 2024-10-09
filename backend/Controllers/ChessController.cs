@@ -26,9 +26,12 @@ namespace CHESSPROJ.Controllers
             _stockfishService = new StockfishService(stockfishPath);
         }
 
+
+        // /api/chess/create-game?skillLevel=10 smth like that for harder
         [HttpGet("create-game")]
-        public IActionResult CreateGame()
+        public IActionResult CreateGame([FromQuery] int SkillLevel = 5) 
         {
+            _stockfishService.SetLevel(SkillLevel); //default set to 5, need to see what level does
             Game game = new Game(Guid.NewGuid(), 1, 1);
             game.MovesArray = new List<string>();
             game.Lives = 3;
