@@ -1,23 +1,26 @@
+using CHESSPROJ.StockfishServiceExtensions;
 using Stockfish.NET;
 
 namespace CHESSPROJ.Services
 {
+
+
     public class StockfishService
     {
         private readonly IStockfish _stockfish;
 
         public StockfishService(string stockfishPath) //if no parameter used, level will be 5
         {
-           _stockfish = new Stockfish.NET.Stockfish(stockfishPath);
+            _stockfish = new Stockfish.NET.Stockfish(stockfishPath);
 
         }
 
-        public void SetLevel(int level) 
+        public void SetLevel(int level)
         {
             _stockfish.SkillLevel = level;
         }
 
-        public void SetPosition(string movesMade, string move) 
+        public void SetPosition(string movesMade, string move)
         {
             _stockfish.SetPosition(movesMade, move);
         }
@@ -34,9 +37,14 @@ namespace CHESSPROJ.Services
 
         public bool IsMoveCorrect(string currentPosition, string move)
         {
-            
+
             _stockfish.SetPosition(currentPosition);
             return _stockfish.IsMoveCorrect(move);
+        }
+
+        public bool IsCheck()
+        {
+            return _stockfish.IsCheck();
         }
 
     }

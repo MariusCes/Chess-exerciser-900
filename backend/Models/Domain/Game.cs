@@ -16,9 +16,12 @@ public class Game
     public TimeOnly EndOfGame { get; set; }
     public int WLD { get; set; } //Win - 1 Lose - 0 Draw - 2
 
-    public Game(Guid guid, int Difficulty, int BotRating)
+    public Game(Guid guid, int Difficulty, int BotRating, int lives)
     {
         gameStartStruct = new GameStartStruct(guid, Difficulty, BotRating);
+        MovesArray = new List<string>();
+        Lives = lives;
+        IsRunning = true;
     }
 
 }

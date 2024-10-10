@@ -10,16 +10,8 @@ function Play() {
 
   const createGame = async () => {
     setMoveList([]);
-    const response = await fetch(
-      "http://localhost:5030/api/chess/create-game",
-      {
-        method: "POST",
-        headers: {
-          "Content-type": "application/json; charset=UTF-8",
-        },
-      }
-    );
-    const data = await response.json();
+    const response = await fetch("http://localhost:5030/api/chess/create-game");
+    const data = await response.json(); // unboxing
     setGameID(data.gameId);
     setIsGameCreated(true);
   };
@@ -31,7 +23,6 @@ function Play() {
         method: "POST",
         body: JSON.stringify({
           move: userMove,
-          id: gameID,
         }),
         headers: {
           "Content-type": "application/json; charset=UTF-8",
