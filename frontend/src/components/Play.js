@@ -23,7 +23,6 @@ function Play() {
         method: "POST",
         body: JSON.stringify({
           move: userMove,
-          id: gameID,
         }),
         headers: {
           "Content-type": "application/json; charset=UTF-8",
