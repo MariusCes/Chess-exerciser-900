@@ -39,7 +39,30 @@ namespace CHESSPROJ.Controllers
             games.Add(game);
             return Ok(new { GameId = game.GameId });
         }
-
+        // GET: api/chess/{gameId}/history
+        [HttpGet("{gameId}/history")]
+        public IActionResult GetMovesHistory(string gameId)
+        {
+            var game = games.FirstOrDefault(g => g.GameId.ToString() == gameId);
+            if (game == null)
+            {
+                return NotFound("Game not found.");
+            }
+            var moves = game.MovesArray;
+            if (game.MovesArray == null || !game.MovesArray.Any())
+            {
+                return Ok(new List<string>()); // Return an empty list if there are no moves
+            }
+            string jsonMoves = JsonSerializer.Serialize(moves);
+            MemoryStream memoryStream = new MemoryStream();
+            using (StreamWriter writer = new StreamWriter(memoryStream))
+            {
+                writer.Write(jsonMoves);
+                writer.Flush();
+            }
+            memoryStream.Position = 0;
+            return new FileStreamResult(memoryStream, "application/json");
+        }
         // POST: api/chessgame/{gameId}/move
         [HttpPost("{gameId}/move")]
         public IActionResult MakeMove(string gameId, [FromBody] MoveDto moveNotation)
