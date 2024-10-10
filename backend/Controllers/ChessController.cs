@@ -12,10 +12,10 @@ namespace CHESSPROJ.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class ChessController : ControllerBase, IEnumerable<Game>
+    public class ChessController : ControllerBase
     {
         private readonly StockfishService _stockfishService;
-        private static List<Game> games = new List<Game>();
+        private static GamesList games = new GamesList(new List<Game>());
         private static ErrorMessages gameNotFound = ErrorMessages.Game_not_found;
         private static ErrorMessages badMove = ErrorMessages.Move_notation_cannot_be_empty;
         public ChessController(IConfiguration configuration)
@@ -30,10 +30,7 @@ namespace CHESSPROJ.Controllers
         public IActionResult CreateGame([FromQuery] int SkillLevel = 5) // po kolkas GET req, bet ateityje reikes ir sito
         {
             _stockfishService.SetLevel(SkillLevel); //default set to 5, need to see what level does
-            Game game = new Game(Guid.NewGuid(), 1, 1);
-            game.MovesArray = new List<string>();
-            game.Lives = 3;
-            game.IsRunning = true;
+            Game game = new Game(Guid.NewGuid(), 1, 1, 3);
             games.Add(game);
             return Ok(new { GameId = game.GameId });
         }
@@ -65,17 +62,7 @@ namespace CHESSPROJ.Controllers
         [HttpPost("{gameId}/move")]
         public IActionResult MakeMove(string gameId, [FromBody] MoveDto moveNotation)       // extractina is JSON post info i MoveDto record'a
         {
-
-            Game game = null;
-
-            foreach (var g in games)
-            {
-                if (g.GameId.ToString() == gameId)
-                {
-                    game = g;
-                    break;
-                }
-            }
+            Game game = games.FirstOrDefault(g => g.GameId.ToString() == gameId);
             if (game == null)
             {
                 return NotFound($"{gameNotFound.ToString()}");
@@ -117,17 +104,15 @@ namespace CHESSPROJ.Controllers
         [HttpGet("games")]
         public IActionResult GetAllGames()
         {
-            return Ok(games);
+            List<Game> gamesWithMoves = new List<Game>();
+
+            foreach (var game in games.GetCustomEnumerator())
+            {
+                // custom filtering using IEnumerable
+                gamesWithMoves.Add(game);
+            }
+            return Ok(gamesWithMoves);
         }
 
-        public IEnumerator<Game> GetEnumerator()
-        {
-            return games.GetEnumerator(); // Use List<Game>'s built-in enumerator
-        }
-
-        System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
-        {
-            return GetEnumerator();
-        }
     }
 }
