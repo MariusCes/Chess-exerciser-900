@@ -1,18 +1,19 @@
 .navbar {
-    background-color: #343a40;
+    background-color: rgba(0, 0, 0, 0.831);
     padding: 1rem;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
 .navbar-brand {
-    color: #f8f9fa;
+    color: #ffffff;
+    font-family: 'Montserrat', sans-serif;
     font-size: 1.5rem;
     font-weight: bold;
     transition: color 0.3s ease;
 }
 
 .navbar .navbar-brand:hover {
-    color: #ff0000;
+    color: #7ccdee;
 }
 
 .navbar .chess-game-title {
@@ -33,9 +34,8 @@
     list-style-type: none;
 }
 
-.navbar .nav-link {
+.nav-link {
     color: #f8f9fa;
-    margin-left: 1.5rem;
     font-size: 1.1rem;
     transition: color 0.3s ease;
 }
