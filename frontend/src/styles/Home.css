@@ -1,8 +1,6 @@
-
-
 .home-logo {
     margin-top: 200px;
-    width: 350px;  /* Adjust size */
+    width: 350px;
     border: 10px solid transparent;
     border-color: #8989ffbe;
     border-style:dashed;
@@ -13,7 +11,7 @@
 }
 
 .home-logo:hover {
-    transform: scale(1.2) rotate(15deg);  /* Rotate more on hover */
-    box-shadow: 0 30px 60px rgba(255, 65, 108, 0.9), 0 15px 45px rgba(255, 75, 43, 0.8); /* Increased shadow on hover */
+    transform: scale(1.2) rotate(15deg);
+    box-shadow: 0 30px 60px rgba(255, 65, 108, 0.9), 0 15px 45px rgba(255, 75, 43, 0.8);
 }
 

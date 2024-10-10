@@ -9,9 +9,17 @@
     margin-bottom: 20px;
   }
 
-  .create-button:hover {
+  .create-button {
     background-color: #5a6268;
     color: white;
+    padding: 10px 20px;
+    border-radius: 5px;
+    border: none;
+    transition: background-color 0.3s ease;
+  }
+
+  .create-button:hover {
+    background-color: #444a4f;
   }
   
   .move-form {
@@ -25,29 +33,29 @@
   }
   
   .move-form button {
-    padding: 10px 15px;
-    font-size: 1.1rem;
-    margin-left: 10px;
-    cursor: pointer;
+    background-color: #5a6268;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 5px;
+    border: none;
+    transition: background-color 0.3s ease;
   }
   
   .move-form button:hover {
-    background-color: #5a6268;
-    color: white;
+    background-color: #444a4f;
   }
 
   .move-list-container {
     margin: 20px auto;
     max-width: 300px;
-    margin-top: 20px;
     height: 400px;
     overflow-y: scroll;
-    border: 2px solid #333;
-    background-color: #afcbe7;
+    background-color: rgba(148, 157, 173, 0.385);
     padding: 10px;
-    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
     border-radius: 10px;
-}
+    border: 1px solid rgba(255, 255, 255, 0.2);
+  }
 
 .move-list {
   list-style-type: none;
@@ -55,15 +63,26 @@
 }
 
 .move-item {
-  padding: 5px 0;
-  border-bottom: 1px solid #ccc;
+  padding: 10px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  font-size: 1.1rem;
 }
 
 .your-move {
-  background-color: #d4edda;
+  background-color: rgba(171, 243, 153, 0.619);
 }
 
 .bot-move {
-  background-color: #f8d7da;
+  background-color: rgba(244, 67, 54, 0.597);
 }
   
+label {
+  background-color: rgba(255, 255, 255, 0.8);
+  padding: 5px 10px;
+  border-radius: 5px;
+  font-size: 1.2rem;
+  color: #333;
+  margin-top: 20px;
+  margin-bottom: 20px;
+  margin-left: 20px;
+}
