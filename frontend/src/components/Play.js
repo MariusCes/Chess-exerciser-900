@@ -8,18 +8,32 @@ function Play() {
   const [isGameCreated, setIsGameCreated] = useState(false); // jei nesukurtas zaidimas negali submittinti judesiu
   const [gameID, setGameID] = useState(""); // tas ID kuri atsiuncia
 
-  const mockCreateGame = () => {
-    const mockGameId = "777777"; // Mock game ID
-    setGameID(mockGameId);
+  const createGame = async () => {
+    setMoveList([]);
+    const response = await fetch("http://localhost:5030/api/chess/create-game");
+    const data = response.json(); // unboxing
+    setGameID(data.gameId);
     setIsGameCreated(true);
-    setMoveList([]); // Reset move list on new game creation
-    console.log("Wow, the back has created a game ID without errors:", mockGameId);
   };
 
-  const mockPostMove = (userMove) => {
-    const mockBotMove = "E2E4"; // Mock bot move
-    if (userMove !== "bad") {
-      setMoveList((prevMoves) => [...prevMoves, userMove, mockBotMove]);
+  const postMove = async (userMove) => {
+    const response = await fetch(
+      "http://localhost:5030/api/chess/" + gameID + "/move",
+      {
+        method: "POST",
+        body: JSON.stringify({
+          move: userMove,
+        }),
+        headers: {
+          "Content-type": "application/json; charset=UTF-8",
+        },
+      }
+    );
+
+    const data = await response.json();
+    if (data.wrongMove === false) {
+      setMoveList((prevMoves) => [...prevMoves, userMove, data.botMove]);
+
     } else {
       setMove("Bad move!");
     }
@@ -32,7 +46,7 @@ function Play() {
         type="submit"
         onClick={(e) => {
           e.preventDefault();
-          mockCreateGame();
+          createGame();
         }}
       >
         Create Game
@@ -51,7 +65,7 @@ function Play() {
           type="submit"
           onClick={(e) => {
             e.preventDefault();
-            mockPostMove(move);
+            postMove(move);
             setMove("");
           }}
         >
