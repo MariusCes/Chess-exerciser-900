@@ -8,6 +8,11 @@
     height: auto;
     margin-bottom: 20px;
   }
+
+  .create-button:hover {
+    background-color: #5a6268;
+    color: white;
+  }
   
   .move-form {
     margin-top: 20px;
@@ -31,11 +36,34 @@
     color: white;
   }
 
-  .chess-board-image {
-    max-width: 50%;  /* Set a more specific width for the chessboard */
-    height: auto;
-    margin-bottom: 20px;
-    border-radius: 8px; /* Add some border radius to soften the corners */
-    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2); /* Add subtle shadow for depth */
+  .move-list-container {
+    margin: 20px auto;
+    max-width: 300px;
+    margin-top: 20px;
+    height: 400px;
+    overflow-y: scroll;
+    border: 2px solid #333;
+    background-color: #afcbe7;
+    padding: 10px;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
+}
+
+.move-list {
+  list-style-type: none;
+  padding: 0;
+}
+
+.move-item {
+  padding: 5px 0;
+  border-bottom: 1px solid #ccc;
+}
+
+.your-move {
+  background-color: #d4edda;
+}
+
+.bot-move {
+  background-color: #f8d7da;
 }
   

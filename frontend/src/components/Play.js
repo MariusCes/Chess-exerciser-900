@@ -28,7 +28,7 @@ function Play() {
 
   return (
     <div className="play-screen">
-      <button
+      <button className="create-button"
         type="submit"
         onClick={(e) => {
           e.preventDefault();
@@ -59,13 +59,15 @@ function Play() {
         </button>
       </form>
 
-      <ul>
-        {" "}
-        {/* po kolkas taip isveda judesius */}
-        {moveList.map((move) => {
-          return <li>{move}</li>;
-        })}
-      </ul>
+      <div className="move-list-container">
+        <ul className="move-list">
+          {moveList.map((move, index) => (
+            <li key={index} className={`move-item ${index % 2 === 0 ? 'your-move' : 'bot-move'}`}>
+              {move}
+            </li>
+          ))}
+        </ul>
+      </div>
     </div>
   );
 }
