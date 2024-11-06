@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import "../styles/Play.css";
+import Board from "./Board"; 
 
 function Play() {
   const [move, setMove] = useState(""); // labelis tam judesiui kuri useris submittina
@@ -53,7 +54,8 @@ function Play() {
       </button>
 
       <label>game ID: {gameID}</label>
-
+      <Board />
+      
       <form className="move-form">
         <input
           type="text"
