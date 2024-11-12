@@ -8,7 +8,8 @@ function Play() {
   const [loading, setLoading] = useState(false); // loading screen...? ar kazkur status update
   const [isGameCreated, setIsGameCreated] = useState(false); // jei nesukurtas zaidimas negali submittinti judesiu
   const [gameID, setGameID] = useState(""); // tas ID kuri atsiuncia
-
+  const [fen, setFen] = useState("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
+  
   const createGame = async () => {
     setMoveList([]);
     const response = await fetch("http://localhost:5030/api/chess/create-game");
@@ -55,7 +56,7 @@ function Play() {
 
       <label>game ID: {gameID}</label>
       <div className="container">
-        <Board />
+        <Board fen={fen} />
         <div>
           <form className="move-form">
             <input

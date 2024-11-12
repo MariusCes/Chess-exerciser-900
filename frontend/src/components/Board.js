@@ -31,8 +31,7 @@ const parseFEN = (fen) => {
   });
 };
 
-const Board = () => {
-  const [fen, setFen] = useState("r1bqkbnr/pppppppp/2n5/8/4P3/5N2/PPPP1PPP/RNBQKB1R w KQkq - 2 3");
+const Board = ({ fen }) => {
   const boardArray = parseFEN(fen);
 
   return (
