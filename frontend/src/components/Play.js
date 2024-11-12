@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import "../styles/Play.css";
-import Board from "./Board"; 
+import Board from "./Board";
 
 function Play() {
   const [move, setMove] = useState(""); // labelis tam judesiui kuri useris submittina
@@ -54,35 +54,38 @@ function Play() {
       </button>
 
       <label>game ID: {gameID}</label>
-      <Board />
-      
-      <form className="move-form">
-        <input
-          type="text"
-          value={move}
-          onChange={(e) => setMove(e.target.value)}
-          placeholder="B1B2"
-        />
-        <button
-          type="submit"
-          onClick={(e) => {
-            e.preventDefault();
-            postMove(move);
-            setMove("");
-          }}
-        >
-          Submit Move
-        </button>
-      </form>
+      <div className="container">
+        <Board />
+        <div>
+          <form className="move-form">
+            <input
+              type="text"
+              value={move}
+              onChange={(e) => setMove(e.target.value)}
+              placeholder="B1B2"
+            />
+            <button
+              type="submit"
+              onClick={(e) => {
+                e.preventDefault();
+                postMove(move);
+                setMove("");
+              }}
+            >
+              Submit Move
+            </button>
+          </form>
 
-      <div className="move-list-container">
-        <ul className="move-list">
-          {moveList.map((move, index) => (
-            <li key={index} className={`move-item ${index % 2 === 0 ? 'your-move' : 'bot-move'}`}>
-              {move}
-            </li>
-          ))}
-        </ul>
+          <div className="move-list-container">
+            <ul className="move-list">
+              {moveList.map((move, index) => (
+                <li key={index} className={`move-item ${index % 2 === 0 ? 'your-move' : 'bot-move'}`}>
+                  {move}
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
       </div>
     </div>
   );
