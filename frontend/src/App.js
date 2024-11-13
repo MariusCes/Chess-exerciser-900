@@ -4,17 +4,21 @@ import Navbar from "./components/Navbar";
 import About from "./components/About";
 import Home from "./components/Home";
 import Play from "./components/Play";
+import './App.css';
+
 
 function App() {
   return (
-    <Router>
-      <Navbar />
-      <Routes>
-        <Route path="/home" element={<Home />} />
-        <Route path="/about" element={<About />} />
-        <Route path="/play" element={<Play />} />
-      </Routes>
-    </Router>
+    <div className="App">
+      <Router>
+        <Navbar />
+        <Routes>
+          <Route path="/home" element={<Home />} />
+          <Route path="/about" element={<About />} />
+          <Route path="/play" element={<Play />} />
+        </Routes>
+      </Router>
+    </div>
   );
 }
 

@@ -18,9 +18,12 @@ public class Game
     public int Blackout { get; set; }
     public Boolean TurnBlack { get; set; }
 
-    public Game(Guid guid, int Difficulty, int BotRating)
+    public Game(Guid guid, int Difficulty, int BotRating, int lives)
     {
         gameStartStruct = new GameStartStruct(guid, Difficulty, BotRating);
+        MovesArray = new List<string>();
+        Lives = lives;
+        IsRunning = true;
     }
 
 }

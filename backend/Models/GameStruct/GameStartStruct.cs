@@ -12,6 +12,5 @@ public struct GameStartStruct
         this.Id = Id;
         this.Difficulty = Difficulty;
         this.BotRating = BotRating;
-
     }
 }
