@@ -30,7 +30,7 @@ namespace CHESSPROJ.Controllers
         public IActionResult CreateGame([FromQuery] int SkillLevel = 5) // po kolkas GET req, bet ateityje reikes ir sito
         {
             _stockfishService.SetLevel(SkillLevel); //default set to 5, need to see what level does
-            Game game = new Game(Guid.NewGuid(), 1, 1, 3);
+            Game game = Game.CreateGameFactory(Guid.NewGuid(), 5, 1, 3);
             games.Add(game);
             return Ok(new { GameId = game.GameId });
         }
