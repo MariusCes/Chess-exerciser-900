@@ -1,0 +1,16 @@
+##DOWLOADING THE APP
+1. dowload app: https://learn.microsoft.com/en-us/sql/ssms/download-sql-server-management-studio-ssms?view=sql-server-ver16
+2. install it on your PC.
+
+##ALL THE NUGGET PACKAGES YOU NEED
+--for vsc users run these in terminal
+1. dotnet add package Microsoft.EntityFrameworkCore.Tools --version 7.0.20
+2. dotnet add package Microsoft.EntityFrameworkCore.SqlServer --version 7.0.20
+
+##THIS STEP IS AFTER YOUVE INSTALLED THE PACKAGES AND MICROSOFT SQL STUDIO MANAGER
+1. Go to appsettings.json file
+2. In "ConnectionStrings" change the "Server=(your connection string)"
+
+HOW TO MAKE A MIGRATION RUN THESE COMMANDS
+1. dotnet ef migrations add "Initial Migration"
+2. dotnet ef database update
