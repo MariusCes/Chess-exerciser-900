@@ -1,24 +1,28 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\krali\\OneDrive\\Dokumentai\\UNI_II\\NET\\BnW\\Chess-exerciser-900\\backend\\backend.csproj": {}
+    "D:\\PROGRAMMING_PROJECTS\\Chess-exerciser-900\\backend\\backend.csproj": {}
   },
   "projects": {
-    "C:\\Users\\krali\\OneDrive\\Dokumentai\\UNI_II\\NET\\BnW\\Chess-exerciser-900\\backend\\backend.csproj": {
+    "D:\\PROGRAMMING_PROJECTS\\Chess-exerciser-900\\backend\\backend.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\krali\\OneDrive\\Dokumentai\\UNI_II\\NET\\BnW\\Chess-exerciser-900\\backend\\backend.csproj",
+        "projectUniqueName": "D:\\PROGRAMMING_PROJECTS\\Chess-exerciser-900\\backend\\backend.csproj",
         "projectName": "backend",
-        "projectPath": "C:\\Users\\krali\\OneDrive\\Dokumentai\\UNI_II\\NET\\BnW\\Chess-exerciser-900\\backend\\backend.csproj",
-        "packagesPath": "C:\\Users\\krali\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\krali\\OneDrive\\Dokumentai\\UNI_II\\NET\\BnW\\Chess-exerciser-900\\backend\\obj\\",
+        "projectPath": "D:\\PROGRAMMING_PROJECTS\\Chess-exerciser-900\\backend\\backend.csproj",
+        "packagesPath": "C:\\Users\\Marius\\.nuget\\packages\\",
+        "outputPath": "D:\\PROGRAMMING_PROJECTS\\Chess-exerciser-900\\backend\\obj\\",
         "projectStyle": "PackageReference",
+        "fallbackFolders": [
+          "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
+        ],
         "configFilePaths": [
-          "C:\\Users\\krali\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\Marius\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
-          "net8.0"
+          "net7.0"
         ],
         "sources": {
           "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
@@ -26,8 +30,8 @@
           "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
-          "net8.0": {
-            "targetAlias": "net8.0",
+          "net7.0": {
+            "targetAlias": "net7.0",
             "projectReferences": {}
           }
         },
@@ -43,12 +47,26 @@
         }
       },
       "frameworks": {
-        "net8.0": {
-          "targetAlias": "net8.0",
+        "net7.0": {
+          "targetAlias": "net7.0",
           "dependencies": {
             "Microsoft.AspNetCore.OpenApi": {
               "target": "Package",
-              "version": "[8.0.2, )"
+              "version": "[7.0.0, )"
+            },
+            "Microsoft.EntityFrameworkCore.SqlServer": {
+              "target": "Package",
+              "version": "[7.0.20, )"
+            },
+            "Microsoft.EntityFrameworkCore.Tools": {
+              "include": "Runtime, Build, Native, ContentFiles, Analyzers, BuildTransitive",
+              "suppressParent": "All",
+              "target": "Package",
+              "version": "[7.0.20, )"
+            },
+            "Stockfish.NET": {
+              "target": "Package",
+              "version": "[1.0.7, )"
             },
             "Swashbuckle.AspNetCore": {
               "target": "Package",
@@ -66,6 +84,24 @@
           ],
           "assetTargetFallback": true,
           "warn": true,
+          "downloadDependencies": [
+            {
+              "name": "Microsoft.AspNetCore.App.Ref",
+              "version": "[7.0.20, 7.0.20]"
+            },
+            {
+              "name": "Microsoft.NETCore.App.Host.win-x64",
+              "version": "[7.0.20, 7.0.20]"
+            },
+            {
+              "name": "Microsoft.NETCore.App.Ref",
+              "version": "[7.0.20, 7.0.20]"
+            },
+            {
+              "name": "Microsoft.WindowsDesktop.App.Ref",
+              "version": "[7.0.20, 7.0.20]"
+            }
+          ],
           "frameworkReferences": {
             "Microsoft.AspNetCore.App": {
               "privateAssets": "none"
@@ -74,7 +110,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.400/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.401\\RuntimeIdentifierGraph.json"
         }
       }
     }
