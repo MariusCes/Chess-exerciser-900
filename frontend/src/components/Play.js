@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import "../styles/Play.css";
 import Board from "./Board";
+import { Dropdown, DropdownButton, Button } from "react-bootstrap";
 
 function Play() {
   const [move, setMove] = useState(""); // labelis tam judesiui kuri useris submittina
@@ -10,6 +11,7 @@ function Play() {
   const [gameID, setGameID] = useState(""); // tas ID kuri atsiuncia
   const [fen, setFen] = useState("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
   const [turnBlack, setTurnBlack] = useState(false);
+  const [difficulty, setDifficulty] = useState(""); // State for selected difficulty
 
   const createGame = async () => {
     setMoveList([]);
@@ -44,11 +46,30 @@ function Play() {
   // atskiras component kuris butu uzloadinamas jei zaidimas sukurtas ir ten ir vyktu visas zaidimas, o siaip tai "create game" button ir vsio (checkai su "isGameCreated" butu)
   return (
     <div className="play-screen">
-      <button className="create-button" onClick={createGame}>
-        Create Game
-      </button>
+      <div className="d-flex align-items-center justify-content-center mb-3">
+        <label className="me-2">Game ID: {gameID}</label>
+        
+        <select
+          className="form-select me-2"
+          value={difficulty}
+          onChange={(e) => setDifficulty(e.target.value)}
+          style={{ width: "120px" }}
+        >
+          <option value="">Select Difficulty</option>
+          <option value="easy">Easy</option>
+          <option value="medium">Medium</option>
+          <option value="hard">Hard</option>
+        </select>
 
-      <label>Game ID: {gameID}</label>
+        <button
+          className="btn btn-secondary"
+          onClick={createGame}
+          disabled={!difficulty}
+        >
+          Create Game
+        </button>
+      </div>
+
       <div className="container">
         <Board fen={fen} turnBlack={turnBlack} />
         <div>

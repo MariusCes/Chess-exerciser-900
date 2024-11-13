@@ -91,3 +91,44 @@ label {
   display: flex;
   gap: 5px;
 }
+
+.difficulty-selection {
+  margin-bottom: 10px;
+  width: 300px; /* Adjust width as needed */
+}
+
+.create-button {
+  width: 100%;
+  padding: 10px;
+  font-size: 1.1rem;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.3s, color 0.3s;
+}
+
+.create-button.inactive {
+  background-color: #d3d3d3; /* Light gray */
+  color: #808080; /* Dark gray */
+  cursor: not-allowed;
+}
+
+.create-button.active {
+  background-color: #ffa500; /* Vibrant orange */
+  color: white;
+}
+
+.difficulty-select {
+  margin: 10px 0;
+}
+
+.difficulty-select-container {
+  display: flex;
+  align-items: center;
+  margin-bottom: 15px;
+}
+
+.create-button {
+  width: 100%;
+  font-size: 1.1rem;
+  padding: 10px;
+}
