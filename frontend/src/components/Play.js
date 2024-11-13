@@ -48,7 +48,7 @@ function Play() {
     <div className="play-screen">
       <div className="d-flex align-items-center justify-content-center mb-3">
         <label className="me-2">Game ID: {gameID}</label>
-        
+
         <select
           className="form-select me-2"
           value={difficulty}
@@ -75,21 +75,25 @@ function Play() {
         <div>
           <form className="move-form">
             <input
+              className="me-1"
               type="text"
               value={move}
               onChange={(e) => setMove(e.target.value)}
               placeholder="B1B2"
             />
             <button
+              className="btn btn-secondary"
               type="submit"
               onClick={(e) => {
                 e.preventDefault();
                 postMove(move);
                 setMove("");
               }}
+              disabled={!isGameCreated}
             >
               Submit Move
             </button>
+
           </form>
 
           <div className="move-list-container">
