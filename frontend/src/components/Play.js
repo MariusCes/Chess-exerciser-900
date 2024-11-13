@@ -27,7 +27,7 @@ function Play() {
       {
         method: "POST",
         body: JSON.stringify({
-          move: userMove,
+          move: userMove.toLowerCase(),
         }),
         headers: {
           "Content-type": "application/json; charset=UTF-8",
