@@ -86,3 +86,8 @@ label {
   margin-bottom: 20px;
   margin-left: 20px;
 }
+
+.container {
+  display: flex;
+  gap: 5px;
+}
