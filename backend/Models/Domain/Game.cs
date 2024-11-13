@@ -15,6 +15,8 @@ public class Game
     public TimeOnly StartOfGame { get; set; }
     public TimeOnly EndOfGame { get; set; }
     public int WLD { get; set; } //Win - 1 Lose - 0 Draw - 2
+    public int Blackout { get; set; }
+    public Boolean TurnBlack { get; set; }
 
     public Game(Guid guid, int Difficulty, int BotRating)
     {

@@ -15,8 +15,8 @@ namespace CHESSPROJ.Services
         public void SetLevel(int level) 
         {
             _stockfish.SkillLevel = level;
-            //_stockfish.Depth = 5;
-            //maybe for faster times
+            _stockfish.Depth = 3;
+            
         }
 
         public void SetPosition(string movesMade, string move) 
@@ -24,10 +24,18 @@ namespace CHESSPROJ.Services
             _stockfish.SetPosition(movesMade, move);
         }
 
-        public void GetFen() //in future maybe some way to see mate 
+        public string GetFen() 
         {
-            _stockfish.GetFenPosition();
+            try
+            {
+                return _stockfish.GetFenPosition(); // Return the FEN position if successful
+            }
+            catch (Exception ex)
+            {
+                return "Error getting the FEN";
+            }
         }
+
 
         public string GetBestMove()
         {
