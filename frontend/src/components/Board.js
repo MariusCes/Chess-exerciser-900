@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import '../styles/Board.css';
 
 const pieceImages = {
@@ -33,24 +33,52 @@ const parseFEN = (fen) => {
 
 const Board = ({ fen }) => {
   const boardArray = parseFEN(fen);
+  const columnLabels = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'];
+  const rowLabels = ['8', '7', '6', '5', '4', '3', '2', '1'];
 
   return (
-    <div className="board">
-      {boardArray.map((row, rowIndex) => 
-        row.map((piece, colIndex) => {
-          const isDarkSquare = (rowIndex + colIndex) % 2 === 1;
-          return (
-            <div
-              className={`square ${isDarkSquare ? 'dark-square' : 'light-square'}`}
-              key={`${rowIndex}-${colIndex}`}
-            >
-              {piece && (
-                <img src={pieceImages[piece]} alt={piece} className="piece" />
-              )}
-            </div>
-          );
-        })
-      )}
+    <div className="board-container">
+      {/* Top column labels */}
+      <div className="column-labels top-labels">
+        {columnLabels.map((label, index) => (
+          <span key={`col-top-${index}`} className="column-label">{label}</span>
+        ))}
+      </div>
+
+      <div className="board-wrapper">
+        {/* Left row labels outside the board */}
+        <div className="row-labels">
+          {rowLabels.map((label, index) => (
+            <span key={`row-${index}`} className="row-label">{label}</span>
+          ))}
+        </div>
+
+        {/* Chess board */}
+        <div className="board">
+          {boardArray.map((row, rowIndex) => 
+            row.map((piece, colIndex) => {
+              const isDarkSquare = (rowIndex + colIndex) % 2 === 1;
+              return (
+                <div
+                  className={`square ${isDarkSquare ? 'dark-square' : 'light-square'}`}
+                  key={`${rowIndex}-${colIndex}`}
+                >
+                  {piece && (
+                    <img src={pieceImages[piece]} alt={piece} className="piece" />
+                  )}
+                </div>
+              );
+            })
+          )}
+        </div>
+      </div>
+
+      {/* Bottom column labels */}
+      <div className="column-labels bottom-labels">
+        {columnLabels.map((label, index) => (
+          <span key={`col-bottom-${index}`} className="column-label">{label}</span>
+        ))}
+      </div>
     </div>
   );
 };
