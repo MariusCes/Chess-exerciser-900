@@ -1,6 +1,12 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using CHESSPROJ.Services;
+using backend.DTOs;
+using backend.Models.Domain;
+using System;
+using System.Collections.Generic;
+using backend.Errors;
+using System.Text.Json;
 
 namespace CHESSPROJ.Controllers
 {
@@ -9,36 +15,103 @@ namespace CHESSPROJ.Controllers
     public class ChessController : ControllerBase
     {
         private readonly StockfishService _stockfishService;
-
+        private static GamesList games = new GamesList(new List<Game>());
+        private static ErrorMessages gameNotFound = ErrorMessages.Game_not_found;
+        private static ErrorMessages badMove = ErrorMessages.Move_notation_cannot_be_empty;
         public ChessController(IConfiguration configuration)
         {
             var stockfishPath = configuration["StockfishPath"];
             _stockfishService = new StockfishService(stockfishPath);
         }
 
-        [HttpPost("analyze-move")]
-        public IActionResult AnalyzeMove([FromBody] string move)
+
+        // /api/chess/create-game?skillLevel=10 smth like that for harder
+        [HttpGet("create-game")]
+        public IActionResult CreateGame([FromQuery] int SkillLevel = 5) // po kolkas GET req, bet ateityje reikes ir sito
         {
+            _stockfishService.SetLevel(SkillLevel); //default set to 5, need to see what level does
+            Game game = new Game(Guid.NewGuid(), 1, 1, 3);
+            games.Add(game);
+            return Ok(new { GameId = game.GameId });
+        }
 
-            //string currentPOS = GetCurrentPosition();
-            //Some function to have all the moves done in the game
-            //example: "e2e4 e7e5 Ng1f3"
+        [HttpGet("{gameId}/history")]
+        public IActionResult GetMovesHistory(string gameId)
+        {
+            var game = games.FirstOrDefault(g => g.GameId.ToString() == gameId);
+            if (game == null)
+                return NotFound("Game not found.");
 
-           //currentPOS has the board with moves done; move has the move user made;
-           //_stockfishService.SetPosition(currentPos, move);
+            var moves = game.MovesArray;
+            if (game.MovesArray == null || !game.MovesArray.Any())
+            {
+                return Ok(new List<string>()); // Return an empty list if there are no moves
+            }
+            string jsonMoves = JsonSerializer.Serialize(moves);
+            MemoryStream memoryStream = new MemoryStream();
+            using (StreamWriter writer = new StreamWriter(memoryStream))
+            {
+                writer.Write(jsonMoves);
+                writer.Flush();
+            }
+            memoryStream.Position = 0;
+            return new FileStreamResult(memoryStream, "application/json");
+        }
 
-           //EXAMPLE
-           _stockfishService.SetPosition("", move); //this would be for the user
+        // POST: api/chessgame/{gameId}/move
+        [HttpPost("{gameId}/move")]
+        public IActionResult MakeMove(string gameId, [FromBody] MoveDto moveNotation)       // extractina is JSON post info i MoveDto record'a
+        {
+            Game game = games.FirstOrDefault(g => g.GameId.ToString() == gameId);
+            if (game == null)
+            {
+                return NotFound($"{gameNotFound.ToString()}");
+            }
 
-            var bestMove = _stockfishService.GetBestMove(); //maybe can be not the best move
+            string move = moveNotation.move;
+            // Validate move input
+            if (string.IsNullOrEmpty(move))
+            {
+                return BadRequest($"{badMove.ToString()}");
+            }
 
-            _stockfishService.SetPosition(move, bestMove); //this would be for the bot, it would make the best move
+            string currentPosition = string.Join(" ", game.MovesArray);
 
-            var evaluation = _stockfishService.GetEvaluation();
-            
-            //PROGRAM ONLY WORKS FOR THE FIRST MOVE AND THAT IS IT FOR NOW!
+            if (_stockfishService.IsMoveCorrect(currentPosition, move))
+            {
+                _stockfishService.SetPosition(currentPosition, move);
+                game.MovesArray.Add(move);
+                string botMove = _stockfishService.GetBestMove();
+                _stockfishService.SetPosition(string.Join(" ", game.MovesArray), botMove);
+                game.MovesArray.Add(botMove);
 
-            return Ok(new { BestMove = bestMove, Evaluation = evaluation });
+                currentPosition = string.Join(" ", game.MovesArray);
+
+                return Ok(new { wrongMove = false, botMove, currentPosition = currentPosition }); // named args here
+            }
+            else
+            {
+                game.Lives--; //minus life
+                if (game.Lives == 0)
+                {
+                    game.IsRunning = false;
+                }
+                return Ok(new { wrongMove = true, lives = game.Lives, game.IsRunning }); // we box here :) (fight club reference)
+            }
+        }
+
+        // Return the list of games
+        [HttpGet("games")]
+        public IActionResult GetAllGames()
+        {
+            List<Game> gamesWithMoves = new List<Game>();
+
+            foreach (var game in games.GetCustomEnumerator())
+            {
+                // custom filtering using IEnumerable
+                gamesWithMoves.Add(game);
+            }
+            return Ok(gamesWithMoves);
         }
 
     }

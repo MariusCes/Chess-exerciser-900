@@ -14,6 +14,7 @@ public class User
     public User(GameHistory userGameHistory, UserStatist userStatist)
     {
         UserGameHistory = userGameHistory;
+        UserGameHistory.Id = Id;
         UserStatistics = userStatist;
     }
 }

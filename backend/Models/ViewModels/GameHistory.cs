@@ -5,5 +5,6 @@ namespace backend.Models.ViewModels;
 
 public class GameHistory
 {
-    public ICollection<Game> Games {get; set;}
+    public Guid Id { get; set; }
+    public ICollection<Game> Games {get; set;} = new List<Game>();
 }

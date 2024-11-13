@@ -1,0 +1,88 @@
+.play-screen {
+    text-align: center;
+    margin: 20px auto;
+  }
+  
+  .chess-board {
+    max-width: 100%;
+    height: auto;
+    margin-bottom: 20px;
+  }
+
+  .create-button {
+    background-color: #5a6268;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 5px;
+    border: none;
+    transition: background-color 0.3s ease;
+  }
+
+  .create-button:hover {
+    background-color: #444a4f;
+  }
+  
+  .move-form {
+    margin-top: 20px;
+  }
+  
+  .move-form input {
+    padding: 10px;
+    font-size: 1.1rem;
+    width: 200px;
+  }
+  
+  .move-form button {
+    background-color: #5a6268;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 5px;
+    border: none;
+    transition: background-color 0.3s ease;
+  }
+  
+  .move-form button:hover {
+    background-color: #444a4f;
+  }
+
+  .move-list-container {
+    margin: 20px auto;
+    max-width: 300px;
+    height: 400px;
+    overflow-y: scroll;
+    background-color: rgba(148, 157, 173, 0.385);
+    padding: 10px;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+    border-radius: 10px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+  }
+
+.move-list {
+  list-style-type: none;
+  padding: 0;
+}
+
+.move-item {
+  padding: 10px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  font-size: 1.1rem;
+}
+
+.your-move {
+  background-color: rgba(171, 243, 153, 0.619);
+}
+
+.bot-move {
+  background-color: rgba(244, 67, 54, 0.597);
+}
+  
+label {
+  background-color: rgba(255, 255, 255, 0.8);
+  padding: 5px 10px;
+  border-radius: 5px;
+  font-size: 1.2rem;
+  color: #333;
+  margin-top: 20px;
+  margin-bottom: 20px;
+  margin-left: 20px;
+}

@@ -1,16 +1,27 @@
 using System;
+using backend.Models.GameStruct;
 
 namespace backend.Models.Domain;
 
 public class Game
 {
-    public Guid Id { get; set; }
-    public string[] MovesArray { get; set; }
-    public string UsersMove { get; set; }
+    GameStartStruct gameStartStruct;
+    public Guid GameId => gameStartStruct.Id;
+    public int Difficulty => gameStartStruct.Difficulty;
+    public int BotRating => gameStartStruct.BotRating;
+    public List<string>? MovesArray { get; set; }
     public int Lives { get; set; }
-    public int Difficulty { get; set; }
-    public int BotRating { get; set; }
+    public Boolean IsRunning { get; set; }
     public TimeOnly StartOfGame { get; set; }
     public TimeOnly EndOfGame { get; set; }
-     public int WLD { get; set; } //Win - 1 Lose - 0 Draw - 2
+    public int WLD { get; set; } //Win - 1 Lose - 0 Draw - 2
+
+    public Game(Guid guid, int Difficulty, int BotRating, int lives)
+    {
+        gameStartStruct = new GameStartStruct(guid, Difficulty, BotRating);
+        MovesArray = new List<string>();
+        Lives = lives;
+        IsRunning = true;
+    }
+
 }

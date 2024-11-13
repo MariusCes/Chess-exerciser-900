@@ -1,0 +1,68 @@
+.navbar {
+    background-color: rgba(0, 0, 0, 0.831);
+    padding: 1rem;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.navbar-brand {
+    color: #ffffff;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 1.5rem;
+    font-weight: bold;
+    transition: color 0.3s ease;
+}
+
+.navbar .navbar-brand:hover {
+    color: #7ccdee;
+}
+
+.navbar .chess-game-title {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 1.5rem;
+    font-weight: bold;
+}
+
+.navbar-nav {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+
+.nav-item {
+    list-style-type: none;
+}
+
+.nav-link {
+    color: #f8f9fa;
+    font-size: 1.1rem;
+    transition: color 0.3s ease;
+}
+
+.navbar .nav-link:hover {
+    color: #7ccdee;
+}
+
+@media (max-width: 768px) {
+    .navbar-nav {
+        flex-direction: column;
+    }
+
+    .nav-link {
+        margin-left: 0;
+        margin-top: 0.5rem;
+    }
+}
+
+.chess-game-title {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 1.5rem;
+    font-weight: bold;
+}
+
+.justify-content-end {
+    margin-left: auto;
+}

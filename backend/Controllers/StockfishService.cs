@@ -1,19 +1,33 @@
+using CHESSPROJ.StockfishServiceExtensions;
 using Stockfish.NET;
 
 namespace CHESSPROJ.Services
 {
+
+
     public class StockfishService
     {
         private readonly IStockfish _stockfish;
 
-        public StockfishService(string stockfishPath)
+        public StockfishService(string stockfishPath) //if no parameter used, level will be 5
         {
-           _stockfish = new Stockfish.NET.Stockfish(stockfishPath);
+            _stockfish = new Stockfish.NET.Stockfish(stockfishPath);
+
         }
 
-        public void SetPosition(string movesMade, string move) 
+        public void SetLevel(int level)
+        {
+            _stockfish.SkillLevel = level;
+        }
+
+        public void SetPosition(string movesMade, string move)
         {
             _stockfish.SetPosition(movesMade, move);
+        }
+
+        public void GetFen() //in future maybe some way to see mate 
+        {
+            _stockfish.GetFenPosition();
         }
 
         public string GetBestMove()
@@ -21,12 +35,16 @@ namespace CHESSPROJ.Services
             return _stockfish.GetBestMove();
         }
 
-        public string GetEvaluation()
+        public bool IsMoveCorrect(string currentPosition, string move)
         {
-            var evaluation = _stockfish.GetEvaluation();
-            return evaluation.ToString(); //idk how to get eval here
 
-            //it outputs Stockfish.NET.Models.Evaluation"???
+            _stockfish.SetPosition(currentPosition);
+            return _stockfish.IsMoveCorrect(move);
+        }
+
+        public bool IsCheck()
+        {
+            return _stockfish.IsCheck();
         }
 
     }
