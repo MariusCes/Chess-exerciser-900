@@ -17,20 +17,20 @@ namespace CHESSPROJ.Controllers
         private static ErrorMessages gameNotFound = ErrorMessages.Game_not_found;
         private static ErrorMessages badMove = ErrorMessages.Move_notation_cannot_be_empty;
         private readonly IStockfishService _stockfishService;
-        private readonly ChessDbContext dbContext;
+        private DatabaseUtilities _dbUtilities;
 
         // Dependency Injection through constructor
         public ChessController(IStockfishService stockfishService, ChessDbContext dbContext)
         {
             _stockfishService = stockfishService;
-            this.dbContext = dbContext;
+            _dbUtilities = newDatabaseUtilities(dbContext);
         }
 
         //all the creation must be asinc and also game must get difficulty from query, also all the dbContext should be async for ex: dbContext.SaveChanges(); has to be dbContext.SaveChangesAsync();
         // HERE TOO ASYNC(POST: api/chessgame/{gameId}/move)
         // /api/chess/create-game?skillLevel=10 smth like that for harder
         [HttpPost("create-game")]
-        public IActionResult CreateGame([FromBody] CreateGameReqDto req) // po kolkas GET req, bet ateityje reikes ir sito
+        public IActionResult CreateGame([FromBody] CreateGameReqDto req)
         {
             _stockfishService.SetLevel(req.aiDifficulty); //default set to 5, need to see what level does
             //this is where we set game with the data from query
@@ -38,15 +38,20 @@ namespace CHESSPROJ.Controllers
 
             // }; 
             Game game = Game.CreateGameFactory(Guid.NewGuid(), 5, 1, 3);
-            dbContext.Games.Add(game);
-            dbContext.SaveChanges();
-            return Ok(new { GameId = game.GameId });
+            //
+            if (_dbUtilities.addGame(game)) {
+                return Ok(new { GameId = game.GameId });    
+            } else {
+                return NotFound($"{gameNotFound.ToString()}");        // return "DB error" here
+            }
         }
 
         [HttpGet("{gameId}/history")]
         public IActionResult GetMovesHistory(string gameId)
         {
-            var game = GetGamesList().FirstOrDefault(g => g.GameId.ToString() == gameId);
+            
+            var game = _dbUtilities.GetGameById(gameId);
+            //GetGamesList().FirstOrDefault(g => g.GameId.ToString() == gameId); => sita logika turi buti toje funkcijoje
             if (game == null)
                 return NotFound("Game not found.");
 
@@ -70,7 +75,9 @@ namespace CHESSPROJ.Controllers
         [HttpPost("{gameId}/move")]
         public IActionResult MakeMove(string gameId, [FromBody] MoveDto moveNotation)       // extractina is JSON post info i MoveDto record'a
         {
-            var game = GetGamesList().FirstOrDefault(g => g.GameId.ToString() == gameId);
+
+            var game = _dbUtilities.GetGameById(gameId);
+            //GetGamesList().FirstOrDefault(g => g.GameId.ToString() == gameId);     => sita logika toje funkc turi buti DBUtilities
             if (game == null)
             {
                 return NotFound($"{gameNotFound.ToString()}");
@@ -105,8 +112,14 @@ namespace CHESSPROJ.Controllers
                 {
                     game.TurnBlack = false;
                 }
-                dbContext.SaveChanges();
-                return Ok(new { wrongMove = false, botMove, currentPosition = currentPosition, fenPosition, game.TurnBlack }); // named args here
+                
+                if (_dbUtilities.updateGame(game)) 
+                {
+                    return Ok(new { wrongMove = false, botMove, currentPosition = currentPosition, fenPosition, game.TurnBlack });
+                } else 
+                {
+                    return BadRequest($"{badMove.ToString()}"); // error DB (nera tokio zaidimo or smth)
+                }
             }
             else
             {
@@ -125,8 +138,14 @@ namespace CHESSPROJ.Controllers
                 {
                     game.TurnBlack = false;
                 }
-                dbContext.SaveChanges();
-                return Ok(new { wrongMove = true, lives = game.Lives, game.IsRunning, game.TurnBlack }); // we box here :) (fight club reference)
+
+                if (_dbUtilities.updateGame(game)) 
+                {
+                    return Ok(new { wrongMove = true, lives = game.Lives, game.IsRunning, game.TurnBlack }); // we box here :) (fight club reference)
+                } else 
+                {
+                    return BadRequest($"{badMove.ToString()}"); // error DB (nera tokio zaidimo or smth)
+                }
             }
         }
 
@@ -135,9 +154,8 @@ namespace CHESSPROJ.Controllers
         [HttpGet("games")]
         public IActionResult GetAllGames()
         {
-            GamesList games = new GamesList(GetGamesList());
+            GamesList games = _dbUtilities.GetGamesList();
             List<Game> gamesWithMoves = new List<Game>();
-
 
             foreach (var game in games.GetCustomEnumerator())
             {
@@ -145,13 +163,6 @@ namespace CHESSPROJ.Controllers
                 gamesWithMoves.Add(game);
             }
             return Ok(gamesWithMoves);
-        }
-
-        public List<Game> GetGamesList()
-        {
-            // Retrieve all games as a List<Game>
-            List<Game> gamesList = dbContext.Games.ToList();
-            return gamesList;
         }
     }
 }
