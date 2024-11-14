@@ -20,7 +20,17 @@ namespace CHESSPROJ.Controllers
 
         public void SetLevel(int level)
         {
-            _stockfish.SkillLevel = level; 
+            _stockfish.SkillLevel = level;
+        }
+
+        public void SetPosition(string movesMade, string move)
+        {
+            _stockfish.SetPosition(movesMade, move);
+        }
+
+        public void GetFen() //in future maybe some way to see mate 
+        {
+            _stockfish.GetFenPosition();
         }
 
         public string GetBestMove()

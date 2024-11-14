@@ -6,6 +6,6 @@ namespace CHESSPROJ.Controllers
         string GetBestMove();
         void SetPosition(params string[] moves);
         bool IsMoveCorrect(string move);
-        string GetFenPosition();
+        string GetFen();
     }
 }
