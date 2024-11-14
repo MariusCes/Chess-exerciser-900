@@ -1,26 +1,25 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using CHESSPROJ.Controllers;
+using CHESSPROJ.StockfishServiceExtensions;
 using Stockfish.NET;
-using Stockfish.NET.Models;
 
-namespace CHESSPROJ.Controllers
+namespace CHESSPROJ.Services
 {
+
+
     public class StockfishService : IStockfishService
     {
-
         private readonly IStockfish _stockfish;
 
-        // Constructor injection
         public StockfishService(IStockfish stockfish)
         {
-            _stockfish = stockfish ?? throw new ArgumentNullException(nameof(stockfish));
-        }
+              _stockfish = stockfish ?? throw new ArgumentNullException(nameof(stockfish));
 
+        }
         public void SetLevel(int level)
         {
             _stockfish.SkillLevel = level;
+            _stockfish.Depth = 3;
+            
         }
 
         public void SetPosition(string movesMade, string move)
@@ -28,35 +27,35 @@ namespace CHESSPROJ.Controllers
             _stockfish.SetPosition(movesMade, move);
         }
 
-        public void GetFen() //in future maybe some way to see mate 
+        public string GetFen() 
         {
-            _stockfish.GetFenPosition();
+            try
+            {
+                return _stockfish.GetFenPosition(); // Return the FEN position if successful
+            }
+            catch (Exception ex)
+            {
+                return "Error getting the FEN";
+            }
         }
+
 
         public string GetBestMove()
         {
-            return _stockfish.GetBestMove(); 
-        }
-
-        public void SetPosition(params string[] moves)
-        {
-            _stockfish.SetPosition(moves);
+            return _stockfish.GetBestMove();
         }
 
         public bool IsMoveCorrect(string currentPosition, string move)
         {
-            _stockfish.SetPosition(currentPosition); 
-            return _stockfish.IsMoveCorrect(move); 
-        }
 
-        public string GetFenPosition()
-        {
-            return _stockfish.GetFenPosition(); 
-        }
-
-        public bool IsMoveCorrect(string move)
-        {
+            _stockfish.SetPosition(currentPosition);
             return _stockfish.IsMoveCorrect(move);
         }
+
+        public bool IsCheck()
+        {
+            return _stockfish.IsCheck();
+        }
+
     }
 }

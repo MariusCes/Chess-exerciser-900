@@ -4,8 +4,8 @@ namespace CHESSPROJ.Controllers
     {
         void SetLevel(int level);
         string GetBestMove();
-        void SetPosition(params string[] moves);
-        bool IsMoveCorrect(string move);
+        void SetPosition(string movesMade, string move);
+        bool IsMoveCorrect(string currentPosition ,string move);
         string GetFen();
     }
 }

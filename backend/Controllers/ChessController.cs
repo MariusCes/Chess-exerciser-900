@@ -2,8 +2,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using backend.DTOs;
 using backend.Models.Domain;
-using System;
-using System.Collections.Generic;
 using backend.Errors;
 using System.Text.Json;
 using Stockfish.NET;
@@ -31,12 +29,11 @@ namespace CHESSPROJ.Controllers
         public IActionResult CreateGame([FromQuery] int SkillLevel = 5) // po kolkas GET req, bet ateityje reikes ir sito
         {
             _stockfishService.SetLevel(SkillLevel); //default set to 5, need to see what level does
-            Game game = new Game(Guid.NewGuid(), 1, 1);
+            Game game = new Game(Guid.NewGuid(), 1, 1, 3); // 1, 1, 3 - difficulty, bot rating, lives
             game.MovesArray = new List<string>();
             game.Lives = 3;
             game.Blackout = 3;
             game.IsRunning = true;
-            Game game = new Game(Guid.NewGuid(), 1, 1, 3);
             games.Add(game);
             return Ok(new { GameId = game.GameId });
         }
@@ -80,21 +77,18 @@ namespace CHESSPROJ.Controllers
             {
                 return BadRequest($"{badMove.ToString()}");
             }
-            string[] currentPosition = game.MovesArray.ToArray();
-            _stockfishService.SetPosition(currentPosition);
 
-            if (_stockfishService.IsMoveCorrect(move))
+            string currentPosition = string.Join(" ", game.MovesArray);
+
+            if (_stockfishService.IsMoveCorrect(currentPosition, move))
             {
+                _stockfishService.SetPosition(currentPosition, move);
                 game.MovesArray.Add(move);
-                currentPosition = game.MovesArray.ToArray();
-                _stockfishService.SetPosition(currentPosition);
                 string botMove = _stockfishService.GetBestMove();
+                _stockfishService.SetPosition(string.Join(" ", game.MovesArray), botMove);
                 game.MovesArray.Add(botMove);
 
                 string fenPosition = _stockfishService.GetFen();
-                currentPosition = game.MovesArray.ToArray();
-                _stockfishService.SetPosition(currentPosition);
-
                 currentPosition = string.Join(" ", game.MovesArray);
                 game.Blackout--;
                 if(game.Blackout == 0)

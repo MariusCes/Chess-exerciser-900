@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using CHESSPROJ.Controllers;
+using CHESSPROJ.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
