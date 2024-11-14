@@ -32,7 +32,7 @@ namespace CHESSPROJ.Controllers
         [HttpPost("create-game")]
         public IActionResult CreateGame([FromBody] CreateGameReqDto req) // po kolkas GET req, bet ateityje reikes ir sito
         {
-            _stockfishService.SetLevel(SkillLevel); //default set to 5, need to see what level does
+            _stockfishService.SetLevel(req.aiDifficulty); //default set to 5, need to see what level does
             //this is where we set game with the data from query
             // var game = new Game {
 
