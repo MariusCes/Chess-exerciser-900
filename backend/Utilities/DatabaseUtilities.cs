@@ -1,6 +1,8 @@
 using Stockfish.NET;
+using backend.Models.Domain;
+using backend.Data;
 
-namespace CHESSPROJ.DatabaseUtilities
+namespace CHESSPROJ.Utilities
 {
     public class DatabaseUtilities 
     {
@@ -20,7 +22,7 @@ namespace CHESSPROJ.DatabaseUtilities
             // code to save changes. returns: T=> all good. F => all bad
         }
 
-        public Game GetGameById(int id) 
+        public Game GetGameById(string id) 
         {
             return null;
         }
@@ -34,7 +36,7 @@ namespace CHESSPROJ.DatabaseUtilities
         public List<Game> GetGamesList()
         {
             // Retrieve all games as a List<Game>
-            List<Game> gamesList;// = dbContext.Games.ToList();
+            List<Game> gamesList = null;// = dbContext.Games.ToList();
             return gamesList;
         }
     }
