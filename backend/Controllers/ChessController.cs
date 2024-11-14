@@ -3,6 +3,7 @@ using Microsoft.Extensions.Configuration;
 using backend.DTOs;
 using backend.Models.Domain;
 using backend.Errors;
+using CHESSPROJ.Utilities;
 using System.Text.Json;
 using Stockfish.NET;
 using backend.Data;
@@ -23,7 +24,7 @@ namespace CHESSPROJ.Controllers
         public ChessController(IStockfishService stockfishService, ChessDbContext dbContext)
         {
             _stockfishService = stockfishService;
-            _dbUtilities = newDatabaseUtilities(dbContext);
+            _dbUtilities = new DatabaseUtilities(dbContext);
         }
 
         //all the creation must be asinc and also game must get difficulty from query, also all the dbContext should be async for ex: dbContext.SaveChanges(); has to be dbContext.SaveChangesAsync();
@@ -39,7 +40,7 @@ namespace CHESSPROJ.Controllers
             // }; 
             Game game = Game.CreateGameFactory(Guid.NewGuid(), 5, 1, 3);
             //
-            if (_dbUtilities.addGame(game)) {
+            if (_dbUtilities.AddGame(game)) {
                 return Ok(new { GameId = game.GameId });    
             } else {
                 return NotFound($"{gameNotFound.ToString()}");        // return "DB error" here
@@ -154,7 +155,7 @@ namespace CHESSPROJ.Controllers
         [HttpGet("games")]
         public IActionResult GetAllGames()
         {
-            GamesList games = _dbUtilities.GetGamesList();
+            GamesList games = new GamesList(_dbUtilities.GetGamesList());
             List<Game> gamesWithMoves = new List<Game>();
 
             foreach (var game in games.GetCustomEnumerator())
