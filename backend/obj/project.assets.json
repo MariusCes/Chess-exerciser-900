@@ -3438,24 +3438,19 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\Marius\\.nuget\\packages\\": {},
-    "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages": {}
+    "C:\\Users\\dovyd\\.nuget\\packages\\": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "D:\\PROGRAMMING_PROJECTS\\Chess-exerciser-900\\backend\\backend.csproj",
+      "projectUniqueName": "C:\\Users\\dovyd\\Desktop\\all\\UNIVERAS\\vsc\\Chess-exerciser-900\\backend\\backend.csproj",
       "projectName": "backend",
-      "projectPath": "D:\\PROGRAMMING_PROJECTS\\Chess-exerciser-900\\backend\\backend.csproj",
-      "packagesPath": "C:\\Users\\Marius\\.nuget\\packages\\",
-      "outputPath": "D:\\PROGRAMMING_PROJECTS\\Chess-exerciser-900\\backend\\obj\\",
+      "projectPath": "C:\\Users\\dovyd\\Desktop\\all\\UNIVERAS\\vsc\\Chess-exerciser-900\\backend\\backend.csproj",
+      "packagesPath": "C:\\Users\\dovyd\\.nuget\\packages\\",
+      "outputPath": "C:\\Users\\dovyd\\Desktop\\all\\UNIVERAS\\vsc\\Chess-exerciser-900\\backend\\obj\\",
       "projectStyle": "PackageReference",
-      "fallbackFolders": [
-        "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
-      ],
       "configFilePaths": [
-        "C:\\Users\\Marius\\AppData\\Roaming\\NuGet\\NuGet.Config",
-        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
+        "C:\\Users\\dovyd\\AppData\\Roaming\\NuGet\\NuGet.Config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
       "originalTargetFrameworks": [
@@ -3463,7 +3458,6 @@
       ],
       "sources": {
         "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
-        "C:\\Program Files\\dotnet\\library-packs": {},
         "https://api.nuget.org/v3/index.json": {}
       },
       "frameworks": {
@@ -3524,30 +3518,27 @@
         "downloadDependencies": [
           {
             "name": "Microsoft.AspNetCore.App.Ref",
-            "version": "[7.0.20, 7.0.20]"
+            "version": "[7.0.16, 7.0.16]"
           },
           {
             "name": "Microsoft.NETCore.App.Host.win-x64",
-            "version": "[7.0.20, 7.0.20]"
+            "version": "[7.0.16, 7.0.16]"
           },
           {
             "name": "Microsoft.NETCore.App.Ref",
-            "version": "[7.0.20, 7.0.20]"
+            "version": "[7.0.16, 7.0.16]"
           },
           {
             "name": "Microsoft.WindowsDesktop.App.Ref",
-            "version": "[7.0.20, 7.0.20]"
+            "version": "[7.0.16, 7.0.16]"
           }
         ],
         "frameworkReferences": {
-          "Microsoft.AspNetCore.App": {
-            "privateAssets": "none"
-          },
           "Microsoft.NETCore.App": {
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.401\\RuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.200\\RuntimeIdentifierGraph.json"
       }
     }
   }
