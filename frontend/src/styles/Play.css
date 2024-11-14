@@ -1,61 +1,61 @@
 .play-screen {
-    text-align: center;
-    margin: 20px auto;
-  }
-  
-  .chess-board {
-    max-width: 100%;
-    height: auto;
-    margin-bottom: 20px;
-  }
+  text-align: center;
+  margin: 20px auto;
+}
 
-  .create-button {
-    background-color: #5a6268;
-    color: white;
-    padding: 10px 20px;
-    border-radius: 5px;
-    border: none;
-    transition: background-color 0.3s ease;
-  }
+.chess-board {
+  max-width: 100%;
+  height: auto;
+  margin-bottom: 20px;
+}
 
-  .create-button:hover {
-    background-color: #444a4f;
-  }
-  
-  .move-form {
-    margin-top: 20px;
-  }
-  
-  .move-form input {
-    padding: 10px;
-    font-size: 1.1rem;
-    width: 200px;
-  }
-  
-  .move-form button {
-    background-color: #5a6268;
-    color: white;
-    padding: 10px 20px;
-    border-radius: 5px;
-    border: none;
-    transition: background-color 0.3s ease;
-  }
-  
-  .move-form button:hover {
-    background-color: #444a4f;
-  }
+.create-button {
+  background-color: #5a6268;
+  color: white;
+  padding: 10px 20px;
+  border-radius: 5px;
+  border: none;
+  transition: background-color 0.3s ease;
+}
 
-  .move-list-container {
-    margin: 20px auto;
-    max-width: 300px;
-    height: 400px;
-    overflow-y: scroll;
-    background-color: rgba(148, 157, 173, 0.385);
-    padding: 10px;
-    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
-    border-radius: 10px;
-    border: 1px solid rgba(255, 255, 255, 0.2);
-  }
+.create-button:hover {
+  background-color: #444a4f;
+}
+
+.move-form {
+  margin-top: 20px;
+}
+
+.move-form input {
+  padding: 10px;
+  font-size: 1.1rem;
+  width: 200px;
+}
+
+.move-form button {
+  background-color: #5a6268;
+  color: white;
+  padding: 10px 20px;
+  border-radius: 5px;
+  border: none;
+  transition: background-color 0.3s ease;
+}
+
+.move-form button:hover {
+  background-color: #444a4f;
+}
+
+.move-list-container {
+  margin: 20px auto;
+  max-width: 300px;
+  height: 400px;
+  overflow-y: scroll;
+  background-color: rgba(148, 157, 173, 0.385);
+  padding: 10px;
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
 
 .move-list {
   list-style-type: none;
@@ -75,7 +75,7 @@
 .bot-move {
   background-color: rgba(244, 67, 54, 0.597);
 }
-  
+
 label {
   background-color: rgba(255, 255, 255, 0.8);
   padding: 5px 10px;
@@ -90,4 +90,41 @@ label {
 .container {
   display: flex;
   gap: 5px;
+}
+
+.difficulty-selection {
+  margin-bottom: 10px;
+  width: 300px;
+  /* Adjust width as needed */
+}
+
+.create-button {
+  width: 100%;
+  padding: 10px;
+  font-size: 1.1rem;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.3s, color 0.3s;
+}
+
+
+.difficulty-select {
+  margin: 10px 0;
+}
+
+.difficulty-select-container {
+  display: flex;
+  align-items: center;
+  margin-bottom: 15px;
+}
+
+.create-button {
+  width: 100%;
+  font-size: 1.1rem;
+  padding: 10px;
+}
+
+.blur { /* Blur for winning/losing */
+  filter: blur(3px);
+  transition: filter 0.3s ease;
 }
