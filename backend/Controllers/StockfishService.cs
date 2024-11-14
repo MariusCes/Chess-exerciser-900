@@ -1,3 +1,4 @@
+using CHESSPROJ.Controllers;
 using CHESSPROJ.StockfishServiceExtensions;
 using Stockfish.NET;
 
@@ -5,16 +6,15 @@ namespace CHESSPROJ.Services
 {
 
 
-    public class StockfishService
+    public class StockfishService : IStockfishService
     {
         private readonly IStockfish _stockfish;
 
-        public StockfishService(string stockfishPath) //if no parameter used, level will be 5
+        public StockfishService(IStockfish stockfish)
         {
-            _stockfish = new Stockfish.NET.Stockfish(stockfishPath);
+              _stockfish = stockfish ?? throw new ArgumentNullException(nameof(stockfish));
 
         }
-
         public void SetLevel(int level)
         {
             _stockfish.SkillLevel = level;

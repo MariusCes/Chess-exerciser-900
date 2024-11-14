@@ -1,12 +1,10 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
-using CHESSPROJ.Services;
 using backend.DTOs;
 using backend.Models.Domain;
-using System;
-using System.Collections.Generic;
 using backend.Errors;
 using System.Text.Json;
+using Stockfish.NET;
 
 namespace CHESSPROJ.Controllers
 {
@@ -14,14 +12,15 @@ namespace CHESSPROJ.Controllers
     [Route("api/[controller]")]
     public class ChessController : ControllerBase
     {
-        private readonly StockfishService _stockfishService;
         private static GamesList games = new GamesList(new List<Game>());
         private static ErrorMessages gameNotFound = ErrorMessages.Game_not_found;
         private static ErrorMessages badMove = ErrorMessages.Move_notation_cannot_be_empty;
-        public ChessController(IConfiguration configuration)
+        private readonly IStockfishService _stockfishService;
+
+        // Dependency Injection through constructor
+        public ChessController(IStockfishService stockfishService)
         {
-            var stockfishPath = configuration["StockfishPath"];
-            _stockfishService = new StockfishService(stockfishPath);
+            _stockfishService = stockfishService;
         }
 
 
@@ -29,8 +28,8 @@ namespace CHESSPROJ.Controllers
         [HttpPost("create-game")]
         public IActionResult CreateGame([FromBody] CreateGameReqDto req) // po kolkas GET req, bet ateityje reikes ir sito
         {
-            _stockfishService.SetLevel(req.gameDiff); //default set to 5, need to see what level does
-            Game game = new Game(Guid.NewGuid(), 1, 1, 3);
+            _stockfishService.SetLevel(SkillLevel); //default set to 5, need to see what level does
+            Game game = new Game(Guid.NewGuid(), 1, 1, 3); // 1, 1, 3 - difficulty, bot rating, lives
             game.MovesArray = new List<string>();
             game.Lives = 3;
             game.Blackout = 3;
@@ -90,7 +89,6 @@ namespace CHESSPROJ.Controllers
                 game.MovesArray.Add(botMove);
 
                 string fenPosition = _stockfishService.GetFen();
-
                 currentPosition = string.Join(" ", game.MovesArray);
                 game.Blackout--;
                 if (game.Blackout == 0)
