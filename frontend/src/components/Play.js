@@ -46,7 +46,19 @@ function Play() {
       setMove("Bad move!");
     }
   };
-  // atskiras component kuris butu uzloadinamas jei zaidimas sukurtas ir ten ir vyktu visas zaidimas, o siaip tai "create game" button ir vsio (checkai su "isGameCreated" butu)
+
+  const convertDifficultyToNumber = (difficulty) => {
+    switch (difficulty) {
+      case "easy":
+        return 1;
+      case "medium":
+        return 2;
+      case "hard":
+        return 3;
+      default:
+        return null;
+    }
+  };
   return (
     <div className="relative min-h-screen overflow-x-hidden">
       <main className={`relative ${gameStatus ? 'blur' : ''} transition-all duration-300`}>
@@ -59,9 +71,14 @@ function Play() {
             style={{ width: "120px" }}
           >
             <option value="">Select Difficulty</option>
-            <option value="easy">Easy</option>
-            <option value="medium">Medium</option>
-            <option value="hard">Hard</option>
+            <option value="1">Baby</option>
+            <option value="3">Kid</option>
+            <option value="6">Casual</option>
+            <option value="9">Average MIF student</option>
+            <option value="13">Competitive player</option>
+            <option value="16">Professional player</option>
+            <option value="18">Drunk Magnus Carlsen</option>
+            <option value="20">AI overlord</option>
           </select>
           <button
             className="btn btn-secondary"
