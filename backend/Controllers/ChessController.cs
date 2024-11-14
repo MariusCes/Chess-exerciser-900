@@ -12,7 +12,7 @@ namespace CHESSPROJ.Controllers
     [Route("api/[controller]")]
     public class ChessController : ControllerBase
     {
-        private static GamesList games = new GamesList(new List<Game>());
+        internal static GamesList games = new GamesList(new List<Game>());
         private static ErrorMessages gameNotFound = ErrorMessages.Game_not_found;
         private static ErrorMessages badMove = ErrorMessages.Move_notation_cannot_be_empty;
         private readonly IStockfishService _stockfishService;

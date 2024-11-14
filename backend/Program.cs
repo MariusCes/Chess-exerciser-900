@@ -22,7 +22,6 @@ builder.Services.AddCors(options =>
 // Read the Stockfish path from configuration (appsettings.json or environment variable)
 string stockfishPath = builder.Configuration["StockfishPath"] ?? "bin\\stockfish\\stockfish12.exe";
 
-// Register the IStockfish (Stockfish instance) as Singleton so that it's shared throughout the application
 builder.Services.AddScoped<Stockfish.NET.Stockfish>(provider =>
 {
     if (string.IsNullOrEmpty(stockfishPath))
@@ -30,7 +29,7 @@ builder.Services.AddScoped<Stockfish.NET.Stockfish>(provider =>
         throw new InvalidOperationException("Stockfish path is not configured.");
     }
 
-    return new Stockfish.NET.Stockfish(stockfishPath); // Stockfish is a static-like service
+    return new Stockfish.NET.Stockfish(stockfishPath);
 });
 
 // Register IStockfishService (StockfishService) as Scoped so it's injected with a fresh instance per request
