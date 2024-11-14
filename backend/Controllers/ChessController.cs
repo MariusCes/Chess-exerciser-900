@@ -26,11 +26,15 @@ namespace CHESSPROJ.Controllers
 
 
         // /api/chess/create-game?skillLevel=10 smth like that for harder
-        [HttpGet("create-game")]
-        public IActionResult CreateGame([FromQuery] int SkillLevel = 5) // po kolkas GET req, bet ateityje reikes ir sito
+        [HttpPost("create-game")]
+        public IActionResult CreateGame([FromBody] CreateGameReqDto req) // po kolkas GET req, bet ateityje reikes ir sito
         {
-            _stockfishService.SetLevel(SkillLevel); //default set to 5, need to see what level does
+            _stockfishService.SetLevel(req.gameDiff); //default set to 5, need to see what level does
             Game game = new Game(Guid.NewGuid(), 1, 1, 3);
+            game.MovesArray = new List<string>();
+            game.Lives = 3;
+            game.Blackout = 3;
+            game.IsRunning = true;
             games.Add(game);
             return Ok(new { GameId = game.GameId });
         }
@@ -85,18 +89,39 @@ namespace CHESSPROJ.Controllers
                 _stockfishService.SetPosition(string.Join(" ", game.MovesArray), botMove);
                 game.MovesArray.Add(botMove);
 
-                currentPosition = string.Join(" ", game.MovesArray);
+                string fenPosition = _stockfishService.GetFen();
 
-                return Ok(new { wrongMove = false, botMove, currentPosition = currentPosition }); // named args here
+                currentPosition = string.Join(" ", game.MovesArray);
+                game.Blackout--;
+                if (game.Blackout == 0)
+                {
+                    game.TurnBlack = true;
+                    game.Blackout = 3;
+                }
+                else
+                {
+                    game.TurnBlack = false;
+                }
+                return Ok(new { wrongMove = false, botMove, currentPosition = currentPosition, fenPosition, game.TurnBlack }); // named args here
             }
             else
             {
                 game.Lives--; //minus life
+                game.Blackout--;
                 if (game.Lives == 0)
                 {
                     game.IsRunning = false;
                 }
-                return Ok(new { wrongMove = true, lives = game.Lives, game.IsRunning }); // we box here :) (fight club reference)
+                if (game.Blackout == 0)
+                {
+                    game.TurnBlack = true;
+                    game.Blackout = 3;
+                }
+                else
+                {
+                    game.TurnBlack = false;
+                }
+                return Ok(new { wrongMove = true, lives = game.Lives, game.IsRunning, game.TurnBlack }); // we box here :) (fight club reference)
             }
         }
 
