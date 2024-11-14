@@ -23,7 +23,7 @@ builder.Services.AddCors(options =>
 string stockfishPath = builder.Configuration["StockfishPath"] ?? "bin\\stockfish\\stockfish12.exe";
 
 // Register the IStockfish (Stockfish instance) as Singleton so that it's shared throughout the application
-builder.Services.AddSingleton<Stockfish.NET.Stockfish>(provider =>
+builder.Services.AddScoped<Stockfish.NET.Stockfish>(provider =>
 {
     if (string.IsNullOrEmpty(stockfishPath))
     {
