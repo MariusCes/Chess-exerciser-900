@@ -8,12 +8,26 @@ function Play() {
   const [loading, setLoading] = useState(false); // loading screen...? ar kazkur status update
   const [isGameCreated, setIsGameCreated] = useState(false); // jei nesukurtas zaidimas negali submittinti judesiu
   const [gameID, setGameID] = useState(""); // tas ID kuri atsiuncia
-  const [fen, setFen] = useState("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
+  const [fen, setFen] = useState(
+    "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
+  );
   const [turnBlack, setTurnBlack] = useState(false);
+  const [gameDiff, setGameDiff] = useState(5);
 
   const createGame = async () => {
     setMoveList([]);
-    const response = await fetch("http://localhost:5030/api/chess/create-game");
+    const response = await fetch(
+      "http://localhost:5030/api/chess/create-game",
+      {
+        method: "POST",
+        body: JSON.stringify({
+          gameDifficulty: gameDiff,
+        }),
+        headers: {
+          "Content-type": "application/json; charset=UTF-8",
+        },
+      }
+    );
     const data = await response.json(); // unboxing
     setGameID(data.gameId);
     setIsGameCreated(true);
@@ -36,7 +50,6 @@ function Play() {
     const data = await response.json();
     if (data.wrongMove === false) {
       setMoveList((prevMoves) => [...prevMoves, userMove, data.botMove]);
-
     } else {
       setMove("Bad move!");
     }
@@ -74,7 +87,12 @@ function Play() {
           <div className="move-list-container">
             <ul className="move-list">
               {moveList.map((move, index) => (
-                <li key={index} className={`move-item ${index % 2 === 0 ? 'your-move' : 'bot-move'}`}>
+                <li
+                  key={index}
+                  className={`move-item ${
+                    index % 2 === 0 ? "your-move" : "bot-move"
+                  }`}
+                >
                   {move}
                 </li>
               ))}
