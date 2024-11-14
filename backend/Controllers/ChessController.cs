@@ -1,12 +1,12 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
-using CHESSPROJ.Services;
 using backend.DTOs;
 using backend.Models.Domain;
 using System;
 using System.Collections.Generic;
 using backend.Errors;
 using System.Text.Json;
+using Stockfish.NET;
 
 namespace CHESSPROJ.Controllers
 {
@@ -14,14 +14,15 @@ namespace CHESSPROJ.Controllers
     [Route("api/[controller]")]
     public class ChessController : ControllerBase
     {
-        private readonly StockfishService _stockfishService;
         private static GamesList games = new GamesList(new List<Game>());
         private static ErrorMessages gameNotFound = ErrorMessages.Game_not_found;
         private static ErrorMessages badMove = ErrorMessages.Move_notation_cannot_be_empty;
-        public ChessController(IConfiguration configuration)
+        private readonly IStockfishService _stockfishService;
+
+        // Dependency Injection through constructor
+        public ChessController(IStockfishService stockfishService)
         {
-            var stockfishPath = configuration["StockfishPath"];
-            _stockfishService = new StockfishService(stockfishPath);
+            _stockfishService = stockfishService;
         }
 
 
@@ -74,18 +75,19 @@ namespace CHESSPROJ.Controllers
             {
                 return BadRequest($"{badMove.ToString()}");
             }
+            string[] currentPosition = game.MovesArray.ToArray();
+            _stockfishService.SetPosition(currentPosition);
 
-            string currentPosition = string.Join(" ", game.MovesArray);
-
-            if (_stockfishService.IsMoveCorrect(currentPosition, move))
+            if (_stockfishService.IsMoveCorrect(move))
             {
-                _stockfishService.SetPosition(currentPosition, move);
                 game.MovesArray.Add(move);
+                currentPosition = game.MovesArray.ToArray();
+                _stockfishService.SetPosition(currentPosition);
                 string botMove = _stockfishService.GetBestMove();
-                _stockfishService.SetPosition(string.Join(" ", game.MovesArray), botMove);
                 game.MovesArray.Add(botMove);
+                currentPosition = game.MovesArray.ToArray();
+                _stockfishService.SetPosition(currentPosition);
 
-                currentPosition = string.Join(" ", game.MovesArray);
 
                 return Ok(new { wrongMove = false, botMove, currentPosition = currentPosition }); // named args here
             }
