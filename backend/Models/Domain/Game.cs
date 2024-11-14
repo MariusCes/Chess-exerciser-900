@@ -17,6 +17,8 @@ public class Game
     public TimeSpan StartOfGame { get; set; }
     public TimeSpan EndOfGame { get; set; }
     public int WLD { get; set; } //Win - 1 Lose - 0 Draw - 2
+    public int Blackout { get; set; }
+    public Boolean TurnBlack { get; set; }
 
     [NotMapped]
     public List<string>? MovesArray

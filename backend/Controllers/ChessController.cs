@@ -1,12 +1,10 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
-using CHESSPROJ.Services;
 using backend.DTOs;
 using backend.Models.Domain;
-using System;
-using System.Collections.Generic;
 using backend.Errors;
 using System.Text.Json;
+using Stockfish.NET;
 
 namespace CHESSPROJ.Controllers
 {
@@ -14,14 +12,15 @@ namespace CHESSPROJ.Controllers
     [Route("api/[controller]")]
     public class ChessController : ControllerBase
     {
-        private readonly StockfishService _stockfishService;
         private static GamesList games = new GamesList(new List<Game>());
         private static ErrorMessages gameNotFound = ErrorMessages.Game_not_found;
         private static ErrorMessages badMove = ErrorMessages.Move_notation_cannot_be_empty;
-        public ChessController(IConfiguration configuration)
+        private readonly IStockfishService _stockfishService;
+
+        // Dependency Injection through constructor
+        public ChessController(IStockfishService stockfishService)
         {
-            var stockfishPath = configuration["StockfishPath"];
-            _stockfishService = new StockfishService(stockfishPath);
+            _stockfishService = stockfishService;
         }
 
 
@@ -85,18 +84,34 @@ namespace CHESSPROJ.Controllers
                 _stockfishService.SetPosition(string.Join(" ", game.MovesArray), botMove);
                 game.MovesArray.Add(botMove);
 
+                string fenPosition = _stockfishService.GetFen();
                 currentPosition = string.Join(" ", game.MovesArray);
-
-                return Ok(new { wrongMove = false, botMove, currentPosition = currentPosition }); // named args here
+                game.Blackout--;
+                if(game.Blackout == 0)
+                {
+                    game.TurnBlack = true;
+                    game.Blackout = 3;
+                }else{
+                    game.TurnBlack = false;
+                }
+                return Ok(new { wrongMove = false, botMove, currentPosition = currentPosition, fenPosition, game.TurnBlack }); // named args here
             }
             else
             {
                 game.Lives--; //minus life
+                game.Blackout--;
                 if (game.Lives == 0)
                 {
                     game.IsRunning = false;
                 }
-                return Ok(new { wrongMove = true, lives = game.Lives, game.IsRunning }); // we box here :) (fight club reference)
+                if(game.Blackout == 0)
+                {
+                    game.TurnBlack = true;
+                    game.Blackout = 3;
+                }else{
+                    game.TurnBlack = false;
+                }
+                return Ok(new { wrongMove = true, lives = game.Lives, game.IsRunning, game.TurnBlack }); // we box here :) (fight club reference)
             }
         }
 
