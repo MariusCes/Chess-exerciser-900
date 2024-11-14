@@ -1,8 +1,13 @@
-import React from "react";
+import React, { useEffect } from "react";
 import "../styles/GameOver.css";
 
 const GameOver = ({ status, moveList, onClose }) => {
   const isWin = status === 'win';
+  
+  useEffect(() => {
+    const sound = new Audio(isWin ? '/sounds/win.mp3' : '/sounds/lose.mp3');
+    sound.play();
+  }, [status]); // The sound plays every time the game status changes.
 
   return (
     <div className="popup-overlay">
