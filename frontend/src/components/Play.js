@@ -14,7 +14,8 @@ function Play() {
     "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
   );
   const [turnBlack, setTurnBlack] = useState(false);
-  const [difficulty, setDifficulty] = useState(""); // State for selected difficulty
+  const [aiDifficulty, setAiDifficulty] = useState(""); // State for selected difficulty
+  const [memoryDifficulty, setMemoryDifficulty] = useState("");
   const [gameStatus, setGameStatus] = useState(null);
 
   const createGame = async () => {
@@ -24,7 +25,8 @@ function Play() {
       {
         method: "POST",
         body: JSON.stringify({
-          gameDifficulty: gameDiff,
+          aiDifficulty, // same as =>  aiDifficulty: aiDifficulty,
+          memoryDifficulty,
         }),
         headers: {
           "Content-type": "application/json; charset=UTF-8",
@@ -59,18 +61,6 @@ function Play() {
     }
   };
 
-  const convertDifficultyToNumber = (difficulty) => {
-    switch (difficulty) {
-      case "easy":
-        return 1;
-      case "medium":
-        return 2;
-      case "hard":
-        return 3;
-      default:
-        return null;
-    }
-  };
   return (
     <div className="relative min-h-screen overflow-x-hidden">
       <main
@@ -82,24 +72,37 @@ function Play() {
           <label className="me-2">Game ID: {gameID}</label>
           <select
             className="form-select me-2"
-            value={difficulty}
-            onChange={(e) => setDifficulty(e.target.value)}
+            value={aiDifficulty}
+            onChange={(e) => setAiDifficulty(e.target.value)}
             style={{ width: "120px" }}
           >
-            <option value="">Select Difficulty</option>
+            <option value="">Select AI</option>
             <option value="1">Baby</option>
-            <option value="3">Kid</option>
-            <option value="6">Casual</option>
-            <option value="9">Average MIF student</option>
-            <option value="13">Competitive player</option>
-            <option value="16">Professional player</option>
-            <option value="18">Drunk Magnus Carlsen</option>
-            <option value="20">AI overlord</option>
+            <option value="2">Kid</option>
+            <option value="3">Casual</option>
+            <option value="4">Average MIF student</option>
+            <option value="5">Competitive player</option>
+            <option value="6">Professional player</option>
+            <option value="7">Drunk Magnus Carlsen</option>
+            <option value="8">AI overlord</option>
           </select>
+
+          <select
+            className="form-select me-2"
+            value={memoryDifficulty}
+            onChange={(e) => setMemoryDifficulty(e.target.value)}
+            style={{ width: "160px" }}
+          >
+            <option value="">Select difficulty</option>
+            <option value="1">ADHD 16 y.o</option>
+            <option value="2">IT enjoyer</option>
+            <option value="3">Literally a computer</option>
+          </select>
+
           <button
             className="btn btn-secondary"
             onClick={createGame}
-            disabled={!difficulty}
+            disabled={!aiDifficulty || !memoryDifficulty}
           >
             Create Game
           </button>
