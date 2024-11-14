@@ -29,8 +29,8 @@ namespace CHESSPROJ.Controllers
         //all the creation must be asinc and also game must get difficulty from query, also all the dbContext should be async for ex: dbContext.SaveChanges(); has to be dbContext.SaveChangesAsync();
         // HERE TOO ASYNC(POST: api/chessgame/{gameId}/move)
         // /api/chess/create-game?skillLevel=10 smth like that for harder
-        [HttpGet("create-game")]
-        public IActionResult CreateGame([FromQuery] int SkillLevel = 5) // po kolkas GET req, bet ateityje reikes ir sito
+        [HttpPost("create-game")]
+        public IActionResult CreateGame([FromBody] CreateGameReqDto req) // po kolkas GET req, bet ateityje reikes ir sito
         {
             _stockfishService.SetLevel(SkillLevel); //default set to 5, need to see what level does
             //this is where we set game with the data from query
@@ -96,11 +96,13 @@ namespace CHESSPROJ.Controllers
                 string fenPosition = _stockfishService.GetFen();
                 currentPosition = string.Join(" ", game.MovesArray);
                 game.Blackout--;
-                if(game.Blackout == 0)
+                if (game.Blackout == 0)
                 {
                     game.TurnBlack = true;
                     game.Blackout = 3;
-                }else{
+                }
+                else
+                {
                     game.TurnBlack = false;
                 }
                 dbContext.SaveChanges();
@@ -114,11 +116,13 @@ namespace CHESSPROJ.Controllers
                 {
                     game.IsRunning = false;
                 }
-                if(game.Blackout == 0)
+                if (game.Blackout == 0)
                 {
                     game.TurnBlack = true;
                     game.Blackout = 3;
-                }else{
+                }
+                else
+                {
                     game.TurnBlack = false;
                 }
                 dbContext.SaveChanges();
