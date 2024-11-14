@@ -25,8 +25,8 @@ namespace CHESSPROJ.Controllers
 
 
         // /api/chess/create-game?skillLevel=10 smth like that for harder
-        [HttpGet("create-game")]
-        public IActionResult CreateGame([FromQuery] int SkillLevel = 5) // po kolkas GET req, bet ateityje reikes ir sito
+        [HttpPost("create-game")]
+        public IActionResult CreateGame([FromBody] CreateGameReqDto req) // po kolkas GET req, bet ateityje reikes ir sito
         {
             _stockfishService.SetLevel(SkillLevel); //default set to 5, need to see what level does
             Game game = new Game(Guid.NewGuid(), 1, 1, 3); // 1, 1, 3 - difficulty, bot rating, lives
@@ -91,11 +91,13 @@ namespace CHESSPROJ.Controllers
                 string fenPosition = _stockfishService.GetFen();
                 currentPosition = string.Join(" ", game.MovesArray);
                 game.Blackout--;
-                if(game.Blackout == 0)
+                if (game.Blackout == 0)
                 {
                     game.TurnBlack = true;
                     game.Blackout = 3;
-                }else{
+                }
+                else
+                {
                     game.TurnBlack = false;
                 }
                 return Ok(new { wrongMove = false, botMove, currentPosition = currentPosition, fenPosition, game.TurnBlack }); // named args here
@@ -108,11 +110,13 @@ namespace CHESSPROJ.Controllers
                 {
                     game.IsRunning = false;
                 }
-                if(game.Blackout == 0)
+                if (game.Blackout == 0)
                 {
                     game.TurnBlack = true;
                     game.Blackout = 3;
-                }else{
+                }
+                else
+                {
                     game.TurnBlack = false;
                 }
                 return Ok(new { wrongMove = true, lives = game.Lives, game.IsRunning, game.TurnBlack }); // we box here :) (fight club reference)

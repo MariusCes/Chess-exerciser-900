@@ -10,14 +10,29 @@ function Play() {
   const [loading, setLoading] = useState(false); // loading screen...? ar kazkur status update
   const [isGameCreated, setIsGameCreated] = useState(false); // jei nesukurtas zaidimas negali submittinti judesiu
   const [gameID, setGameID] = useState(""); // tas ID kuri atsiuncia
-  const [fen, setFen] = useState("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
+  const [fen, setFen] = useState(
+    "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
+  );
   const [turnBlack, setTurnBlack] = useState(false);
-  const [difficulty, setDifficulty] = useState(""); // State for selected difficulty
+  const [aiDifficulty, setAiDifficulty] = useState(""); // State for selected difficulty
+  const [memoryDifficulty, setMemoryDifficulty] = useState("");
   const [gameStatus, setGameStatus] = useState(null);
 
   const createGame = async () => {
     setMoveList([]);
-    const response = await fetch("http://localhost:5030/api/chess/create-game");
+    const response = await fetch(
+      "http://localhost:5030/api/chess/create-game",
+      {
+        method: "POST",
+        body: JSON.stringify({
+          aiDifficulty, // same as =>  aiDifficulty: aiDifficulty,
+          memoryDifficulty,
+        }),
+        headers: {
+          "Content-type": "application/json; charset=UTF-8",
+        },
+      }
+    );
     const data = await response.json(); // unboxing
     setGameStatus(null);
     setGameID(data.gameId);
@@ -41,49 +56,53 @@ function Play() {
     const data = await response.json();
     if (data.wrongMove === false) {
       setMoveList((prevMoves) => [...prevMoves, userMove, data.botMove]);
-
     } else {
       setMove("Bad move!");
     }
   };
 
-  const convertDifficultyToNumber = (difficulty) => {
-    switch (difficulty) {
-      case "easy":
-        return 1;
-      case "medium":
-        return 2;
-      case "hard":
-        return 3;
-      default:
-        return null;
-    }
-  };
   return (
     <div className="relative min-h-screen overflow-x-hidden">
-      <main className={`relative ${gameStatus ? 'blur' : ''} transition-all duration-300`}>
+      <main
+        className={`relative ${
+          gameStatus ? "blur" : ""
+        } transition-all duration-300`}
+      >
         <div className="d-flex align-items-center justify-content-center mb-3">
           <label className="me-2">Game ID: {gameID}</label>
           <select
             className="form-select me-2"
-            value={difficulty}
-            onChange={(e) => setDifficulty(e.target.value)}
+            value={aiDifficulty}
+            onChange={(e) => setAiDifficulty(e.target.value)}
             style={{ width: "120px" }}
           >
-            <option value="">Select Difficulty</option>
+            <option value="">Select AI</option>
             <option value="1">Baby</option>
-            <option value="3">Kid</option>
-            <option value="6">Casual</option>
-            <option value="9">Average MIF student</option>
-            <option value="13">Competitive player</option>
-            <option value="16">Professional player</option>
-            <option value="18">Drunk Magnus Carlsen</option>
-            <option value="20">AI overlord</option>
+            <option value="2">Kid</option>
+            <option value="3">Casual</option>
+            <option value="4">Average MIF student</option>
+            <option value="5">Competitive player</option>
+            <option value="6">Professional player</option>
+            <option value="7">Drunk Magnus Carlsen</option>
+            <option value="8">AI overlord</option>
           </select>
+
+          <select
+            className="form-select me-2"
+            value={memoryDifficulty}
+            onChange={(e) => setMemoryDifficulty(e.target.value)}
+            style={{ width: "160px" }}
+          >
+            <option value="">Select difficulty</option>
+            <option value="1">ADHD 16 y.o</option>
+            <option value="2">IT enjoyer</option>
+            <option value="3">Literally a computer</option>
+          </select>
+
           <button
             className="btn btn-secondary"
             onClick={createGame}
-            disabled={!difficulty}
+            disabled={!aiDifficulty || !memoryDifficulty}
           >
             Create Game
           </button>
@@ -117,7 +136,9 @@ function Play() {
                 {moveList.map((move, index) => (
                   <li
                     key={index}
-                    className={`move-item ${index % 2 === 0 ? 'your-move' : 'bot-move'}`}
+                    className={`move-item ${
+                      index % 2 === 0 ? "your-move" : "bot-move"
+                    }`}
                   >
                     {move}
                   </li>
@@ -157,7 +178,9 @@ function Play() {
               setGameStatus(null);
               setIsGameCreated(false);
               setMoveList([]);
-              setFen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
+              setFen(
+                "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
+              );
             }}
           />
         </div>
