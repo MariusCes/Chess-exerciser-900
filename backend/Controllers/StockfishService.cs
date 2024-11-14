@@ -20,12 +20,12 @@ namespace CHESSPROJ.Controllers
 
         public void SetLevel(int level)
         {
-            _stockfish.SkillLevel = level; // Assuming SetSkillLevel is a method in Stockfish
+            _stockfish.SkillLevel = level; 
         }
 
         public string GetBestMove()
         {
-            return _stockfish.GetBestMove(); // Get the best move from Stockfish
+            return _stockfish.GetBestMove(); 
         }
 
         public void SetPosition(params string[] moves)
@@ -35,13 +35,13 @@ namespace CHESSPROJ.Controllers
 
         public bool IsMoveCorrect(string currentPosition, string move)
         {
-            _stockfish.SetPosition(currentPosition); // Set the current position
-            return _stockfish.IsMoveCorrect(move); // Validate if the move is correct
+            _stockfish.SetPosition(currentPosition); 
+            return _stockfish.IsMoveCorrect(move); 
         }
 
         public string GetFenPosition()
         {
-            return _stockfish.GetFenPosition(); // Get the FEN string for the current position
+            return _stockfish.GetFenPosition(); 
         }
 
         public bool IsMoveCorrect(string move)
