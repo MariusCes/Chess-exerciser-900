@@ -95,7 +95,6 @@ label {
 .difficulty-selection {
   margin-bottom: 10px;
   width: 300px;
-  /* Adjust width as needed */
 }
 
 .create-button {
@@ -132,7 +131,7 @@ label {
 .health-bar-container {
   width: 100%;
   height: 20px;
-  background-color: #1e1e1e; /* Dark background */
+  background-color: #1e1e1e;
   border-radius: 10px;
   margin-top: 15px;
   margin-bottom: 15px;
@@ -142,7 +141,7 @@ label {
 
 .health-bar {
   height: 100%;
-  background-color: #63b3ed; /* Your accent color */
+  background-color: #63b3ed;
   border-radius: 10px;
   transition: width 0.3s ease-in-out;  /* Smooth transition */
   box-shadow: 0 0 8px rgba(99, 179, 237, 0.8); /* Light glow effect */
