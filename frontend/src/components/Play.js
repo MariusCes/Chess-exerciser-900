@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import "../styles/Play.css";
 import Board from "./Board";
 import GameOver from "./GameOver";
@@ -18,6 +18,7 @@ function Play() {
   const [memoryDifficulty, setMemoryDifficulty] = useState("");
   const [gameStatus, setGameStatus] = useState(null);
   const [health, setHealth] = useState(100);
+  const [timer, setTimer] = useState(0);
 
   const createGame = async () => {
     setMoveList([]);
@@ -83,6 +84,26 @@ function Play() {
     });
   };
 
+  useEffect(() => {
+    if (isGameCreated) {
+      const interval = setInterval(() => {
+        setTimer((prevTime) => prevTime + 1);
+      }, 1000);
+
+      return () => {
+        clearInterval(interval);
+        setTimer(0);
+      };
+    }
+  }, [isGameCreated]);
+
+  const formatTimer = (seconds) => {
+    const minutes = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${minutes.toString().padStart(2, "0")}:${secs
+      .toString()
+      .padStart(2, "0")}`;
+  };
 
   return (
     <div className="relative min-h-screen overflow-x-hidden">
@@ -153,6 +174,11 @@ function Play() {
                 Submit Move
               </button>
             </form>
+            {isGameCreated && (
+              <div className="timer-container mt-2">
+                <span className="timer">{formatTimer(timer)}</span>
+              </div>
+            )}
             <div className="health-bar-container">
               <div className="health-bar" style={{ width: `${health}%` }}></div>
             </div>

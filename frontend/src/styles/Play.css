@@ -158,3 +158,29 @@ label {
   color: #fff;
   font-weight: bold;
 }
+
+.timer-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 1rem;
+  position: relative;
+  width: fit-content;
+  margin: 0 auto; /* Center the timer horizontally */
+  padding: 1rem;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #1e293b9e, #37415196);
+  box-shadow: 0px 8px 15px rgba(0, 0, 0, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.timer {
+  font-size: 1.75rem;
+  font-weight: bold;
+  background: linear-gradient(90deg, #94ddff, #ffffff);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
