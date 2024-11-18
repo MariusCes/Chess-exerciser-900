@@ -17,9 +17,11 @@ function Play() {
   const [aiDifficulty, setAiDifficulty] = useState(""); // State for selected difficulty
   const [memoryDifficulty, setMemoryDifficulty] = useState("");
   const [gameStatus, setGameStatus] = useState(null);
+  const [health, setHealth] = useState(100);
 
   const createGame = async () => {
     setMoveList([]);
+    setHealth(100);
     const response = await fetch(
       "http://localhost:5030/api/chess/create-game",
       {
@@ -61,12 +63,24 @@ function Play() {
     }
   };
 
+  const decreaseHealth = (amount) => {
+    setHealth((prevHealth) => {
+      const newHealth = Math.max(prevHealth - amount, 0); // Ensure health doesnt go below 0
+  
+      // If health reaches 0, set the game over state
+      if (newHealth === 0) {
+        setGameStatus("lose")
+      }
+      return newHealth;
+    });
+  };
+  
+
   return (
     <div className="relative min-h-screen overflow-x-hidden">
       <main
-        className={`relative ${
-          gameStatus ? "blur" : ""
-        } transition-all duration-300`}
+        className={`relative ${gameStatus ? "blur" : ""
+          } transition-all duration-300`}
       >
         <div className="d-flex align-items-center justify-content-center mb-3">
           <label className="me-2">Game ID: {gameID}</label>
@@ -131,14 +145,16 @@ function Play() {
                 Submit Move
               </button>
             </form>
+            <div className="health-bar-container">
+              <div className="health-bar" style={{ width: `${health}%` }}></div>
+            </div>
             <div className="move-list-container">
               <ul className="move-list">
                 {moveList.map((move, index) => (
                   <li
                     key={index}
-                    className={`move-item ${
-                      index % 2 === 0 ? "your-move" : "bot-move"
-                    }`}
+                    className={`move-item ${index % 2 === 0 ? "your-move" : "bot-move"
+                      }`}
                   >
                     {move}
                   </li>
@@ -165,6 +181,14 @@ function Play() {
               >
                 Test Lose
               </button>
+              
+              <button
+                onClick={() =>decreaseHealth(10)}
+                className="btn btn-warning ms-2"
+              >
+                Decrease Health
+              </button>
+
             </div>
           </div>
         </div>
