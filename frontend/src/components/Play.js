@@ -41,6 +41,14 @@ function Play() {
     setIsGameCreated(true);
   };
 
+  const mockCreateGame = () => {
+    setMoveList([]);
+    setHealth(100);
+    setGameStatus(null);
+    setGameID(2024);
+    setIsGameCreated(true);
+  };
+
   const postMove = async (userMove) => {
     const response = await fetch(
       "http://localhost:5030/api/chess/" + gameID + "/move",
@@ -66,7 +74,7 @@ function Play() {
   const decreaseHealth = (amount) => {
     setHealth((prevHealth) => {
       const newHealth = Math.max(prevHealth - amount, 0); // Ensure health doesnt go below 0
-  
+
       // If health reaches 0, set the game over state
       if (newHealth === 0) {
         setGameStatus("lose")
@@ -74,7 +82,7 @@ function Play() {
       return newHealth;
     });
   };
-  
+
 
   return (
     <div className="relative min-h-screen overflow-x-hidden">
@@ -181,14 +189,22 @@ function Play() {
               >
                 Test Lose
               </button>
-              
+
               <button
-                onClick={() =>decreaseHealth(10)}
+                onClick={() => decreaseHealth(10)}
                 className="btn btn-warning ms-2"
               >
                 Decrease Health
               </button>
 
+            </div>
+            <div className="test-buttons2 mt-3">
+              <button
+                onClick={mockCreateGame}
+                className="btn btn-success me-2"
+              >
+                Mock create game
+              </button>
             </div>
           </div>
         </div>
