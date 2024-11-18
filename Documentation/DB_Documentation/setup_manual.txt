@@ -6,6 +6,7 @@
 --for vsc users run these in terminal
 1. dotnet add package Microsoft.EntityFrameworkCore.Tools --version 7.0.20
 2. dotnet add package Microsoft.EntityFrameworkCore.SqlServer --version 7.0.20
+3. dotnet tool install --global dotnet-ef // CLI ef tools
 
 ##THIS STEP IS AFTER YOUVE INSTALLED THE PACKAGES AND MICROSOFT SQL STUDIO MANAGER
 1. Go to appsettings.json file

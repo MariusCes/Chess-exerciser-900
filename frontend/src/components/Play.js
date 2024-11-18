@@ -56,6 +56,8 @@ function Play() {
     const data = await response.json();
     if (data.wrongMove === false) {
       setMoveList((prevMoves) => [...prevMoves, userMove, data.botMove]);
+      setFen(data.fenPosition); // to be tested
+      setTurnBlack(data.turnBlack); // to be tested???
     } else {
       setMove("Bad move!");
     }
@@ -178,9 +180,7 @@ function Play() {
               setGameStatus(null);
               setIsGameCreated(false);
               setMoveList([]);
-              setFen(
-                "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
-              );
+              setFen(fen);
             }}
           />
         </div>

@@ -1,5 +1,6 @@
 namespace backend.DTOs;
 
 public record class CreateGameReqDto(
-    int gameDiff
+    int aiDifficulty,
+    int gameDifficulty
 );
