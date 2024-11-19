@@ -12,9 +12,4 @@ public class User
 
     // Parameterless constructor for EF
     public User() { }
-
-    public User(UserStatist userStatist)
-    {
-        Id = Guid.NewGuid(); // Generate a new Id for the user
-    }
 }
