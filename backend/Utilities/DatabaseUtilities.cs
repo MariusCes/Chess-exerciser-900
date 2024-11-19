@@ -27,6 +27,12 @@ namespace CHESSPROJ.Utilities
             else return false;
         }
 
+        public void AddUser(User newUser) 
+        {
+            dbContext.Users.Add(newUser);
+            dbContext.SaveChanges();
+        }
+
         public async Task<Game?> GetGameById(string gameId) 
         {
             var game = await dbContext.Games.FirstOrDefaultAsync(g => g.GameId.ToString() == gameId);

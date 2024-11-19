@@ -12,4 +12,11 @@ public class User
 
     // Parameterless constructor for EF
     public User() { }
+
+    public User(Guid Id, string Username, string Password) 
+    {
+        this.Id = Id;
+        this.Username = Username;
+        this.Password = Password;
+    }
 }

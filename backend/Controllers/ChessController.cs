@@ -18,12 +18,15 @@ namespace CHESSPROJ.Controllers
         private static ErrorMessages badMove = ErrorMessages.Move_notation_cannot_be_empty;
         private readonly IStockfishService _stockfishService;
         private DatabaseUtilities _dbUtilities;
+        private static User demoUser;
 
         // Dependency Injection through constructor
         public ChessController(IStockfishService stockfishService, ChessDbContext dbContext)
         {
             _stockfishService = stockfishService;
             _dbUtilities = new DatabaseUtilities(dbContext);
+            demoUser = new User(Guid.NewGuid(), "BNW", "12amGANG");
+            _dbUtilities.AddUser(demoUser);
         }
 
         //all the creation must be asinc and also game must get difficulty from query, also all the dbContext should be async for ex: dbContext.SaveChanges(); has to be dbContext.SaveChangesAsync();
@@ -36,7 +39,8 @@ namespace CHESSPROJ.Controllers
             Game game = Game.CreateGameFactory(Guid.NewGuid(), 5, 1, 3);
 
             // add user here. For now its only one (hardcoded)
-            // game.UserId = userId 
+            game.UserId = demoUser.Id;
+            game.User = demoUser; 
 
             if (await _dbUtilities.AddGame(game)) {
                 return Ok(new { GameId = game.GameId });    
