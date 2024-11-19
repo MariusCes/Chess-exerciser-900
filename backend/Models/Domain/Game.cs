@@ -7,10 +7,10 @@ namespace backend.Models.Domain;
 
 public class Game
 {
-    public GameStartStruct gameStartStruct;
+    private GameStartStruct _gameStartStruct;
     public Guid GameId { get; set; }
-    public int Difficulty => gameStartStruct.Difficulty;
-    public int BotRating => gameStartStruct.BotRating;
+    public int Difficulty { get; private set; }
+    public int BotRating { get; private set; }
      public string MovesArraySerialized { get; set; }
     public int Lives { get; set; }
     public Boolean IsRunning { get; set; }
@@ -34,13 +34,18 @@ public class Game
     public User User { get; set; }
 
     public Game() { }
-    public Game(Guid id, int Difficulty, int BotRating, int lives)
+    public Game(Guid id, int difficulty, int botRating, int lives)
     {
         GameId = id;
-        gameStartStruct = new GameStartStruct(Difficulty, BotRating);
+        _gameStartStruct = new GameStartStruct(difficulty, botRating);
+        this.Difficulty = _gameStartStruct.Difficulty;
+        this.BotRating = _gameStartStruct.BotRating;
+        BotRating = botRating;
         MovesArray = new List<string>();
         Lives = lives;
         IsRunning = true;
+        TurnBlack = false;
+        Blackout = 3;
     }
 
     //factory

@@ -43,12 +43,11 @@ builder.Services.AddScoped<IStockfishService>(provider =>
     return new StockfishService(stockfish); // Pass the singleton Stockfish to the StockfishService
 });
 
+builder.Services.AddDbContext<ChessDbContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("ChessPortal")));
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-
-builder.Services.AddDbContext<ChessDbContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("ChessPortal")));
 
 var app = builder.Build();
 

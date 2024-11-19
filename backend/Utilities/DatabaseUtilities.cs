@@ -1,6 +1,7 @@
 using Stockfish.NET;
 using backend.Models.Domain;
 using backend.Data;
+using Microsoft.EntityFrameworkCore;
 
 namespace CHESSPROJ.Utilities
 {
@@ -13,30 +14,45 @@ namespace CHESSPROJ.Utilities
             this.dbContext = dbContext;
         }
 
-
-        public bool AddGame(Game game) 
+        //adds a game
+        public async Task<bool> AddGame(Game newGame) 
         {
-            return false;
-            // check if this game already exists
-
-            // code to save changes. returns: T=> all good. F => all bad
+            var game = await GetGameById(newGame.GameId.ToString());
+            if (game == null)
+            {
+                await dbContext.Games.AddAsync(newGame);
+                await dbContext.SaveChangesAsync();
+                return true;
+            }
+            else return false;
         }
 
-        public Game GetGameById(string id) 
+        public async void AddUser(User newUser) 
         {
-            return null;
+            await dbContext.Users.AddAsync(newUser);
+            await dbContext.SaveChangesAsync();
         }
 
-        public bool updateGame(Game game) 
+        public async Task<Game?> GetGameById(string gameId) 
+        {
+            var game = await dbContext.Games.FirstOrDefaultAsync(g => g.GameId.ToString() == gameId);
+            if (game == null)
+            {
+                return null;
+            }
+            else return game;
+        }
+
+        // update the game in DB.
+        public async void UpdateGame(Game game) 
         { 
-            return true;        // update the game in DB. (find existing and update it)
+            await dbContext.SaveChangesAsync();  
         }
 
-
-        public List<Game> GetGamesList()
+        // Retrieve all games as a List<Game>
+        public async Task<List<Game>> GetGamesList()
         {
-            // Retrieve all games as a List<Game>
-            List<Game> gamesList = null;// = dbContext.Games.ToList();
+            List<Game> gamesList = await dbContext.Games.ToListAsync();
             return gamesList;
         }
     }
