@@ -21,6 +21,7 @@ function Play() {
   const [timer, setTimer] = useState(0);
 
   const createGame = async () => {
+    setTimer(0);
     setMoveList([]);
     setHealth(100);
     const response = await fetch(
@@ -48,6 +49,7 @@ function Play() {
     setGameStatus(null);
     setGameID(2024);
     setIsGameCreated(true);
+    setTimer(0);
   };
 
   const postMove = async (userMove) => {
@@ -87,17 +89,18 @@ function Play() {
   };
 
   useEffect(() => {
-    if (isGameCreated) {
-      const interval = setInterval(() => {
-        setTimer((prevTime) => prevTime + 1);
+    let interval;
+  
+    if (isGameCreated && !gameStatus) {
+      interval = setInterval(() => {
+        setTimer((prevTimer) => prevTimer + 1);
       }, 1000);
-
-      return () => {
-        clearInterval(interval);
-        setTimer(0);
-      };
     }
-  }, [isGameCreated]);
+  
+    return () => {
+      clearInterval(interval); // Stops the timer, but does not reset it
+    };
+  }, [isGameCreated, gameStatus]);
 
   const formatTimer = (seconds) => {
     const minutes = Math.floor(seconds / 60);
@@ -177,11 +180,11 @@ function Play() {
                 Submit Move
               </button>
             </form>
-            {isGameCreated && (
+
               <div className="timer-container mt-2">
                 <span className="timer">{formatTimer(timer)}</span>
               </div>
-            )}
+
             <div className="health-bar-container">
               <div className="health-bar" style={{ width: `${health}%` }}></div>
             </div>
