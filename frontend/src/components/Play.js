@@ -243,6 +243,7 @@ function Play() {
           <GameOver
             status={gameStatus}
             moveList={moveList}
+            onPlayAgain={mockCreateGame}
             onClose={() => {
               setGameStatus(null);
               setIsGameCreated(false);
