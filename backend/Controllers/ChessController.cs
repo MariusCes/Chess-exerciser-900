@@ -8,6 +8,7 @@ using System.Text.Json;
 using Stockfish.NET;
 using backend.Data;
 using backend.Utilities;
+using Microsoft.Extensions.Logging;
 
 namespace CHESSPROJ.Controllers
 {
@@ -19,15 +20,17 @@ namespace CHESSPROJ.Controllers
         private static ErrorMessages badMove = ErrorMessages.Move_notation_cannot_be_empty;
         private readonly IStockfishService _stockfishService;
         private readonly IDatabaseUtilities dbUtilities;
+        private readonly ILogger<ChessController> logger;
         private static User demoUser;
 
         // Dependency Injection through constructor
-        public ChessController(IStockfishService stockfishService, IDatabaseUtilities dbUtilities)
+        public ChessController(IStockfishService stockfishService, IDatabaseUtilities dbUtilities, ILogger<ChessController> logger)
         {
             _stockfishService = stockfishService;
             this.dbUtilities = dbUtilities;
             demoUser = new User(Guid.NewGuid(), "BNW", "12amGANG");
-            this.dbUtilities.AddUser(demoUser);
+            //this.dbUtilities.AddUser(demoUser);
+            this.logger = logger;
         }
 
         //all the creation must be asinc and also game must get difficulty from query, also all the dbContext should be async for ex: dbContext.SaveChanges(); has to be dbContext.SaveChangesAsync();
@@ -148,15 +151,24 @@ namespace CHESSPROJ.Controllers
         [HttpGet("games")]
         public async Task<IActionResult> GetAllGames()
         {
-            GamesList games = new GamesList(await dbUtilities.GetGamesList());
-            List<Game> gamesWithMoves = new List<Game>();
+            logger.LogInformation("Method started");
 
-            foreach (var game in games.GetCustomEnumerator())
-            {
-                // custom filtering using IEnumerable
-                gamesWithMoves.Add(game);
-            }
-            return Ok(gamesWithMoves);
+            GamesList gamesList = new GamesList(await dbUtilities.GetGamesList());
+
+
+            logger.LogInformation("Retrieved {Count} games", gamesList.Count);
+
+            //GamesList games = new GamesList(gamesList);
+            //List<Game> gamesWithMoves = new List<Game>();
+
+            //foreach (var game in games.GetCustomEnumerator())
+            //{
+            //    // custom filtering using IEnumerable
+            //    gamesWithMoves.Add(game);
+            //}
+            //return Ok(gamesWithMoves);
+
+            return Ok(gamesList);
         }
     }
 }

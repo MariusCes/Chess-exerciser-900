@@ -10,9 +10,9 @@ namespace backend.Utilities
     public interface IDatabaseUtilities
     {
         public Task<bool> AddGame(Game newGame);
-        public void AddUser(User newUser);
+        public Task AddUser(User newUser);
         public Task<Game?> GetGameById(string gameId);
-        public void UpdateGame(Game game);
+        public Task UpdateGame(Game game);
         public Task<List<Game>> GetGamesList();
 
     }
