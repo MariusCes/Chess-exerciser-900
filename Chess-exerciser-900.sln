@@ -84,6 +84,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "pieces", "pieces", "{A694BC
 		frontend\public\pieces\white-rook.png = frontend\public\pieces\white-rook.png
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ChessExerciser.Tests", "ChessExerciser.Tests\ChessExerciser.Tests.csproj", "{3F0DF5F9-C30E-4F20-A677-675E24322A5E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -94,6 +96,10 @@ Global
 		{2B91837B-0E90-492C-A4DB-1F045B17E434}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2B91837B-0E90-492C-A4DB-1F045B17E434}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2B91837B-0E90-492C-A4DB-1F045B17E434}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3F0DF5F9-C30E-4F20-A677-675E24322A5E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3F0DF5F9-C30E-4F20-A677-675E24322A5E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3F0DF5F9-C30E-4F20-A677-675E24322A5E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3F0DF5F9-C30E-4F20-A677-675E24322A5E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
