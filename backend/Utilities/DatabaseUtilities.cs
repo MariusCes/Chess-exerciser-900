@@ -2,19 +2,22 @@ using Stockfish.NET;
 using backend.Models.Domain;
 using backend.Data;
 using Microsoft.EntityFrameworkCore;
+using backend.Utilities;
+using Microsoft.Extensions.Logging;
 
 namespace CHESSPROJ.Utilities
 {
-    public class DatabaseUtilities 
+    public class DatabaseUtilities : IDatabaseUtilities
     {
         private readonly ChessDbContext dbContext;
+        private readonly ILogger<DatabaseUtilities> logger; 
 
-        public DatabaseUtilities(ChessDbContext dbContext) 
+        public DatabaseUtilities(ChessDbContext dbContext, ILogger<DatabaseUtilities> logger) 
         {
             this.dbContext = dbContext;
+            this.logger = logger;
         }
 
-        //adds a game
         public async Task<bool> AddGame(Game newGame) 
         {
             var game = await GetGameById(newGame.GameId.ToString());
@@ -27,7 +30,7 @@ namespace CHESSPROJ.Utilities
             else return false;
         }
 
-        public async void AddUser(User newUser) 
+        public async Task AddUser(User newUser) 
         {
             await dbContext.Users.AddAsync(newUser);
             await dbContext.SaveChangesAsync();
@@ -43,16 +46,29 @@ namespace CHESSPROJ.Utilities
             else return game;
         }
 
-        // update the game in DB.
-        public async void UpdateGame(Game game) 
-        { 
+        public async Task UpdateGame(Game game) 
+        {
+            
             await dbContext.SaveChangesAsync();  
         }
+
+
+
+        //dbContext.Games.Update(game); // Ensure the game is updated
+
 
         // Retrieve all games as a List<Game>
         public async Task<List<Game>> GetGamesList()
         {
+            logger.LogInformation("Attempting to retrieve games list");
+            logger.LogInformation("Generated SQL Query: {Query}",
+                dbContext.Games.ToQueryString());
+
+
             List<Game> gamesList = await dbContext.Games.ToListAsync();
+
+            logger.LogInformation("Retrieved {Count} games from database", gamesList.Count);
+
             return gamesList;
         }
     }

@@ -6,6 +6,9 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using CHESSPROJ.Controllers;
 using CHESSPROJ.Services;
+using CHESSPROJ.Utilities;
+using backend.Utilities;
+using Microsoft.Extensions.Logging;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -21,9 +24,11 @@ builder.Services.AddCors(options =>
         });
 });
 
-
 // Read the Stockfish path from configuration (appsettings.json or environment variable)
-string stockfishPath = builder.Configuration["StockfishPath"] ?? "bin\\stockfish\\stockfish12.exe";
+string stockfishPath = builder.Configuration["StockfishPath"] ?? "gaidys";
+
+
+
 
 // Register the IStockfish (Stockfish instance) as Singleton so that it's shared throughout the application
 builder.Services.AddScoped<Stockfish.NET.Stockfish>(provider =>
@@ -44,6 +49,16 @@ builder.Services.AddScoped<IStockfishService>(provider =>
 });
 
 builder.Services.AddDbContext<ChessDbContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("ChessPortal")));
+builder.Services.AddScoped<IDatabaseUtilities, DatabaseUtilities>();
+
+builder.Services.AddLogging(configure =>
+{
+    configure.AddConsole();
+    configure.AddDebug();
+    configure.SetMinimumLevel(LogLevel.Information);
+}
+);
+
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
