@@ -20,20 +20,15 @@ namespace CHESSPROJ.Controllers
         private static ErrorMessages badMove = ErrorMessages.Move_notation_cannot_be_empty;
         private readonly IStockfishService _stockfishService;
         private readonly IDatabaseUtilities dbUtilities;
-        private readonly ILogger<ChessController> logger;
-        private static User demoUser;
 
         // Dependency Injection through constructor
-        public ChessController(IStockfishService stockfishService, IDatabaseUtilities dbUtilities, ILogger<ChessController> logger)
+        public ChessController(IStockfishService stockfishService, IDatabaseUtilities dbUtilities)
         {
             _stockfishService = stockfishService;
             this.dbUtilities = dbUtilities;
-            demoUser = new User(Guid.NewGuid(), "BNW", "12amGANG");
-            //this.dbUtilities.AddUser(demoUser);
-            this.logger = logger;
+            //this.dbUtilities.AddUser(demoUser);  hahahafoasfasokf
         }
 
-        //all the creation must be asinc and also game must get difficulty from query, also all the dbContext should be async for ex: dbContext.SaveChanges(); has to be dbContext.SaveChangesAsync();
         // /api/chess/create-game?skillLevel=10 smth like that for harder
         [HttpPost("create-game")]
         public async Task<IActionResult> CreateGame([FromBody] CreateGameReqDto req)
@@ -41,10 +36,6 @@ namespace CHESSPROJ.Controllers
             _stockfishService.SetLevel(req.aiDifficulty); //default set to 5, need to see what level does
 
             Game game = Game.CreateGameFactory(Guid.NewGuid(), req.gameDifficulty, req.aiDifficulty, 3);
-
-            // add user here. For now its only one (hardcoded)
-            game.UserId = demoUser.Id;
-            game.User = demoUser; 
 
             if (await dbUtilities.AddGame(game)) {
                 return Ok(new { GameId = game.GameId });    
@@ -118,7 +109,7 @@ namespace CHESSPROJ.Controllers
                     game.TurnBlack = false;
                 }
                 
-                dbUtilities.UpdateGame(game);
+                await dbUtilities.UpdateGame(game);
                 
                 return Ok(new { wrongMove = false, botMove, currentPosition = currentPosition, fenPosition, game.TurnBlack });
             }
@@ -140,35 +131,26 @@ namespace CHESSPROJ.Controllers
                     game.TurnBlack = false;
                 }
 
-                dbUtilities.UpdateGame(game);
+                await dbUtilities.UpdateGame(game);
                 
                 return Ok(new { wrongMove = true, lives = game.Lives, game.IsRunning, game.TurnBlack }); // we box here :) (fight club reference)
             }
         }
 
-        //this should point to game history
-        // Return the list of games
         [HttpGet("games")]
         public async Task<IActionResult> GetAllGames()
         {
-            logger.LogInformation("Method started");
-
             GamesList gamesList = new GamesList(await dbUtilities.GetGamesList());
 
+            GamesList games = new GamesList(gamesList);
+            List<Game> gamesWithMoves = new List<Game>();
 
-            logger.LogInformation("Retrieved {Count} games", gamesList.Count);
-
-            //GamesList games = new GamesList(gamesList);
-            //List<Game> gamesWithMoves = new List<Game>();
-
-            //foreach (var game in games.GetCustomEnumerator())
-            //{
-            //    // custom filtering using IEnumerable
-            //    gamesWithMoves.Add(game);
-            //}
-            //return Ok(gamesWithMoves);
-
-            return Ok(gamesList);
+            foreach (var game in games.GetCustomEnumerator())
+            {
+                // custom filtering using IEnumerable
+                gamesWithMoves.Add(game);
+            }
+            return Ok(gamesWithMoves);
         }
     }
 }
