@@ -2,10 +2,11 @@ using Stockfish.NET;
 using backend.Models.Domain;
 using backend.Data;
 using Microsoft.EntityFrameworkCore;
+using backend.Utilities;
 
 namespace CHESSPROJ.Utilities
 {
-    public class DatabaseUtilities 
+    public class DatabaseUtilities : IDatabaseUtilities
     {
         private readonly ChessDbContext dbContext;
 
@@ -45,9 +46,15 @@ namespace CHESSPROJ.Utilities
 
         // update the game in DB.
         public async void UpdateGame(Game game) 
-        { 
+        {
+            
             await dbContext.SaveChangesAsync();  
         }
+
+
+
+        //dbContext.Games.Update(game); // Ensure the game is updated
+
 
         // Retrieve all games as a List<Game>
         public async Task<List<Game>> GetGamesList()

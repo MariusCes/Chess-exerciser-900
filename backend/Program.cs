@@ -6,6 +6,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using CHESSPROJ.Controllers;
 using CHESSPROJ.Services;
+using CHESSPROJ.Utilities;
+using backend.Utilities;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -44,6 +46,7 @@ builder.Services.AddScoped<IStockfishService>(provider =>
 });
 
 builder.Services.AddDbContext<ChessDbContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("ChessPortal")));
+builder.Services.AddScoped<IDatabaseUtilities, DatabaseUtilities>();
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
