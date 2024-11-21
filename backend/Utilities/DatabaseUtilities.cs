@@ -10,16 +10,22 @@ namespace CHESSPROJ.Utilities
     public class DatabaseUtilities : IDatabaseUtilities
     {
         private readonly ChessDbContext dbContext;
-        private readonly ILogger<DatabaseUtilities> logger; 
+        private User tempUser;
 
-        public DatabaseUtilities(ChessDbContext dbContext, ILogger<DatabaseUtilities> logger) 
+        public DatabaseUtilities(ChessDbContext dbContext, UserSingleton userSingleton) 
         {
             this.dbContext = dbContext;
-            this.logger = logger;
+            tempUser = userSingleton.GetUser();
         }
 
         public async Task<bool> AddGame(Game newGame) 
         {
+            // dooooont please
+            dbContext.Entry(tempUser).State = EntityState.Unchanged;
+
+            newGame.UserId = tempUser.Id;
+            newGame.User = tempUser;
+
             var game = await GetGameById(newGame.GameId.ToString());
             if (game == null)
             {
@@ -46,10 +52,34 @@ namespace CHESSPROJ.Utilities
             else return game;
         }
 
-        public async Task UpdateGame(Game game) 
+        public async Task UpdateGame(Game game)
         {
-            
-            await dbContext.SaveChangesAsync();  
+            // Ensure the entity is tracked by the context
+            var existingGame = await dbContext.Games.FirstOrDefaultAsync(g => g.GameId.ToString() == game.GameId.ToString());
+
+            if (existingGame != null)
+            {
+                // If the entity exists, update its properties manually (or map the changes)
+                existingGame.Blackout = game.Blackout;
+                existingGame.Lives = game.Lives;
+                existingGame.TurnBlack = game.TurnBlack;
+                existingGame.MovesArray = game.MovesArray;
+                existingGame.MovesArraySerialized = game.MovesArraySerialized;
+
+                // Set the entity as modified if not already tracked
+                dbContext.Entry(existingGame).State = EntityState.Modified;
+
+                // Save changes to the database
+                try
+                {
+                    await dbContext.SaveChangesAsync();
+                }
+                catch (DbUpdateException ex)
+                {
+                    // Log the inner exception or inspect its details
+                    Console.WriteLine(ex.InnerException?.Message ?? ex.Message);
+                }
+            }
         }
 
 
@@ -60,14 +90,9 @@ namespace CHESSPROJ.Utilities
         // Retrieve all games as a List<Game>
         public async Task<List<Game>> GetGamesList()
         {
-            logger.LogInformation("Attempting to retrieve games list");
-            logger.LogInformation("Generated SQL Query: {Query}",
-                dbContext.Games.ToQueryString());
-
+                dbContext.Games.ToQueryString();
 
             List<Game> gamesList = await dbContext.Games.ToListAsync();
-
-            logger.LogInformation("Retrieved {Count} games from database", gamesList.Count);
 
             return gamesList;
         }

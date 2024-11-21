@@ -50,6 +50,7 @@ builder.Services.AddScoped<IStockfishService>(provider =>
 
 builder.Services.AddDbContext<ChessDbContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("ChessPortal")));
 builder.Services.AddScoped<IDatabaseUtilities, DatabaseUtilities>();
+builder.Services.AddSingleton<UserSingleton>(provider => UserSingleton.GetInstance()); // mappinam
 
 builder.Services.AddLogging(configure =>
 {
