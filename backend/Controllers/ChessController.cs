@@ -1,12 +1,12 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
-using CHESSPROJ.Services;
 using backend.DTOs;
 using backend.Models.Domain;
-using System;
-using System.Collections.Generic;
 using backend.Errors;
+using CHESSPROJ.Utilities;
 using System.Text.Json;
+using Stockfish.NET;
+using backend.Data;
 
 namespace CHESSPROJ.Controllers
 {
@@ -14,21 +14,27 @@ namespace CHESSPROJ.Controllers
     [Route("api/[controller]")]
     public class ChessController : ControllerBase
     {
-        private readonly StockfishService _stockfishService;
-        private static GamesList games = new GamesList(new List<Game>());
         private static ErrorMessages gameNotFound = ErrorMessages.Game_not_found;
         private static ErrorMessages badMove = ErrorMessages.Move_notation_cannot_be_empty;
-        public ChessController(IConfiguration configuration)
+        private readonly IStockfishService _stockfishService;
+        private DatabaseUtilities _dbUtilities;
+        private static User demoUser;
+
+        // Dependency Injection through constructor
+        public ChessController(IStockfishService stockfishService, ChessDbContext dbContext)
         {
-            var stockfishPath = configuration["StockfishPath"];
-            _stockfishService = new StockfishService(stockfishPath);
+            _stockfishService = stockfishService;
+            _dbUtilities = new DatabaseUtilities(dbContext);
+            demoUser = new User(Guid.NewGuid(), "BNW", "12amGANG");
+            _dbUtilities.AddUser(demoUser);
         }
 
-
+        //all the creation must be asinc and also game must get difficulty from query, also all the dbContext should be async for ex: dbContext.SaveChanges(); has to be dbContext.SaveChangesAsync();
         // /api/chess/create-game?skillLevel=10 smth like that for harder
-        [HttpGet("create-game")]
-        public IActionResult CreateGame([FromQuery] int SkillLevel = 5) // po kolkas GET req, bet ateityje reikes ir sito
+        [HttpPost("create-game")]
+        public async Task<IActionResult> CreateGame([FromBody] CreateGameReqDto req)
         {
+<<<<<<< HEAD
             _stockfishService.SetLevel(SkillLevel); //default set to 5, need to see what level does
             Game game = new Game(Guid.NewGuid(), 1, 1, ę);
             game.MovesArray = new List<string>();
@@ -38,12 +44,28 @@ namespace CHESSPROJ.Controllers
 
             games.Add(game);
             return Ok(new { GameId = game.GameId });
+=======
+            _stockfishService.SetLevel(req.aiDifficulty); //default set to 5, need to see what level does
+
+            Game game = Game.CreateGameFactory(Guid.NewGuid(), 5, 1, 3);
+
+            // add user here. For now its only one (hardcoded)
+            game.UserId = demoUser.Id;
+            game.User = demoUser; 
+
+            if (await _dbUtilities.AddGame(game)) {
+                return Ok(new { GameId = game.GameId });    
+            } else {
+                return NotFound($"{gameNotFound.ToString()}");        // return "DB error" here
+            }
+>>>>>>> 1359b12c5bb629118b243448fd8c02fafba3878a
         }
 
         [HttpGet("{gameId}/history")]
-        public IActionResult GetMovesHistory(string gameId)
+        public async Task<IActionResult> GetMovesHistory(string gameId)
         {
-            var game = games.FirstOrDefault(g => g.GameId.ToString() == gameId);
+            
+            Game game = await _dbUtilities.GetGameById(gameId);
             if (game == null)
                 return NotFound("Game not found.");
 
@@ -65,9 +87,10 @@ namespace CHESSPROJ.Controllers
 
         // POST: api/chessgame/{gameId}/move
         [HttpPost("{gameId}/move")]
-        public IActionResult MakeMove(string gameId, [FromBody] MoveDto moveNotation)       // extractina is JSON post info i MoveDto record'a
+        public async Task<IActionResult> MakeMove(string gameId, [FromBody] MoveDto moveNotation)       // extractina is JSON post info i MoveDto record'a
         {
-            Game game = games.FirstOrDefault(g => g.GameId.ToString() == gameId);
+
+            var game = await _dbUtilities.GetGameById(gameId);
             if (game == null)
             {
                 return NotFound($"{gameNotFound.ToString()}");
@@ -91,17 +114,21 @@ namespace CHESSPROJ.Controllers
                 game.MovesArray.Add(botMove);
 
                 string fenPosition = _stockfishService.GetFen();
-
                 currentPosition = string.Join(" ", game.MovesArray);
                 game.Blackout--;
-                if(game.Blackout == 0)
+                if (game.Blackout == 0)
                 {
                     game.TurnBlack = true;
                     game.Blackout = 3;
-                }else{
+                }
+                else
+                {
                     game.TurnBlack = false;
                 }
-                return Ok(new { wrongMove = false, botMove, currentPosition = currentPosition, fenPosition, game.TurnBlack }); // named args here
+                
+                _dbUtilities.UpdateGame(game);
+                
+                return Ok(new { wrongMove = false, botMove, currentPosition = currentPosition, fenPosition, game.TurnBlack });
             }
             else
             {
@@ -111,21 +138,28 @@ namespace CHESSPROJ.Controllers
                 {
                     game.IsRunning = false;
                 }
-                if(game.Blackout == 0)
+                if (game.Blackout == 0)
                 {
                     game.TurnBlack = true;
                     game.Blackout = 3;
-                }else{
+                }
+                else
+                {
                     game.TurnBlack = false;
                 }
+
+                _dbUtilities.UpdateGame(game);
+                
                 return Ok(new { wrongMove = true, lives = game.Lives, game.IsRunning, game.TurnBlack }); // we box here :) (fight club reference)
             }
         }
 
+        //this should point to game history
         // Return the list of games
         [HttpGet("games")]
-        public IActionResult GetAllGames()
+        public async Task<IActionResult> GetAllGames()
         {
+            GamesList games = new GamesList(await _dbUtilities.GetGamesList());
             List<Game> gamesWithMoves = new List<Game>();
 
             foreach (var game in games.GetCustomEnumerator())
@@ -135,6 +169,5 @@ namespace CHESSPROJ.Controllers
             }
             return Ok(gamesWithMoves);
         }
-
     }
 }

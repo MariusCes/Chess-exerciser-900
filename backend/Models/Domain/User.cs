@@ -5,16 +5,18 @@ namespace backend.Models.Domain;
 
 public class User
 {
-    public Guid Id { get; set; }
+    public Guid Id { get; set; } // Primary key
     public string Username { get; set; }
     public string Password { get; set; }
-    public GameHistory UserGameHistory;
-    public UserStatist UserStatistics;
+    public ICollection<Game> Games { get; set; } = new List<Game>();
 
-    public User(GameHistory userGameHistory, UserStatist userStatist)
+    // Parameterless constructor for EF
+    public User() { }
+
+    public User(Guid Id, string Username, string Password) 
     {
-        UserGameHistory = userGameHistory;
-        UserGameHistory.Id = Id;
-        UserStatistics = userStatist;
+        this.Id = Id;
+        this.Username = Username;
+        this.Password = Password;
     }
 }
