@@ -25,7 +25,7 @@ builder.Services.AddCors(options =>
 });
 
 // Read the Stockfish path from configuration (appsettings.json or environment variable)
-string stockfishPath = builder.Configuration["StockfishPath"] ?? "gaidys";
+string stockfishPath = builder.Configuration["StockfishPath"] ?? "stockfish12.exe";
 
 
 
@@ -79,3 +79,4 @@ app.UseAuthorization();
 app.MapControllers();
 
 app.Run();
+public partial class Program { }
