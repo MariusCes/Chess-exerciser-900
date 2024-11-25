@@ -6,7 +6,6 @@ public class GamesList : List<Game>, IEnumerable<Game> // cia yra paturbintas li
 {
     public GamesList(List<Game> _games) : base(_games) { }
 
-
     public IEnumerable<Game> GetCustomEnumerator() // returnina collection, which can be itterated over. naudojam default enumerator
     {
         foreach (var game in this)

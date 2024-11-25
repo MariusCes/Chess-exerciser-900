@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import "../styles/Play.css";
 import Board from "./Board";
 import GameOver from "./GameOver";
@@ -17,9 +17,13 @@ function Play() {
   const [aiDifficulty, setAiDifficulty] = useState(""); // State for selected difficulty
   const [memoryDifficulty, setMemoryDifficulty] = useState("");
   const [gameStatus, setGameStatus] = useState(null);
+  const [health, setHealth] = useState(100);
+  const [timer, setTimer] = useState(0);
 
   const createGame = async () => {
+    setTimer(0);
     setMoveList([]);
+    setHealth(100);
     const response = await fetch(
       "http://localhost:5030/api/chess/create-game",
       {
@@ -37,6 +41,15 @@ function Play() {
     setGameStatus(null);
     setGameID(data.gameId);
     setIsGameCreated(true);
+  };
+
+  const mockCreateGame = () => {
+    setMoveList([]);
+    setHealth(100);
+    setGameStatus(null);
+    setGameID(2024);
+    setIsGameCreated(true);
+    setTimer(0);
   };
 
   const postMove = async (userMove) => {
@@ -61,6 +74,40 @@ function Play() {
     } else {
       setMove("Bad move!");
     }
+  };
+
+  const decreaseHealth = (amount) => {
+    setHealth((prevHealth) => {
+      const newHealth = Math.max(prevHealth - amount, 0); // Ensure health doesnt go below 0
+
+      // If health reaches 0, set the game over state
+      if (newHealth === 0) {
+        setGameStatus("lose");
+      }
+      return newHealth;
+    });
+  };
+
+  useEffect(() => {
+    let interval;
+  
+    if (isGameCreated && !gameStatus) {
+      interval = setInterval(() => {
+        setTimer((prevTimer) => prevTimer + 1);
+      }, 1000);
+    }
+  
+    return () => {
+      clearInterval(interval); // Stops the timer, but does not reset it
+    };
+  }, [isGameCreated, gameStatus]);
+
+  const formatTimer = (seconds) => {
+    const minutes = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${minutes.toString().padStart(2, "0")}:${secs
+      .toString()
+      .padStart(2, "0")}`;
   };
 
   return (
@@ -133,6 +180,14 @@ function Play() {
                 Submit Move
               </button>
             </form>
+
+              <div className="timer-container mt-2">
+                <span className="timer">{formatTimer(timer)}</span>
+              </div>
+
+            <div className="health-bar-container">
+              <div className="health-bar" style={{ width: `${health}%` }}></div>
+            </div>
             <div className="move-list-container">
               <ul className="move-list">
                 {moveList.map((move, index) => (
@@ -167,6 +222,18 @@ function Play() {
               >
                 Test Lose
               </button>
+
+              <button
+                onClick={() => decreaseHealth(10)}
+                className="btn btn-warning ms-2"
+              >
+                Decrease Health
+              </button>
+            </div>
+            <div className="test-buttons2 mt-3">
+              <button onClick={mockCreateGame} className="btn btn-success me-2">
+                Mock create game
+              </button>
             </div>
           </div>
         </div>
@@ -176,11 +243,10 @@ function Play() {
           <GameOver
             status={gameStatus}
             moveList={moveList}
+            onPlayAgain={mockCreateGame}
             onClose={() => {
               setGameStatus(null);
               setIsGameCreated(false);
-              setMoveList([]);
-              setFen(fen);
             }}
           />
         </div>

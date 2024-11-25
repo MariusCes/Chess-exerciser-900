@@ -35,7 +35,7 @@ namespace CHESSPROJ.Services
             }
             catch (Exception ex)
             {
-                return "Error getting the FEN";
+                return "Error getting the FEN" + ex;
             }
         }
 

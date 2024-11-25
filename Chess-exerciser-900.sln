@@ -5,6 +5,85 @@ VisualStudioVersion = 17.5.002.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "backend", "backend\backend.csproj", "{2B91837B-0E90-492C-A4DB-1F045B17E434}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "frontend", "frontend", "{0CC9245D-BC20-4D8B-9FEA-CA4116FD29A8}"
+	ProjectSection(SolutionItems) = preProject
+		frontend\.gitignore = frontend\.gitignore
+		frontend\package-lock.json = frontend\package-lock.json
+		frontend\package.json = frontend\package.json
+		frontend\README.md = frontend\README.md
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{47E293AB-BB32-45CB-9A85-7876B535B220}"
+	ProjectSection(SolutionItems) = preProject
+		frontend\src\App.css = frontend\src\App.css
+		frontend\src\App.js = frontend\src\App.js
+		frontend\src\App.test.js = frontend\src\App.test.js
+		frontend\src\index.css = frontend\src\index.css
+		frontend\src\index.js = frontend\src\index.js
+		frontend\src\logo.svg = frontend\src\logo.svg
+		frontend\src\reportWebVitals.js = frontend\src\reportWebVitals.js
+		frontend\src\setupTests.js = frontend\src\setupTests.js
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "styles", "styles", "{874D93E5-8FA2-431B-B293-4FF6AEAE5C01}"
+	ProjectSection(SolutionItems) = preProject
+		frontend\src\styles\About.css = frontend\src\styles\About.css
+		frontend\src\styles\Board.css = frontend\src\styles\Board.css
+		frontend\src\styles\GameOver.css = frontend\src\styles\GameOver.css
+		frontend\src\styles\History.css = frontend\src\styles\History.css
+		frontend\src\styles\Home.css = frontend\src\styles\Home.css
+		frontend\src\styles\Navbar.css = frontend\src\styles\Navbar.css
+		frontend\src\styles\Play.css = frontend\src\styles\Play.css
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "components", "components", "{09814425-324F-410E-BA23-3D506D7E29C6}"
+	ProjectSection(SolutionItems) = preProject
+		frontend\src\components\About.js = frontend\src\components\About.js
+		frontend\src\components\Board.js = frontend\src\components\Board.js
+		frontend\src\components\GameOver.js = frontend\src\components\GameOver.js
+		frontend\src\components\History.js = frontend\src\components\History.js
+		frontend\src\components\Home.js = frontend\src\components\Home.js
+		frontend\src\components\Navbar.js = frontend\src\components\Navbar.js
+		frontend\src\components\Play.js = frontend\src\components\Play.js
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "public", "public", "{F682D21E-B532-4673-92D0-64DB202FB9DD}"
+	ProjectSection(SolutionItems) = preProject
+		frontend\public\background.jpg = frontend\public\background.jpg
+		frontend\public\ce9000.png = frontend\public\ce9000.png
+		frontend\public\chess.jpg = frontend\public\chess.jpg
+		frontend\public\favicon.ico = frontend\public\favicon.ico
+		frontend\public\fruit.jpg = frontend\public\fruit.jpg
+		frontend\public\index.html = frontend\public\index.html
+		frontend\public\logo192.png = frontend\public\logo192.png
+		frontend\public\logo512.png = frontend\public\logo512.png
+		frontend\public\manifest.json = frontend\public\manifest.json
+		frontend\public\robots.txt = frontend\public\robots.txt
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "sounds", "sounds", "{3EC4B5B2-CF41-4B9E-A53F-2DF73EBED998}"
+	ProjectSection(SolutionItems) = preProject
+		frontend\public\sounds\bgmusic.mp3 = frontend\public\sounds\bgmusic.mp3
+		frontend\public\sounds\lose.mp3 = frontend\public\sounds\lose.mp3
+		frontend\public\sounds\win.mp3 = frontend\public\sounds\win.mp3
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "pieces", "pieces", "{A694BC47-1994-463E-A820-F69BC514259B}"
+	ProjectSection(SolutionItems) = preProject
+		frontend\public\pieces\black-bishop.png = frontend\public\pieces\black-bishop.png
+		frontend\public\pieces\black-king.png = frontend\public\pieces\black-king.png
+		frontend\public\pieces\black-knight.png = frontend\public\pieces\black-knight.png
+		frontend\public\pieces\black-pawn.png = frontend\public\pieces\black-pawn.png
+		frontend\public\pieces\black-queen.png = frontend\public\pieces\black-queen.png
+		frontend\public\pieces\black-rook.png = frontend\public\pieces\black-rook.png
+		frontend\public\pieces\white-bishop.png = frontend\public\pieces\white-bishop.png
+		frontend\public\pieces\white-king.png = frontend\public\pieces\white-king.png
+		frontend\public\pieces\white-knight.png = frontend\public\pieces\white-knight.png
+		frontend\public\pieces\white-pawn.png = frontend\public\pieces\white-pawn.png
+		frontend\public\pieces\white-queen.png = frontend\public\pieces\white-queen.png
+		frontend\public\pieces\white-rook.png = frontend\public\pieces\white-rook.png
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -18,6 +97,14 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{47E293AB-BB32-45CB-9A85-7876B535B220} = {0CC9245D-BC20-4D8B-9FEA-CA4116FD29A8}
+		{874D93E5-8FA2-431B-B293-4FF6AEAE5C01} = {47E293AB-BB32-45CB-9A85-7876B535B220}
+		{09814425-324F-410E-BA23-3D506D7E29C6} = {47E293AB-BB32-45CB-9A85-7876B535B220}
+		{F682D21E-B532-4673-92D0-64DB202FB9DD} = {0CC9245D-BC20-4D8B-9FEA-CA4116FD29A8}
+		{3EC4B5B2-CF41-4B9E-A53F-2DF73EBED998} = {F682D21E-B532-4673-92D0-64DB202FB9DD}
+		{A694BC47-1994-463E-A820-F69BC514259B} = {F682D21E-B532-4673-92D0-64DB202FB9DD}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {9E2B7EE0-C11B-441A-ADE4-22ECBB5B3214}
