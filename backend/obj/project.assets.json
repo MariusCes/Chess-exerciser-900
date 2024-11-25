@@ -3438,23 +3438,23 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\Marius\\.nuget\\packages\\": {},
+    "C:\\Users\\makal\\.nuget\\packages\\": {},
     "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "D:\\PROGRAMMING_PROJECTS\\Chess-exerciser-900\\backend\\backend.csproj",
+      "projectUniqueName": "C:\\VU\\Chess-exerciser-900\\backend\\backend.csproj",
       "projectName": "backend",
-      "projectPath": "D:\\PROGRAMMING_PROJECTS\\Chess-exerciser-900\\backend\\backend.csproj",
-      "packagesPath": "C:\\Users\\Marius\\.nuget\\packages\\",
-      "outputPath": "D:\\PROGRAMMING_PROJECTS\\Chess-exerciser-900\\backend\\obj\\",
+      "projectPath": "C:\\VU\\Chess-exerciser-900\\backend\\backend.csproj",
+      "packagesPath": "C:\\Users\\makal\\.nuget\\packages\\",
+      "outputPath": "C:\\VU\\Chess-exerciser-900\\backend\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
       ],
       "configFilePaths": [
-        "C:\\Users\\Marius\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Users\\makal\\AppData\\Roaming\\NuGet\\NuGet.Config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],

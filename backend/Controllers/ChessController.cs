@@ -34,20 +34,21 @@ namespace CHESSPROJ.Controllers
         [HttpPost("create-game")]
         public async Task<IActionResult> CreateGame([FromBody] CreateGameReqDto req)
         {
-<<<<<<< HEAD
-            _stockfishService.SetLevel(SkillLevel); //default set to 5, need to see what level does
-            Game game = new Game(Guid.NewGuid(), 1, 1, ę);
-            game.MovesArray = new List<string>();
-            game.Lives = 3;
-            game.Blackout = 3;
-            game.IsRunning = true;
-
-            games.Add(game);
-            return Ok(new { GameId = game.GameId });
-=======
             _stockfishService.SetLevel(req.aiDifficulty); //default set to 5, need to see what level does
+            //req.gameDifficulty - nuo kiek iki kiek yra
+            //req.aiDifficulty - nuo kiek iki kiek yra
 
-            Game game = Game.CreateGameFactory(Guid.NewGuid(), 5, 1, 3);
+        int blackout = req.gameDifficulty switch
+        {
+            1 => 2,
+            2 => 4,
+            3 => 6,
+            _ => 3 //jei kazkaip neina, tai duos 3
+        };
+
+            
+            Game game = Game.CreateGameFactory(Guid.NewGuid(), req.gameDifficulty, req.aiDifficulty, 3);
+            
 
             // add user here. For now its only one (hardcoded)
             game.UserId = demoUser.Id;
@@ -58,7 +59,6 @@ namespace CHESSPROJ.Controllers
             } else {
                 return NotFound($"{gameNotFound.ToString()}");        // return "DB error" here
             }
->>>>>>> 1359b12c5bb629118b243448fd8c02fafba3878a
         }
 
         [HttpGet("{gameId}/history")]
@@ -115,17 +115,7 @@ namespace CHESSPROJ.Controllers
 
                 string fenPosition = _stockfishService.GetFen();
                 currentPosition = string.Join(" ", game.MovesArray);
-                game.Blackout--;
-                if (game.Blackout == 0)
-                {
-                    game.TurnBlack = true;
-                    game.Blackout = 3;
-                }
-                else
-                {
-                    game.TurnBlack = false;
-                }
-                
+                game.HandleBlackout();
                 _dbUtilities.UpdateGame(game);
                 
                 return Ok(new { wrongMove = false, botMove, currentPosition = currentPosition, fenPosition, game.TurnBlack });
@@ -133,20 +123,13 @@ namespace CHESSPROJ.Controllers
             else
             {
                 game.Lives--; //minus life
-                game.Blackout--;
-                if (game.Lives == 0)
+                
+                if (game.Lives <= 0)
                 {
                     game.IsRunning = false;
+                    game.Lives = 0; //so there are no negative lives in db i hope
                 }
-                if (game.Blackout == 0)
-                {
-                    game.TurnBlack = true;
-                    game.Blackout = 3;
-                }
-                else
-                {
-                    game.TurnBlack = false;
-                }
+                game.HandleBlackout();
 
                 _dbUtilities.UpdateGame(game);
                 
@@ -154,8 +137,6 @@ namespace CHESSPROJ.Controllers
             }
         }
 
-        //this should point to game history
-        // Return the list of games
         [HttpGet("games")]
         public async Task<IActionResult> GetAllGames()
         {

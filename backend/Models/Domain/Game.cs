@@ -45,12 +45,52 @@ public class Game
         Lives = lives;
         IsRunning = true;
         TurnBlack = false;
-        Blackout = 3;
+        Blackout = 3; //set to default 3, but should cahnge based on difficulty 
     }
+
+
 
     //factory
     public static Game CreateGameFactory(Guid guid, int difficulty, int botRating, int lives)
     {
-        return new Game(guid, difficulty, botRating, lives);
+        int blackout = difficulty switch
+        {
+            1 => 2,
+            2 => 4,
+            3 => 6,
+            _ => 3 // Default fallback value
+        };
+
+        return new Game(guid, difficulty, botRating, lives)
+        {
+            Blackout = blackout
+        };
+    }
+
+    //function for the blackout every n moves:
+    /*
+
+
+
+
+    */
+    public void HandleBlackout()
+    {
+        Blackout--;
+        if (Blackout == 0)
+        {
+            TurnBlack = true;
+            Blackout = Difficulty switch
+            {
+                1 => 2,
+                2 => 4,
+                3 => 6,
+                _ => 3
+            };
+        }
+        else
+        {
+            TurnBlack = false;
+        }
     }
 }
