@@ -4,6 +4,7 @@ import Navbar from "./components/Navbar";
 import About from "./components/About";
 import Home from "./components/Home";
 import Play from "./components/Play";
+import History from "./components/History";
 import './App.css';
 
 
@@ -15,6 +16,7 @@ function App() {
         <Routes>
           <Route path="/home" element={<Home />} />
           <Route path="/about" element={<About />} />
+          <Route path="/history" element={<History />} />
           <Route path="/play" element={<Play />} />
         </Routes>
       </Router>
