@@ -11,7 +11,7 @@ public class Game
     public Guid GameId { get; set; }
     public int Difficulty { get; private set; }
     public int BotRating { get; private set; }
-     public string MovesArraySerialized { get; set; }
+    public string? MovesArraySerialized { get; set; }
     public int Lives { get; set; }
     public Boolean IsRunning { get; set; }
     public TimeSpan StartOfGame { get; set; }
@@ -19,13 +19,6 @@ public class Game
     public int WLD { get; set; } //Win - 1 Lose - 0 Draw - 2
     public int Blackout { get; set; }
     public Boolean TurnBlack { get; set; }
-
-    [NotMapped]
-    public List<string>? MovesArray
-    {
-        get => MovesArraySerialized == null ? new List<string>() : JsonSerializer.Deserialize<List<string>>(MovesArraySerialized);
-        set => MovesArraySerialized = JsonSerializer.Serialize(value);
-    }
 
     // Foreign key to User
     public Guid UserId { get; set; }
@@ -41,7 +34,6 @@ public class Game
         this.Difficulty = _gameStartStruct.Difficulty;
         this.BotRating = _gameStartStruct.BotRating;
         BotRating = botRating;
-        MovesArray = new List<string>();
         Lives = lives;
         IsRunning = true;
         TurnBlack = false;
