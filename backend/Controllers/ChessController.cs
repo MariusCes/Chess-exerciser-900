@@ -37,9 +37,12 @@ namespace CHESSPROJ.Controllers
 
             Game game = Game.CreateGameFactory(Guid.NewGuid(), req.gameDifficulty, req.aiDifficulty, 3);
 
-            if (await dbUtilities.AddGame(game)) {
-                return Ok(new { GameId = game.GameId });    
-            } else {
+            if (await dbUtilities.AddGame(game))
+            {
+                return Ok(new { GameId = game.GameId });
+            }
+            else
+            {
                 return NotFound($"{gameNotFound.ToString()}");        // return "DB error" here
             }
         }
@@ -47,17 +50,22 @@ namespace CHESSPROJ.Controllers
         [HttpGet("{gameId}/history")]
         public async Task<IActionResult> GetMovesHistory(string gameId)
         {
-            
+
             Game game = await dbUtilities.GetGameById(gameId);
             if (game == null)
                 return NotFound("Game not found.");
 
-            var moves = game.MovesArray;
-            if (game.MovesArray == null || !game.MovesArray.Any())
+            List<string> MovesArray = new List<string>();
+
+            if (game.MovesArraySerialized != null)
+            {
+                MovesArray = JsonSerializer.Deserialize<List<string>>(game.MovesArraySerialized);
+            }
+            if (MovesArray == null || !MovesArray.Any())
             {
                 return Ok(new List<string>()); // Return an empty list if there are no moves
             }
-            string jsonMoves = JsonSerializer.Serialize(moves);
+            string jsonMoves = JsonSerializer.Serialize(MovesArray);
             MemoryStream memoryStream = new MemoryStream();
             using (StreamWriter writer = new StreamWriter(memoryStream))
             {
@@ -86,18 +94,23 @@ namespace CHESSPROJ.Controllers
                 return BadRequest($"{badMove.ToString()}");
             }
 
-            string currentPosition = string.Join(" ", game.MovesArray);
+            List<string> MovesArray = new List<string>();
+
+            if (game.MovesArraySerialized != null)
+            {
+                MovesArray = JsonSerializer.Deserialize<List<string>>(game.MovesArraySerialized);
+            }
+            string currentPosition = string.Join(" ", MovesArray);
 
             if (_stockfishService.IsMoveCorrect(currentPosition, move))
             {
                 _stockfishService.SetPosition(currentPosition, move);
-                game.MovesArray.Add(move);
+                MovesArray.Add(move);
                 string botMove = _stockfishService.GetBestMove();
-                _stockfishService.SetPosition(string.Join(" ", game.MovesArray), botMove);
-                game.MovesArray.Add(botMove);
-
+                _stockfishService.SetPosition(string.Join(" ", MovesArray), botMove);
+                MovesArray.Add(botMove);
                 string fenPosition = _stockfishService.GetFen();
-                currentPosition = string.Join(" ", game.MovesArray);
+                currentPosition = string.Join(" ", MovesArray);
                 game.Blackout--;
                 if (game.Blackout == 0)
                 {
@@ -108,9 +121,10 @@ namespace CHESSPROJ.Controllers
                 {
                     game.TurnBlack = false;
                 }
-                
+
+                game.MovesArraySerialized = JsonSerializer.Serialize(MovesArray);
                 await dbUtilities.UpdateGame(game);
-                
+
                 return Ok(new { wrongMove = false, botMove, currentPosition = currentPosition, fenPosition, game.TurnBlack });
             }
             else
@@ -132,7 +146,7 @@ namespace CHESSPROJ.Controllers
                 }
 
                 await dbUtilities.UpdateGame(game);
-                
+
                 return Ok(new { wrongMove = true, lives = game.Lives, game.IsRunning, game.TurnBlack }); // we box here :) (fight club reference)
             }
         }
