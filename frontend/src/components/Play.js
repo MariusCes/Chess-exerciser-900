@@ -83,11 +83,12 @@ function Play() {
       // If health reaches 0, set the game over state
       if (newHealth === 0) {
         setGameStatus("lose");
+        return 0;
       }
       return newHealth;
     });
   };
-
+  
   useEffect(() => {
     let interval;
   
@@ -215,6 +216,12 @@ function Play() {
                 className="btn btn-success me-2"
               >
                 Test Win
+              </button>
+              <button
+                onClick={() => setGameStatus("draw")}
+                className="btn btn-warning me-2"
+              >
+                Test Draw
               </button>
               <button
                 onClick={() => setGameStatus("lose")}

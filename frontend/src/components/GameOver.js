@@ -3,9 +3,11 @@ import "../styles/GameOver.css";
 
 const GameOver = ({ status, moveList, onClose, onPlayAgain }) => {
   const isWin = status === "win";
+  const isDraw = status === "draw";
 
   useEffect(() => {
     const sound = new Audio(isWin ? "/sounds/win.mp3" : "/sounds/lose.mp3");
+    sound.volume = 0.2;
     sound.play();
   }, [status]); // Play sound every time the game status changes.
 
@@ -16,8 +18,8 @@ const GameOver = ({ status, moveList, onClose, onPlayAgain }) => {
           ✕
         </button>
         <div className="content-wrapper">
-          <h1 className={`game-status ${isWin ? "win" : "loss"}`}>
-            {isWin ? "Victory!" : "Game Over"}
+          <h1 className={`game-status ${isWin ? "win" : isDraw ? "draw" : "loss"}`}>
+            {isWin ? "Victory!" : isDraw ? "Draw!" : "Game Over"}
           </h1>
 
           <div className="move-summary">

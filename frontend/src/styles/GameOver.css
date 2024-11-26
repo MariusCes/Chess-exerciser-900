@@ -43,6 +43,11 @@
   color: #f56565;
 }
 
+.draw {
+  color: #b2aa8c;
+}
+
+
 .move-summary {
   background: rgba(255, 255, 255, 0.05);
   padding: 16px;
