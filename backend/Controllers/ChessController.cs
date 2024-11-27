@@ -78,7 +78,9 @@ namespace CHESSPROJ.Controllers
         [HttpPost("{gameId}/move")]
         public async Task<IActionResult> MakeMove(string gameId, [FromBody] MoveDto moveNotation)       // extractina is JSON post info i MoveDto record'a
         {
-e
+            Game game = await dbUtilities.GetGameById(gameId);
+            if (game == null)
+            {
                 return NotFound($"{gameNotFound.ToString()}");
             }
 
