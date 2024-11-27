@@ -89,7 +89,7 @@ namespace CHESSPROJ.Controllers
             }
             string currentPosition = string.Join(" ", MovesArray);
 
-            if (_stockfishService.IsMoveCorrect(currentPosition, move))
+            if (_stockfishService.IsMoveCorrect(currentPosition, move) && game.IsRunning) //kad nebtuu kokiu shenaningans
             {
                 _stockfishService.SetPosition(currentPosition, move);
                 MovesArray.Add(move);
@@ -109,6 +109,10 @@ namespace CHESSPROJ.Controllers
             else
             {
                 game.Lives--; //minus life
+                if(game.Lives <= 0){
+                    game.IsRunning = false; 
+                    game.Lives = 0; //kad nebutu negative in db
+                }
                 game.HandleBlackout();
 
                 await dbUtilities.UpdateGame(game);
