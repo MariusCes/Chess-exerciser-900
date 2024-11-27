@@ -16,6 +16,7 @@
     </PackageReference>
     <PackageReference Include="Stockfish.NET" Version="1.0.7" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.4.0" />
+    <PackageReference Include="System.Text.Json" Version="9.0.0" />
   </ItemGroup>
 
 </Project>

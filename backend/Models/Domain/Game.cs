@@ -69,10 +69,10 @@ public class Game
 
     //function for the blackout every n moves:
     /*
-
-
-
-
+    if diff is 1, black will be every 2 moves,
+    if diff is 2, black will be every 4 moves,
+    if diff is 3, black will be every 6 moves,
+    otherwise it will be every 3 moves
     */
     public void HandleBlackout()
     {
