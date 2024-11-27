@@ -20,6 +20,13 @@ public class Game
     public int Blackout { get; set; }
     public Boolean TurnBlack { get; set; }
 
+
+    [NotMapped]
+    public List<string>? MovesArray
+    {
+        get => MovesArraySerialized == null ? new List<string>() : JsonSerializer.Deserialize<List<string>>(MovesArraySerialized);
+        set => MovesArraySerialized = JsonSerializer.Serialize(value);
+    }
     // Foreign key to User
     public Guid UserId { get; set; }
 

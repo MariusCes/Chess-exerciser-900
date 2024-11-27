@@ -34,24 +34,8 @@ namespace CHESSPROJ.Controllers
         public async Task<IActionResult> CreateGame([FromBody] CreateGameReqDto req)
         {
             _stockfishService.SetLevel(req.aiDifficulty); //default set to 5, need to see what level does
-            //req.gameDifficulty - nuo kiek iki kiek yra
-            //req.aiDifficulty - nuo kiek iki kiek yra
 
-        int blackout = req.gameDifficulty switch
-        {
-            1 => 2,
-            2 => 4,
-            3 => 6,
-            _ => 3 //jei kazkaip neina, tai duos 3
-        };
-
-            
             Game game = Game.CreateGameFactory(Guid.NewGuid(), req.gameDifficulty, req.aiDifficulty, 3);
-            
-
-            // add user here. For now its only one (hardcoded)
-            game.UserId = demoUser.Id;
-            game.User = demoUser; 
 
             if (await dbUtilities.AddGame(game))
             {
@@ -63,33 +47,20 @@ namespace CHESSPROJ.Controllers
             }
         }
 
-        [HttpGet("{gameId}/history")]
+         [HttpGet("{gameId}/history")]
         public async Task<IActionResult> GetMovesHistory(string gameId)
         {
-
             Game game = await dbUtilities.GetGameById(gameId);
             if (game == null)
                 return NotFound("Game not found.");
 
-            List<string> MovesArray = new List<string>();
-
-            if (game.MovesArraySerialized != null)
+            var moves = game.MovesArray ?? new List<string>();
+            var response = new GetMovesHistoryResponseDTO 
             {
-                MovesArray = JsonSerializer.Deserialize<List<string>>(game.MovesArraySerialized);
-            }
-            if (MovesArray == null || !MovesArray.Any())
-            {
-                return Ok(new List<string>()); // Return an empty list if there are no moves
-            }
-            string jsonMoves = JsonSerializer.Serialize(MovesArray);
-            MemoryStream memoryStream = new MemoryStream();
-            using (StreamWriter writer = new StreamWriter(memoryStream))
-            {
-                writer.Write(jsonMoves);
-                writer.Flush();
-            }
-            memoryStream.Position = 0;
-            return new FileStreamResult(memoryStream, "application/json");
+                MovesArray = moves
+            };
+            
+            return Ok(response);
         }
 
         // POST: api/chessgame/{gameId}/move
@@ -127,16 +98,8 @@ namespace CHESSPROJ.Controllers
                 MovesArray.Add(botMove);
                 string fenPosition = _stockfishService.GetFen();
                 currentPosition = string.Join(" ", MovesArray);
-                game.Blackout--;
-                if (game.Blackout == 0)
-                {
-                    game.TurnBlack = true;
-                    game.Blackout = 3;
-                }
-                else
-                {
-                    game.TurnBlack = false;
-                }
+
+                game.HandleBlackout();
 
                 game.MovesArraySerialized = JsonSerializer.Serialize(MovesArray);
                 await dbUtilities.UpdateGame(game);
@@ -146,12 +109,6 @@ namespace CHESSPROJ.Controllers
             else
             {
                 game.Lives--; //minus life
-                
-                if (game.Lives <= 0)
-                {
-                    game.IsRunning = false;
-                    game.Lives = 0; //so there are no negative lives in db i hope
-                }
                 game.HandleBlackout();
 
                 await dbUtilities.UpdateGame(game);
@@ -168,11 +125,12 @@ namespace CHESSPROJ.Controllers
             GamesList games = new GamesList(gamesList);
             List<Game> gamesWithMoves = new List<Game>();
 
-            foreach (var game in games.GetCustomEnumerator())
+           foreach (var game in games.GetCustomEnumerator())
             {
                 // custom filtering using IEnumerable
                 gamesWithMoves.Add(game);
             }
+            
             return Ok(gamesWithMoves);
         }
     }
