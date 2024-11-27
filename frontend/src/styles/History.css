@@ -1,135 +1,142 @@
 .history-container {
-    padding: 20px;
-    max-width: 800px;
-    margin: 0 auto;
-    background-color: rgb(33 37 41);
-    border-radius: 10px;
-    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.5);
-    color: #f8f9fa;
+  padding: 20px;
+  max-width: 800px;
+  margin: 0 auto;
+  background-color: rgb(33 37 41);
+  border-radius: 10px;
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.5);
+  color: #f8f9fa;
+}
+
+.history-title {
+  text-align: center;
+  font-size: 2rem;
+  font-weight: bold;
+  margin-bottom: 20px;
+  font-family: 'Montserrat', sans-serif;
+  color: #ffffff;
+}
+
+.game-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.game-item {
+  padding: 15px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: transform 0.3s ease, box-shadow 0.3s ease, background-color 0.3s ease;
+  background-color: rgba(30, 30, 30, 0.9);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.game-item:hover {
+  transform: scale(1.02);
+  box-shadow: 0px 6px 12px rgba(0, 0, 0, 0.7);
+  background-color: rgba(50, 50, 50, 0.9);
+}
+
+.game-won {
+  border-left: 5px solid #7ccdee;
+}
+
+.game-lost {
+  border-left: 5px solid #ff6b6b;
+}
+
+.game-summary {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 1.2rem;
+  font-weight: bold;
+}
+
+.game-outcome {
+  font-size: 1.4rem;
+}
+
+.game-duration {
+  font-size: 1.1rem;
+  color: #7ccdee;
+}
+
+/* Expanded Game Details */
+.game-details {
+  margin-top: 10px;
+  padding: 15px;
+  background-color: rgba(20, 20, 20, 0.9);
+  border-radius: 6px;
+  box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.5);
+  color: #f8f9fa;
+}
+
+.details-header {
+  font-size: 1.2rem;
+  margin-bottom: 8px;
+  text-align: center;
+  font-weight: bold;
+  color: #7ccdee;
+}
+
+.move-list-container {
+  max-height: 150px;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: #7ccdee rgba(30, 30, 30, 0.9);
+}
+
+.move-list-container::-webkit-scrollbar {
+  width: 8px;
+}
+
+.move-list-container::-webkit-scrollbar-thumb {
+  background-color: #7ccdee;
+  border-radius: 4px;
+}
+
+.move-list {
+  list-style-type: none;
+  padding: 0;
+}
+
+.move-item {
+  padding: 5px 10px;
+  margin-bottom: 5px;
+  border-radius: 4px;
+  transition: background-color 0.3s ease;
+}
+
+.move-item.your-move {
+  background-color: rgba(171, 243, 153, 0.619);
+  color: #ffffff;
+}
+
+.move-item.bot-move {
+  background-color: rgba(244, 67, 54, 0.597);
+  color: #ffffff;
+}
+
+.game-draw {
+  border-left: 5px solid #b2aa8c;
+}
+
+.game-outcome-draw {
+  color: #b2aa8c;
+}
+
+@media (max-width: 768px) {
+  .history-container {
+    padding: 15px;
   }
-  
+
   .history-title {
-    text-align: center;
-    font-size: 2rem;
-    font-weight: bold;
-    margin-bottom: 20px;
-    font-family: 'Montserrat', sans-serif;
-    color: #ffffff;
+    font-size: 1.5rem;
   }
-  
-  .game-list {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-  }
-  
-  .game-item {
-    padding: 15px;
-    border-radius: 8px;
-    cursor: pointer;
-    transition: transform 0.3s ease, box-shadow 0.3s ease, background-color 0.3s ease;
-    background-color: rgba(30, 30, 30, 0.9);
-    border: 1px solid rgba(255, 255, 255, 0.2);
-  }
-  
-  .game-item:hover {
-    transform: scale(1.02);
-    box-shadow: 0px 6px 12px rgba(0, 0, 0, 0.7);
-    background-color: rgba(50, 50, 50, 0.9);
-  }
-  
-  .game-won {
-    border-left: 5px solid #7ccdee;
-  }
-  
-  .game-lost {
-    border-left: 5px solid #ff6b6b;
-  }
-  
+
   .game-summary {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    font-size: 1.2rem;
-    font-weight: bold;
+    font-size: 1rem;
   }
-  
-  .game-outcome {
-    font-size: 1.4rem;
-  }
-  
-  .game-duration {
-    font-size: 1.1rem;
-    color: #7ccdee;
-  }
-  
-  /* Expanded Game Details */
-  .game-details {
-    margin-top: 10px;
-    padding: 15px;
-    background-color: rgba(20, 20, 20, 0.9);
-    border-radius: 6px;
-    box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.5);
-    color: #f8f9fa;
-  }
-  
-  .details-header {
-    font-size: 1.2rem;
-    margin-bottom: 8px;
-    text-align: center;
-    font-weight: bold;
-    color: #7ccdee;
-  }
-  
-  .move-list-container {
-    max-height: 150px;
-    overflow-y: auto;
-    scrollbar-width: thin;
-    scrollbar-color: #7ccdee rgba(30, 30, 30, 0.9);
-  }
-  
-  .move-list-container::-webkit-scrollbar {
-    width: 8px;
-  }
-  
-  .move-list-container::-webkit-scrollbar-thumb {
-    background-color: #7ccdee;
-    border-radius: 4px;
-  }
-  
-  .move-list {
-    list-style-type: none;
-    padding: 0;
-  }
-  
-  .move-item {
-    padding: 5px 10px;
-    margin-bottom: 5px;
-    border-radius: 4px;
-    transition: background-color 0.3s ease;
-  }
-  
-  .move-item.your-move {
-    background-color: rgba(171, 243, 153, 0.619);
-    color: #ffffff;
-  }
-  
-  .move-item.bot-move {
-    background-color: rgba(244, 67, 54, 0.597);
-    color: #ffffff;
-  }
-  
-  @media (max-width: 768px) {
-    .history-container {
-      padding: 15px;
-    }
-  
-    .history-title {
-      font-size: 1.5rem;
-    }
-  
-    .game-summary {
-      font-size: 1rem;
-    }
-  }
-  
+}

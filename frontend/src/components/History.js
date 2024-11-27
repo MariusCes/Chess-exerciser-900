@@ -20,7 +20,14 @@ const mockGames = [
         duration: "15:45",
         moves: ["g3", "d5", "Bg2", "e6", "d3", "c5", "Nf3", "Nc6", "O-O"],
     },
+    {
+        id: 4,
+        outcome: "draw",
+        duration: "10:00",
+        moves: ["e4", "e5", "Nf3", "Nc6", "Bb5", "a6", "Ba4", "Nf6", "O-O", "O-O-O"],
+    },
 ];
+
 
 const History = () => {
     const [games, setGames] = useState([]);
@@ -41,12 +48,28 @@ const History = () => {
                 {mockGames.map((game) => (
                     <div
                         key={game.id}
-                        className={`game-item ${game.outcome === "won" ? "game-won" : "game-lost"}`}
+                        className={`game-item ${game.outcome === "won"
+                            ? "game-won"
+                            : game.outcome === "lost"
+                                ? "game-lost"
+                                : "game-draw"
+                            }`}
                         onClick={() => toggleGameDetails(game.id)}
                     >
                         <div className="game-summary">
-                            <span className="game-outcome">
-                                {game.outcome === "won" ? "Victory" : "Defeat"}
+                            <span
+                                className={`game-outcome ${game.outcome === "won"
+                                        ? "game-outcome-won"
+                                        : game.outcome === "lost"
+                                            ? "game-outcome-lost"
+                                            : "game-outcome-draw"
+                                    }`}
+                            >
+                                {game.outcome === "won"
+                                    ? "Victory"
+                                    : game.outcome === "lost"
+                                        ? "Defeat"
+                                        : "Draw"}
                             </span>
                             <span className="game-duration">{game.duration}</span>
                         </div>

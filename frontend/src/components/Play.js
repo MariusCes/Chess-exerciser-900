@@ -78,16 +78,15 @@ function Play() {
 
   const decreaseHealth = (amount) => {
     setHealth((prevHealth) => {
-      const newHealth = Math.max(prevHealth - amount, 0); // Ensure health doesnt go below 0
-
-      // If health reaches 0, set the game over state
-      if (newHealth === 0) {
+      const newHealth = prevHealth - amount;
+      if (newHealth <= 0) {
         setGameStatus("lose");
+        return 0;
       }
       return newHealth;
     });
   };
-
+  
   useEffect(() => {
     let interval;
   
@@ -215,6 +214,12 @@ function Play() {
                 className="btn btn-success me-2"
               >
                 Test Win
+              </button>
+              <button
+                onClick={() => setGameStatus("draw")}
+                className="btn btn-warning me-2"
+              >
+                Test Draw
               </button>
               <button
                 onClick={() => setGameStatus("lose")}
