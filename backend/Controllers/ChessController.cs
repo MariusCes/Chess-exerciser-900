@@ -47,7 +47,11 @@ namespace CHESSPROJ.Controllers
             game.User = demoUser; 
 
             if (await dbUtilities.AddGame(game)) {
-                return Ok(new { GameId = game.GameId });    
+
+                var PostCreateGameResponseDTO = new PostCreateGameResponseDTO {
+                    GameId = game.GameId.ToString()
+                };
+                return Ok(PostCreateGameResponseDTO);  //TODO: All anonymous objects have to be converted to DTO  
             } else {
                 return NotFound($"{gameNotFound.ToString()}");        // return "DB error" here
             }
@@ -56,35 +60,25 @@ namespace CHESSPROJ.Controllers
         [HttpGet("{gameId}/history")]
         public async Task<IActionResult> GetMovesHistory(string gameId)
         {
-            
             Game game = await dbUtilities.GetGameById(gameId);
             if (game == null)
                 return NotFound("Game not found.");
 
-            var moves = game.MovesArray;
-            if (game.MovesArray == null || !game.MovesArray.Any())
+            var moves = game.MovesArray ?? new List<string>();
+            var response = new GetMovesHistoryResponseDTO 
             {
-                return Ok(new List<string>()); // Return an empty list if there are no moves
-            }
-            string jsonMoves = JsonSerializer.Serialize(moves);
-            MemoryStream memoryStream = new MemoryStream();
-            using (StreamWriter writer = new StreamWriter(memoryStream))
-            {
-                writer.Write(jsonMoves);
-                writer.Flush();
-            }
-            memoryStream.Position = 0;
-            return new FileStreamResult(memoryStream, "application/json");
-        }
+                MovesArray = moves
+            };
+            
+            return Ok(response);
+}
+
 
         // POST: api/chessgame/{gameId}/move
         [HttpPost("{gameId}/move")]
         public async Task<IActionResult> MakeMove(string gameId, [FromBody] MoveDto moveNotation)       // extractina is JSON post info i MoveDto record'a
         {
-
-            var game = await dbUtilities.GetGameById(gameId);
-            if (game == null)
-            {
+e
                 return NotFound($"{gameNotFound.ToString()}");
             }
 
@@ -120,7 +114,15 @@ namespace CHESSPROJ.Controllers
                 
                 dbUtilities.UpdateGame(game);
                 
-                return Ok(new { wrongMove = false, botMove, currentPosition = currentPosition, fenPosition, game.TurnBlack });
+                var postMoveResponseDTO = new PostMoveResponseDTO {
+                    WrongMove = false,
+                    BotMove = botMove,
+                    CurrentPosition = currentPosition,
+                    FenPosition = fenPosition,
+                    TurnBlack = game.TurnBlack
+                };
+
+                return Ok(postMoveResponseDTO);
             }
             else
             {
@@ -142,7 +144,14 @@ namespace CHESSPROJ.Controllers
 
                 dbUtilities.UpdateGame(game);
                 
-                return Ok(new { wrongMove = true, lives = game.Lives, game.IsRunning, game.TurnBlack }); // we box here :) (fight club reference)
+                var postMoveResponseDTO = new PostMoveResponseDTO {
+                    WrongMove = true,
+                    Lives = game.Lives,
+                    IsRunning = game.IsRunning,
+                    TurnBlack = game.TurnBlack
+                };
+                
+                return Ok(postMoveResponseDTO); // we box here :) (fight club reference)
             }
         }
 
@@ -158,17 +167,19 @@ namespace CHESSPROJ.Controllers
 
             logger.LogInformation("Retrieved {Count} games", gamesList.Count);
 
-            //GamesList games = new GamesList(gamesList);
-            //List<Game> gamesWithMoves = new List<Game>();
+            GamesList games = new GamesList(gamesList);
+            List<Game> gamesWithMoves = new List<Game>();
 
-            //foreach (var game in games.GetCustomEnumerator())
-            //{
-            //    // custom filtering using IEnumerable
-            //    gamesWithMoves.Add(game);
-            //}
-            //return Ok(gamesWithMoves);
-
-            return Ok(gamesList);
+            foreach (var game in games.GetCustomEnumerator())
+        {
+                // custom filtering using IEnumerable
+                gamesWithMoves.Add(game);
+            }
+            var getAllGamesResponseDTO = new GetAllGamesResponseDTO {
+                GamesList = gamesWithMoves
+            };
+            return Ok(getAllGamesResponseDTO);
+            
         }
     }
 }
