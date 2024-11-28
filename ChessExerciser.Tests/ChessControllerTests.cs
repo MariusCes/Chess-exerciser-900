@@ -16,15 +16,13 @@ namespace ChessExerciser.Tests
     {
         private readonly Mock<IStockfishService> _mockStockfishService;
         private readonly Mock<IDatabaseUtilities> _mockDbUtilities;
-        private readonly Mock<ILogger<ChessController>> _mockLogger;
         private readonly ChessController _controller;
 
         public ChessControllerTests()
         {
             _mockStockfishService = new Mock<IStockfishService>();
             _mockDbUtilities = new Mock<IDatabaseUtilities>();
-            _mockLogger = new Mock<ILogger<ChessController>>();
-            _controller = new ChessController(_mockStockfishService.Object, _mockDbUtilities.Object, _mockLogger.Object);
+            _controller = new ChessController(_mockStockfishService.Object, _mockDbUtilities.Object);
         }
 
         [Fact]
