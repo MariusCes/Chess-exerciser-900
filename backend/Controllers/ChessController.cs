@@ -34,9 +34,6 @@ namespace CHESSPROJ.Controllers
         public async Task<IActionResult> CreateGame([FromBody] CreateGameReqDto req)
         {
             _stockfishService.SetLevel(req.aiDifficulty);
-
-            logger.LogInformation(req.gameDifficulty, "ttaaataojaojao{gameDifficulty}", req.gameDifficulty);
-
             Game game = Game.CreateGameFactory(Guid.NewGuid(), req.gameDifficulty, req.aiDifficulty, 3);
 
             try
@@ -122,6 +119,7 @@ namespace CHESSPROJ.Controllers
                 if(game.Lives <= 0){
                     game.IsRunning = false; 
                     game.Lives = 0; //kad nebutu negative in db
+                    game.WLD = 0;
                 }
                 game.HandleBlackout();
 
@@ -146,6 +144,23 @@ namespace CHESSPROJ.Controllers
             }
             
             return Ok(gamesWithMoves);
+        }
+
+        [HttpGet("{userId}/games")]
+        public async Task<IActionResult> GetUserGames(string userId)
+        {
+            GamesList gamesList = new GamesList(await dbUtilities.GetGamesList());
+            List<Game> userGames = new List<Game>();
+
+            foreach(var game in gamesList)
+            {
+                if (game.UserId.ToString() == userId)
+                {
+                    userGames.Add(game);
+                }
+            }
+
+            return Ok(userGames);
         }
     }
 }
