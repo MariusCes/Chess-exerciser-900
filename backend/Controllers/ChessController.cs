@@ -55,7 +55,12 @@ namespace CHESSPROJ.Controllers
             if (game == null)
                 return NotFound("Game not found.");
 
-            var moves = game.MovesArray ?? new List<string>();
+            List<string> moves = new List<string>();
+            if (game.MovesArraySerialized != null)
+            {
+                moves = JsonSerializer.Deserialize<List<string>>(game.MovesArraySerialized);
+            }
+
             var response = new GetMovesHistoryResponseDTO 
             {
                 MovesArray = moves
@@ -82,18 +87,23 @@ namespace CHESSPROJ.Controllers
                 return BadRequest($"{badMove.ToString()}");
             }
 
-            string currentPosition = string.Join(" ", game.MovesArray);
+            List<string> MovesArray = new List<string>();
+
+            if (game.MovesArraySerialized != null)
+            {
+                MovesArray = JsonSerializer.Deserialize<List<string>>(game.MovesArraySerialized);
+            }
+            string currentPosition = string.Join(" ", MovesArray);
 
             if (_stockfishService.IsMoveCorrect(currentPosition, move))
             {
                 _stockfishService.SetPosition(currentPosition, move);
-                game.MovesArray.Add(move);
+                MovesArray.Add(move);
                 string botMove = _stockfishService.GetBestMove();
-                _stockfishService.SetPosition(string.Join(" ", game.MovesArray), botMove);
-                game.MovesArray.Add(botMove);
-
+                _stockfishService.SetPosition(string.Join(" ", MovesArray), botMove);
+                MovesArray.Add(botMove);
                 string fenPosition = _stockfishService.GetFen();
-                currentPosition = string.Join(" ", game.MovesArray);
+                currentPosition = string.Join(" ", MovesArray);
                 game.Blackout--;
                 if (game.Blackout == 0)
                 {
@@ -104,7 +114,8 @@ namespace CHESSPROJ.Controllers
                 {
                     game.TurnBlack = false;
                 }
-                
+
+                game.MovesArraySerialized = JsonSerializer.Serialize(MovesArray);
                 await dbUtilities.UpdateGame(game);
                 
                 var postMoveResponseDTO = new PostMoveResponseDTO {

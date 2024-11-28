@@ -39,3 +39,7 @@ CREATE TABLE [Games] (
             CONSTRAINT [PK_Games] PRIMARY KEY ([GameId]),
             CONSTRAINT [FK_Games_Users_UserId] FOREIGN KEY ([UserId]) REFERENCES [Users] ([Id]) ON DELETE CASCADE
         );
+
+--to insert the dummy user into db
+INSERT INTO dbo.Users (Id, Username, Password)
+VALUES ('7097194a-84a3-4010-9bf8-028f4869c54f', 'BNW', '12amGANG');

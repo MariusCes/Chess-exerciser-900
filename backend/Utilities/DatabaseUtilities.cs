@@ -4,6 +4,7 @@ using backend.Data;
 using Microsoft.EntityFrameworkCore;
 using backend.Utilities;
 using Microsoft.Extensions.Logging;
+using System.Text.Json;
 
 namespace CHESSPROJ.Utilities
 {
@@ -16,6 +17,7 @@ namespace CHESSPROJ.Utilities
         {
             this.dbContext = dbContext;
             tempUser = userSingleton.GetUser();
+            dbContext.SaveChanges();
         }
 
         public async Task<bool> AddGame(Game newGame) 
@@ -63,7 +65,6 @@ namespace CHESSPROJ.Utilities
                 existingGame.Blackout = game.Blackout;
                 existingGame.Lives = game.Lives;
                 existingGame.TurnBlack = game.TurnBlack;
-                existingGame.MovesArray = game.MovesArray;
                 existingGame.MovesArraySerialized = game.MovesArraySerialized;
 
                 // Set the entity as modified if not already tracked
