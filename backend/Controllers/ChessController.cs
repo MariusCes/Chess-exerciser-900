@@ -35,6 +35,8 @@ namespace CHESSPROJ.Controllers
         {
             _stockfishService.SetLevel(req.aiDifficulty);
 
+            logger.LogInformation(req.gameDifficulty, "ttaaataojaojao{gameDifficulty}", req.gameDifficulty);
+
             Game game = Game.CreateGameFactory(Guid.NewGuid(), req.gameDifficulty, req.aiDifficulty, 3);
 
             try
