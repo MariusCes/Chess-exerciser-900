@@ -9,6 +9,7 @@ using backend.Utilities;
 using backend.Data;
 using Microsoft.Extensions.Logging;
 using System;
+using System.Text.Json;
 
 namespace ChessExerciser.Tests
 {
@@ -16,15 +17,13 @@ namespace ChessExerciser.Tests
     {
         private readonly Mock<IStockfishService> _mockStockfishService;
         private readonly Mock<IDatabaseUtilities> _mockDbUtilities;
-        private readonly Mock<ILogger<ChessController>> _mockLogger;
         private readonly ChessController _controller;
 
         public ChessControllerTests()
         {
             _mockStockfishService = new Mock<IStockfishService>();
             _mockDbUtilities = new Mock<IDatabaseUtilities>();
-            _mockLogger = new Mock<ILogger<ChessController>>();
-            _controller = new ChessController(_mockStockfishService.Object, _mockDbUtilities.Object, _mockLogger.Object);
+            _controller = new ChessController(_mockStockfishService.Object, _mockDbUtilities.Object);
         }
 
         [Fact]
@@ -43,7 +42,7 @@ namespace ChessExerciser.Tests
             // Cast the result's value to an anonymous object with GameId
             var response = okResult.Value as object;
             Assert.NotNull(response);
-            
+
             // Check if the object has the GameId property
             var gameIdProperty = response.GetType().GetProperty("GameId");
             Assert.NotNull(gameIdProperty);
@@ -85,7 +84,7 @@ namespace ChessExerciser.Tests
         public async Task GetMovesHistory_ShouldReturnEmptyList_WhenNoMovesExist()
         {
             // Arrange
-            var game = new Game { MovesArray = new List<string>() };
+            var game = new Game { MovesArraySerialized = JsonSerializer.Serialize(new List<string>()) };
             _mockDbUtilities.Setup(db => db.GetGameById(It.IsAny<string>())).ReturnsAsync(game);
 
             // Act
@@ -130,7 +129,7 @@ namespace ChessExerciser.Tests
         public async Task MakeMove_ShouldReturnOk_WithCorrectBotMove()
         {
             // Arrange
-            var game = new Game { MovesArray = new List<string>() };
+            var game = new Game { MovesArraySerialized = JsonSerializer.Serialize(new List<string>()) };
             _mockDbUtilities.Setup(db => db.GetGameById(It.IsAny<string>())).ReturnsAsync(game);
             _mockStockfishService.Setup(s => s.IsMoveCorrect(It.IsAny<string>(), It.IsAny<string>())).Returns(true);
             _mockStockfishService.Setup(s => s.GetBestMove()).Returns("e7e5");
@@ -144,7 +143,7 @@ namespace ChessExerciser.Tests
 
             Assert.False(response.WrongMove);
             Assert.Equal("e7e5", response.BotMove);
-                }
+        }
 
         [Fact]
         public async Task GetAllGames_ShouldReturnGamesList()
@@ -152,8 +151,8 @@ namespace ChessExerciser.Tests
             // Arrange
             var games = new List<Game>
             {
-                new Game { GameId = Guid.NewGuid(), MovesArray = new List<string> { "e2e4" } },
-                new Game { GameId = Guid.NewGuid(), MovesArray = new List<string> { "e7e5" } }
+                new Game { GameId = Guid.NewGuid(), MovesArraySerialized = JsonSerializer.Serialize(new List<string> { "e2e4" }) },
+                new Game { GameId = Guid.NewGuid(), MovesArraySerialized = JsonSerializer.Serialize(new List<string> { "e7e5" }) }
             };
             _mockDbUtilities.Setup(db => db.GetGamesList()).ReturnsAsync(games);
 
@@ -164,7 +163,7 @@ namespace ChessExerciser.Tests
             var okResult = Assert.IsType<OkObjectResult>(result);
             var response = Assert.IsType<GetAllGamesResponseDTO>(okResult.Value);
             var gamesList = Assert.IsAssignableFrom<List<Game>>(response.GamesList);
-            Assert.Equal(0, gamesList.Count); //empty games do not count
+            Assert.Empty(gamesList); //empty games do not count
         }
     }
 }

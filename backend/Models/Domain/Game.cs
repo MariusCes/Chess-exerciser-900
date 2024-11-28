@@ -60,9 +60,18 @@ public class Game
             _ => 3 // Default fallback value
         };
 
+        int newLives = difficulty switch
+        {
+            1 => 10,
+            2 => 8,
+            3 => 6,
+            _ => 0 // Default fallback value
+        };
+
         return new Game(guid, difficulty, botRating, lives)
         {
-            Blackout = blackout
+            Blackout = blackout,
+            Lives = newLives
         };
     }
 

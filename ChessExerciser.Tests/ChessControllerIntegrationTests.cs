@@ -1,3 +1,4 @@
+
 using System.Net.Http;
 using System.Text;
 using System.Text.Json;
@@ -21,7 +22,7 @@ using Microsoft.VisualStudio.TestPlatform.TestHost;
 
 namespace ChessExerciser.Tests;
 
-public class ChessControllerIntegrationTests 
+public class ChessControllerIntegrationTests
 {
     private readonly WebApplicationFactory<Program> _factory;
     private readonly HttpClient _client;
@@ -89,7 +90,7 @@ public class ChessControllerIntegrationTests
         {
             new Game(Guid.NewGuid(), 1, 5, 3)
             {
-                MovesArray = new List<string> { "e2e4" }
+                MovesArraySerialized = JsonSerializer.Serialize(new List<string> { "e2e4" })
             }
         };
 
@@ -113,10 +114,10 @@ public class ChessControllerIntegrationTests
     public async Task CreateGame_WithValidRequest_ShouldCreateNewGame()
     {
         // Arrange
-        var createGameRequest = new CreateGameReqDto(5,1);
+        var createGameRequest = new CreateGameReqDto(5, 1);
 
         // Act
-        var response = await _client.PostAsync("/api/chess/create-game", 
+        var response = await _client.PostAsync("/api/chess/create-game",
             new StringContent(JsonSerializer.Serialize(createGameRequest), Encoding.UTF8, "application/json"));
 
         // Assert
@@ -136,7 +137,7 @@ public class ChessControllerIntegrationTests
         var gameId = Guid.NewGuid();
         var game = new Game(gameId, 1, 5, 3)
         {
-            MovesArray = new List<string> { "e2e4" }
+            MovesArraySerialized = JsonSerializer.Serialize(new List<string> { "e2e4" })
         };
 
         _mockDbUtilities.Setup(d => d.GetGameById(gameId.ToString()))
@@ -147,10 +148,10 @@ public class ChessControllerIntegrationTests
 
         // Assert
         response.EnsureSuccessStatusCode();
-        
+
         var responseContent = await response.Content.ReadAsStringAsync();
         var result = JsonSerializer.Deserialize<GetMovesHistoryResponseDTO>(responseContent, _jsonOptions);
-        
+
         result.Should().NotBeNull();
         result.MovesArray.Should().NotBeNull();
         result.MovesArray.Should().ContainSingle();
@@ -164,7 +165,7 @@ public class ChessControllerIntegrationTests
         var gameId = Guid.NewGuid();
         var game = new Game(gameId, 1, 5, 3)
         {
-            MovesArray = new List<string>(),
+            MovesArraySerialized = JsonSerializer.Serialize(new List<string>()),
             IsRunning = true,
             Lives = 3
         };
@@ -199,7 +200,7 @@ public class ChessControllerIntegrationTests
         var gameId = Guid.NewGuid();
         var game = new Game(gameId, 1, 5, 3)
         {
-            MovesArray = new List<string>(),
+            MovesArraySerialized = JsonSerializer.Serialize(new List<string>()),
             IsRunning = true,
             Lives = 3
         };
@@ -213,7 +214,7 @@ public class ChessControllerIntegrationTests
         _mockStockfishService.Setup(s => s.IsMoveCorrect(It.IsAny<string>(), It.IsAny<string>()))
             .Returns(false);
 
-        var moveRequest = new MoveDto ("invalid");
+        var moveRequest = new MoveDto("invalid");
 
         // Act
         var response = await _client.PostAsync($"/api/chess/{gameId}/move",
