@@ -94,6 +94,13 @@ namespace CHESSPROJ.Controllers
                 MovesArray = JsonSerializer.Deserialize<List<string>>(game.MovesArraySerialized);
             }
             string currentPosition = string.Join(" ", MovesArray);
+            List<string> MovesArray = new List<string>();
+
+            if (game.MovesArraySerialized != null)
+            {
+                MovesArray = JsonSerializer.Deserialize<List<string>>(game.MovesArraySerialized);
+            }
+            string currentPosition = string.Join(" ", MovesArray);
 
             if (_stockfishService.IsMoveCorrect(currentPosition, move))
             {
@@ -114,6 +121,8 @@ namespace CHESSPROJ.Controllers
                 {
                     game.TurnBlack = false;
                 }
+
+                game.MovesArraySerialized = JsonSerializer.Serialize(MovesArray);
 
                 game.MovesArraySerialized = JsonSerializer.Serialize(MovesArray);
                 await dbUtilities.UpdateGame(game);
