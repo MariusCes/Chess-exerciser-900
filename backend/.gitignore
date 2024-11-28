@@ -5,7 +5,7 @@
 
 obj
 appsettings.Development.json
-
+logs
 
 # dotenv files
 .env
