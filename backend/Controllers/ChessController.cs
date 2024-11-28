@@ -29,6 +29,26 @@ namespace CHESSPROJ.Controllers
             //this.dbUtilities.AddUser(demoUser);  hahahafoasfasokf
         }
 
+        private async Task<OperationResult<T>> PerformDatabaseOperation<T>(Func<Task<T>> operation) where T : class, new()
+        {
+            try
+            {
+                var result = await operation();
+                if (result != null)
+                {
+                    return OperationResult<T>.Success(result);
+                }
+                else{
+                    return OperationResult<T>.Failure($"{gameNotFound}");
+                }
+            }
+            catch (Exception ex)
+            {
+                    return OperationResult<T>.Failure($"big error: {ex.Message}");
+            }
+        }
+
+
         // /api/chess/create-game?skillLevel=10 smth like that for harder
         [HttpPost("create-game")]
         public async Task<IActionResult> CreateGame([FromBody] CreateGameReqDto req)
@@ -36,7 +56,7 @@ namespace CHESSPROJ.Controllers
             _stockfishService.SetLevel(req.aiDifficulty); //default set to 5, need to see what level does
 
             Game game = Game.CreateGameFactory(Guid.NewGuid(), req.gameDifficulty, req.aiDifficulty, 3);
-
+            System.Console.WriteLine(req.aiDifficulty + " " + req.gameDifficulty);
             if (await dbUtilities.AddGame(game))
             {
                 return Ok(new { GameId = game.GameId });
@@ -46,22 +66,28 @@ namespace CHESSPROJ.Controllers
                 return NotFound($"{gameNotFound.ToString()}");        // return "DB error" here
             }
         }
+        
 
-         [HttpGet("{gameId}/history")]
+        [HttpGet("{gameId}/history")]
         public async Task<IActionResult> GetMovesHistory(string gameId)
         {
-            Game game = await dbUtilities.GetGameById(gameId);
-            if (game == null)
-                return NotFound("Game not found.");
+            var result = await PerformDatabaseOperation(async () => await dbUtilities.GetGameById(gameId));
 
+            if (!result.IsSuccess)
+            {
+                return NotFound(result.ErrorMessage); // Handle failure
+            }
+
+            var game = result.Value;
             var moves = game.MovesArray ?? new List<string>();
-            var response = new GetMovesHistoryResponseDTO 
+            var response = new GetMovesHistoryResponseDTO
             {
                 MovesArray = moves
             };
-            
-            return Ok(response);
+
+            return Ok(response); // Handle success
         }
+
 
         // POST: api/chessgame/{gameId}/move
         [HttpPost("{gameId}/move")]
@@ -124,7 +150,12 @@ namespace CHESSPROJ.Controllers
         [HttpGet("games")]
         public async Task<IActionResult> GetAllGames()
         {
-            GamesList gamesList = new GamesList(await dbUtilities.GetGamesList());
+            var result = await PerformDatabaseOperation(async () => await dbUtilities.GetGamesList());
+
+            if (!result.IsSuccess)
+            {
+                return NotFound(result.ErrorMessage); // Handle failure
+            }
 
             GamesList games = new GamesList(gamesList);
             List<Game> gamesWithMoves = new List<Game>();
