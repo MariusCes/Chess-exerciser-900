@@ -89,7 +89,7 @@ public class ChessControllerIntegrationTests
         {
             new Game(Guid.NewGuid(), 1, 5, 3)
             {
-                MovesArray = new List<string> { "e2e4" }
+                MovesArraySerialized = JsonSerializer.Serialize(new List<string> { "e2e4" })
             }
         };
 
@@ -136,7 +136,7 @@ public class ChessControllerIntegrationTests
         var gameId = Guid.NewGuid();
         var game = new Game(gameId, 1, 5, 3)
         {
-            MovesArray = new List<string> { "e2e4" }
+            MovesArraySerialized = JsonSerializer.Serialize(new List<string> { "e2e4" })
         };
 
         _mockDbUtilities.Setup(d => d.GetGameById(gameId.ToString()))
@@ -164,7 +164,7 @@ public class ChessControllerIntegrationTests
         var gameId = Guid.NewGuid();
         var game = new Game(gameId, 1, 5, 3)
         {
-            MovesArray = new List<string>(),
+            MovesArraySerialized = JsonSerializer.Serialize(new List<string>()),
             IsRunning = true,
             Lives = 3
         };
@@ -199,7 +199,7 @@ public class ChessControllerIntegrationTests
         var gameId = Guid.NewGuid();
         var game = new Game(gameId, 1, 5, 3)
         {
-            MovesArray = new List<string>(),
+            MovesArraySerialized = JsonSerializer.Serialize(new List<string>()),
             IsRunning = true,
             Lives = 3
         };

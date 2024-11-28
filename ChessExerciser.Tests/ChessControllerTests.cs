@@ -9,6 +9,7 @@ using backend.Utilities;
 using backend.Data;
 using Microsoft.Extensions.Logging;
 using System;
+using System.Text.Json;
 
 namespace ChessExerciser.Tests
 {
@@ -83,7 +84,7 @@ namespace ChessExerciser.Tests
         public async Task GetMovesHistory_ShouldReturnEmptyList_WhenNoMovesExist()
         {
             // Arrange
-            var game = new Game { MovesArray = new List<string>() };
+            var game = new Game { MovesArraySerialized = JsonSerializer.Serialize(new List<string>()) };
             _mockDbUtilities.Setup(db => db.GetGameById(It.IsAny<string>())).ReturnsAsync(game);
 
             // Act
@@ -128,7 +129,7 @@ namespace ChessExerciser.Tests
         public async Task MakeMove_ShouldReturnOk_WithCorrectBotMove()
         {
             // Arrange
-            var game = new Game { MovesArray = new List<string>() };
+            var game = new Game { MovesArraySerialized = JsonSerializer.Serialize(new List<string>()) };
             _mockDbUtilities.Setup(db => db.GetGameById(It.IsAny<string>())).ReturnsAsync(game);
             _mockStockfishService.Setup(s => s.IsMoveCorrect(It.IsAny<string>(), It.IsAny<string>())).Returns(true);
             _mockStockfishService.Setup(s => s.GetBestMove()).Returns("e7e5");
@@ -150,8 +151,8 @@ namespace ChessExerciser.Tests
             // Arrange
             var games = new List<Game>
             {
-                new Game { GameId = Guid.NewGuid(), MovesArray = new List<string> { "e2e4" } },
-                new Game { GameId = Guid.NewGuid(), MovesArray = new List<string> { "e7e5" } }
+                new Game { GameId = Guid.NewGuid(), MovesArraySerialized = JsonSerializer.Serialize(new List<string> { "e2e4" }) },
+                new Game { GameId = Guid.NewGuid(), MovesArraySerialized = JsonSerializer.Serialize(new List<string> { "e7e5" }) }
             };
             _mockDbUtilities.Setup(db => db.GetGamesList()).ReturnsAsync(games);
 
@@ -162,7 +163,7 @@ namespace ChessExerciser.Tests
             var okResult = Assert.IsType<OkObjectResult>(result);
             var response = Assert.IsType<GetAllGamesResponseDTO>(okResult.Value);
             var gamesList = Assert.IsAssignableFrom<List<Game>>(response.GamesList);
-            Assert.Equal(0, gamesList.Count); //empty games do not count
+            Assert.Empty(gamesList); //empty games do not count
         }
     }
 }
