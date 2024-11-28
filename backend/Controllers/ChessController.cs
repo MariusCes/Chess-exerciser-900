@@ -93,8 +93,6 @@ namespace CHESSPROJ.Controllers
             {
                 MovesArray = JsonSerializer.Deserialize<List<string>>(game.MovesArraySerialized);
             }
-            string currentPosition = string.Join(" ", MovesArray);
-            List<string> MovesArray = new List<string>();
 
             if (game.MovesArraySerialized != null)
             {
