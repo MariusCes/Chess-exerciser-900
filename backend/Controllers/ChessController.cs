@@ -33,6 +33,17 @@ namespace CHESSPROJ.Controllers
         [HttpPost("create-game")]
         public async Task<IActionResult> CreateGame([FromBody] CreateGameReqDto req)
         {
+<<<<<<< HEAD
+            _stockfishService.SetLevel(SkillLevel); //default set to 5, need to see what level does
+            Game game = new Game(Guid.NewGuid(), 1, 1, ę);
+            game.MovesArray = new List<string>();
+            game.Lives = 3;
+            game.Blackout = 3;
+            game.IsRunning = true;
+
+            games.Add(game);
+            return Ok(new { GameId = game.GameId });
+=======
             _stockfishService.SetLevel(req.aiDifficulty); //default set to 5, need to see what level does
 
             Game game = Game.CreateGameFactory(Guid.NewGuid(), req.gameDifficulty, req.aiDifficulty, 3);
@@ -46,6 +57,7 @@ namespace CHESSPROJ.Controllers
             } else {
                 return NotFound($"{gameNotFound.ToString()}");        // return "DB error" here
             }
+>>>>>>> 1359b12c5bb629118b243448fd8c02fafba3878a
         }
 
         [HttpGet("{gameId}/history")]
