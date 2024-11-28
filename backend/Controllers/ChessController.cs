@@ -20,34 +20,42 @@ namespace CHESSPROJ.Controllers
         private static ErrorMessages badMove = ErrorMessages.Move_notation_cannot_be_empty;
         private readonly IStockfishService _stockfishService;
         private readonly IDatabaseUtilities dbUtilities;
+        private readonly ILogger<ChessController> logger;
 
         // Dependency Injection through constructor
-        public ChessController(IStockfishService stockfishService, IDatabaseUtilities dbUtilities)
+        public ChessController(IStockfishService stockfishService, IDatabaseUtilities dbUtilities, ILogger<ChessController> logger)
         {
             _stockfishService = stockfishService;
             this.dbUtilities = dbUtilities;
-            //this.dbUtilities.AddUser(demoUser);  hahahafoasfasokf
+            this.logger = logger;
         }
 
-        // /api/chess/create-game?skillLevel=10 smth like that for harder
         [HttpPost("create-game")]
         public async Task<IActionResult> CreateGame([FromBody] CreateGameReqDto req)
         {
-            _stockfishService.SetLevel(req.aiDifficulty); //default set to 5, need to see what level does
+            _stockfishService.SetLevel(req.aiDifficulty);
 
             Game game = Game.CreateGameFactory(Guid.NewGuid(), req.gameDifficulty, req.aiDifficulty, 3);
 
-            if (await dbUtilities.AddGame(game))
+            try
             {
-                return Ok(new { GameId = game.GameId });
+                if (await dbUtilities.AddGame(game))
+                {
+                    return Ok(new { GameId = game.GameId });
+                }
+                else
+                {
+                    throw new DatabaseOperationException("Failed to add the game to the database.");
+                }
             }
-            else
+            catch (DatabaseOperationException ex)
             {
-                return NotFound($"{gameNotFound.ToString()}");        // return "DB error" here
+                logger.LogError(ex, "error while adding game to database {message}", ex.Message);
+                return StatusCode(500, new { Error = ex.Message });
             }
         }
 
-         [HttpGet("{gameId}/history")]
+        [HttpGet("{gameId}/history")]
         public async Task<IActionResult> GetMovesHistory(string gameId)
         {
             Game game = await dbUtilities.GetGameById(gameId);
@@ -65,7 +73,7 @@ namespace CHESSPROJ.Controllers
 
         // POST: api/chessgame/{gameId}/move
         [HttpPost("{gameId}/move")]
-        public async Task<IActionResult> MakeMove(string gameId, [FromBody] MoveDto moveNotation)       // extractina is JSON post info i MoveDto record'a
+        public async Task<IActionResult> MakeMove(string gameId, [FromBody] MoveDto moveNotation)
         {
 
             var game = await dbUtilities.GetGameById(gameId);
