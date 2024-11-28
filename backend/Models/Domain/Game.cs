@@ -20,6 +20,13 @@ public class Game
     public int Blackout { get; set; }
     public Boolean TurnBlack { get; set; }
 
+
+    [NotMapped]
+    public List<string>? MovesArray
+    {
+        get => MovesArraySerialized == null ? new List<string>() : JsonSerializer.Deserialize<List<string>>(MovesArraySerialized);
+        set => MovesArraySerialized = JsonSerializer.Serialize(value);
+    }
     // Foreign key to User
     public Guid UserId { get; set; }
 
@@ -37,12 +44,52 @@ public class Game
         Lives = lives;
         IsRunning = true;
         TurnBlack = false;
-        Blackout = 3;
+        Blackout = 3; //set to default 3, but should cahnge based on difficulty 
     }
+
+
 
     //factory
     public static Game CreateGameFactory(Guid guid, int difficulty, int botRating, int lives)
     {
-        return new Game(guid, difficulty, botRating, lives);
+        int blackout = difficulty switch
+        {
+            1 => 2,
+            2 => 4,
+            3 => 6,
+            _ => 3 // Default fallback value
+        };
+
+        return new Game(guid, difficulty, botRating, lives)
+        {
+            Blackout = blackout
+        };
+    }
+
+    //function for the blackout every n moves:
+    /*
+    if diff is 1, black will be every 2 moves,
+    if diff is 2, black will be every 4 moves,
+    if diff is 3, black will be every 6 moves,
+    otherwise it will be every 3 moves
+    */
+    public void HandleBlackout()
+    {
+        Blackout--;
+        if (Blackout == 0)
+        {
+            TurnBlack = true;
+            Blackout = Difficulty switch
+            {
+                1 => 2,
+                2 => 4,
+                3 => 6,
+                _ => 3
+            };
+        }
+        else
+        {
+            TurnBlack = false;
+        }
     }
 }
