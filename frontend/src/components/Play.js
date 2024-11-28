@@ -17,20 +17,21 @@ function Play() {
   const [aiDifficulty, setAiDifficulty] = useState(""); // State for selected difficulty
   const [memoryDifficulty, setMemoryDifficulty] = useState("");
   const [gameStatus, setGameStatus] = useState(null);
-  const [health, setHealth] = useState(100);
+  const [health, setHealth] = useState(10);
   const [timer, setTimer] = useState(0);
 
   const createGame = async () => {
     setTimer(0);
-    setMoveList([]);
-    setHealth(100);
+      setMoveList([]);
+      setFen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
+    setHealth(health);
     const response = await fetch(
       "http://localhost:5030/api/chess/create-game",
       {
         method: "POST",
         body: JSON.stringify({
-          aiDifficulty, // same as =>  aiDifficulty: aiDifficulty,
-          memoryDifficulty,
+          gameDifficulty: memoryDifficulty, // same as =>  aiDifficulty: aiDifficulty,
+          aiDifficulty,
         }),
         headers: {
           "Content-type": "application/json; charset=UTF-8",
@@ -72,7 +73,8 @@ function Play() {
       setFen(data.fenPosition); // to be tested
       setTurnBlack(data.turnBlack); // to be tested???
     } else {
-      setMove("Bad move!");
+        setMove("Bad move!");
+        decreaseHealth(10) // visada po 1 health nuima
     }
   };
 
@@ -121,7 +123,7 @@ function Play() {
           <select
             className="form-select me-2"
             value={aiDifficulty}
-            onChange={(e) => setAiDifficulty(e.target.value)}
+                      onChange={(e) => setAiDifficulty(e.target.value)}
             style={{ width: "120px" }}
           >
             <option value="">Select AI</option>
@@ -138,13 +140,32 @@ function Play() {
           <select
             className="form-select me-2"
             value={memoryDifficulty}
-            onChange={(e) => setMemoryDifficulty(e.target.value)}
+                      onChange={(e) => {
+                          const value = e.target.value;
+                          setMemoryDifficulty(value)
+
+                          switch (value) {
+                              case "1":
+                                  setHealth(100);  // Easy
+                                  break;
+                              case "2":
+                                  setHealth(80);   // Medium
+                                  break;
+                              case "3":
+                                  setHealth(60);   // Hard
+                                  break;
+                              default:
+                                  setHealth(0);
+                                  break;
+                          }
+                      }
+                      }
             style={{ width: "160px" }}
           >
             <option value="">Select difficulty</option>
-            <option value="1">ADHD 16 y.o</option>
-            <option value="2">IT enjoyer</option>
-            <option value="3">Literally a computer</option>
+            <option value="1">easy</option>
+            <option value="2">medium</option>
+            <option value="3">hard</option>
           </select>
 
           <button
