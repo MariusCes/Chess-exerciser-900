@@ -20,6 +20,52 @@ function Play() {
   const [health, setHealth] = useState(10);
   const [timer, setTimer] = useState(0);
 
+  // This saves to localStorage
+  useEffect(() => {
+    if (isGameCreated) {
+      localStorage.setItem('chessGameState', JSON.stringify({
+        // Here you say which variables to keep an eye on for change
+        gameID,
+        fen,
+        moveList,
+        health,
+        timer,
+        turnBlack,
+        aiDifficulty,
+        memoryDifficulty,
+        isGameCreated
+      }));
+    }
+  }, [
+    // Here you say what to write into the localStorage save
+    gameID, 
+    fen, 
+    moveList, 
+    health, 
+    timer, 
+    turnBlack, 
+    aiDifficulty, 
+    memoryDifficulty, 
+    isGameCreated
+  ]);
+  
+  // On component load, restore the game state
+  useEffect(() => {
+    const savedGameState = localStorage.getItem('chessGameState');
+    if (savedGameState) {
+      const parsedState = JSON.parse(savedGameState);
+      setGameID(parsedState.gameID);
+      setFen(parsedState.fen);
+      setMoveList(parsedState.moveList);
+      setHealth(parsedState.health);
+      setTimer(parsedState.timer);
+      setTurnBlack(parsedState.turnBlack);
+      setAiDifficulty(parsedState.aiDifficulty);
+      setMemoryDifficulty(parsedState.memoryDifficulty);
+      setIsGameCreated(parsedState.isGameCreated);
+    }
+  }, []);
+
   const createGame = async () => {
     setTimer(0);
       setMoveList([]);
