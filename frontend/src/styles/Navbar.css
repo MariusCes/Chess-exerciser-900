@@ -10,23 +10,67 @@
     font-size: 1.5rem;
     font-weight: bold;
     transition: color 0.3s ease;
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
 }
 
 .navbar .navbar-brand:hover {
     color: #7ccdee;
 }
 
-.navbar .chess-game-title {
-    position: absolute;
-    left: 50%;
-    transform: translateX(-50%);
-    font-size: 1.5rem;
+.navbar-left {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.navbar-right {
+    margin-left: auto;
+}
+
+.navbar .username-cool {
+    font-size: 1.2rem;
     font-weight: bold;
+    color: #b9f1ff;
+    position: relative;
+    animation: subtle-glow 4s infinite alternate;
+}
+
+@keyframes subtle-glow {
+    0% {
+        text-shadow: 0 0 2px #87c0cc, 0 0 4px #87c0cc, 0 0 6px #87c0cc;
+    }
+    50% {
+        text-shadow: 0 0 3px #a3d9e7, 0 0 6px #a3d9e7, 0 0 9px #a3d9e7;
+    }
+    100% {
+        text-shadow: 0 0 2px #87c0cc, 0 0 4px #87c0cc, 0 0 6px #87c0cc;
+    }
+}
+
+.login-link {
+    font-size: 1.1rem;
+    color: #a49e9e !important;
+    font-weight: bold;
+}
+
+.login-link:hover {
+    color: #7ccdee !important;
+}
+
+.logout-button {
+    font-size: 1.1rem;
+    color: #a49e9e !important;
+    transition: color 0.3s ease;
+}
+
+.logout-button:hover {
+    color: #e57373 !important;
 }
 
 .navbar-nav {
     display: flex;
-    flex-direction: row;
     align-items: center;
 }
 
@@ -53,16 +97,4 @@
         margin-left: 0;
         margin-top: 0.5rem;
     }
-}
-
-.chess-game-title {
-    position: absolute;
-    left: 50%;
-    transform: translateX(-50%);
-    font-size: 1.5rem;
-    font-weight: bold;
-}
-
-.justify-content-end {
-    margin-left: auto;
 }
