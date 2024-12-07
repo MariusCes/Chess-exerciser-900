@@ -10,7 +10,7 @@ const Login = () => {
 
     const handleLogin = async (e) => {
         e.preventDefault();
-        
+
         if (username === "testuser" && password === "password123") {
             localStorage.setItem("isLoggedIn", "true");
             localStorage.setItem("username", username);
@@ -51,7 +51,6 @@ const Login = () => {
                                 checked={showPassword}
                                 onChange={() => setShowPassword(!showPassword)} 
                             />
-                            <label className="form-check-label" htmlFor="showPassword">Show Password</label>
                         </div>
                     </div>
                     <button 
