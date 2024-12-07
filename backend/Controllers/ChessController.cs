@@ -22,34 +22,13 @@ namespace CHESSPROJ.Controllers
         private readonly IDatabaseUtilities dbUtilities;
 
         // Dependency Injection through constructor
-        public ChessController(IStockfishService stockfishService, IDatabaseUtilities dbUtilities)
+        public ChessController(IStockfishService stockfishService, IDatabaseUtilities dbUtilities, ILogger<ChessController> logger)
         {
             _stockfishService = stockfishService;
             this.dbUtilities = dbUtilities;
-            //this.dbUtilities.AddUser(demoUser);  hahahafoasfasokf
-        }
-
-        private async Task<OperationResult<T>> PerformDatabaseOperation<T>(Func<Task<T>> operation) where T : class, new()
-        {
-            try
-            {
-                var result = await operation();
-                if (result != null)
-                {
-                    return OperationResult<T>.Success(result);
-                }
-                else{
-                    return OperationResult<T>.Failure($"{gameNotFound}");
-                }
+            this.logger = logger;
             }
-            catch (Exception ex)
-            {
-                    return OperationResult<T>.Failure($"big error: {ex.Message}");
-            }
-        }
-
-
-        // /api/chess/create-game?skillLevel=10 smth like that for harder
+        
         [HttpPost("create-game")]
         public async Task<IActionResult> CreateGame([FromBody] CreateGameReqDto req)
         {
@@ -147,26 +126,6 @@ namespace CHESSPROJ.Controllers
             }
         }
 
-        [HttpGet("games")]
-        public async Task<IActionResult> GetAllGames()
-        {
-            var result = await PerformDatabaseOperation(async () => await dbUtilities.GetGamesList());
 
-            if (!result.IsSuccess)
-            {
-                return NotFound(result.ErrorMessage); // Handle failure
-            }
-
-            GamesList games = new GamesList(gamesList);
-            List<Game> gamesWithMoves = new List<Game>();
-
-           foreach (var game in games.GetCustomEnumerator())
-            {
-                // custom filtering using IEnumerable
-                gamesWithMoves.Add(game);
-            }
-            
-            return Ok(gamesWithMoves);
-        }
     }
 }
