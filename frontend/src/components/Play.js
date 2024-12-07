@@ -66,6 +66,19 @@ function Play() {
     }
   }, []);
 
+  const resetGame = () => {
+    // Clear the localStorage to reset the game state
+    localStorage.removeItem('chessGameState');
+  
+    // Reset the component's state to initial values  
+    setGameID(null);
+    setIsGameCreated(false);
+    setMoveList([]);
+    setHealth([100, 100]);
+    setTimer(0);
+  };
+  
+
   const createGame = async () => {
     setTimer(0);
       setMoveList([]);
@@ -306,6 +319,7 @@ function Play() {
               <button onClick={mockCreateGame} className="btn btn-success me-2">
                 Mock create game
               </button>
+              <button onClick={resetGame} className="btn btn-danger">Reset Game</button>
             </div>
           </div>
         </div>
