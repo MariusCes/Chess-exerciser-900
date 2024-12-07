@@ -16,10 +16,31 @@ const Navbar = () => {
     return (
         <nav className="navbar navbar-expand-lg navbar-dark bg-dark">
             <div className="container-fluid">
+                <div className="navbar-left">
+                    {isLoggedIn ? (
+                        <>
+                            <span className="navbar-text username-cool">
+                                Welcome, {username}
+                            </span>
+                            <button
+                                className="btn btn-link nav-link logout-button"
+                                onClick={handleLogout}
+                            >
+                                Logout
+                            </button>
+                        </>
+                    ) : (
+                        <Link className="nav-link login-link" to="/login">
+                            Login
+                        </Link>
+                    )}
+                </div>
+
                 <Link className="navbar-brand chess-game-title" to="/">
                     CHESS EXERCISER
                 </Link>
-                <div className="justify-content-end">
+
+                <div className="navbar-right">
                     <ul className="navbar-nav">
                         <li className="nav-item">
                             <Link className="nav-link" to="/home">Home</Link>
@@ -33,25 +54,6 @@ const Navbar = () => {
                         <li className="nav-item">
                             <Link className="nav-link" to="/about">About</Link>
                         </li>
-                        {isLoggedIn ? (
-                            <>
-                                <li className="nav-item">
-                                    <span className="navbar-text">Hello, {username}!</span>
-                                </li>
-                                <li className="nav-item">
-                                    <button 
-                                        className="btn btn-link nav-link" 
-                                        onClick={handleLogout}
-                                    >
-                                        Logout
-                                    </button>
-                                </li>
-                            </>
-                        ) : (
-                            <li className="nav-item">
-                                <Link className="nav-link" to="/login">Login</Link>
-                            </li>
-                        )}
                     </ul>
                 </div>
             </div>
