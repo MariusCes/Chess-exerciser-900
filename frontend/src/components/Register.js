@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import '../styles/Login.css'; // Reusing the same styles as Login
+import '../styles/Login.css';
 
 const Register = () => {
     const [username, setUsername] = useState('');
@@ -9,20 +9,19 @@ const Register = () => {
     const [confirmPassword, setConfirmPassword] = useState('');
     const [showPassword, setShowPassword] = useState(false);
 
-    const handleSubmit = (e) => {
+    const handleRegister = (e) => {
         e.preventDefault();
         if (password !== confirmPassword) {
             alert("Passwords do not match!");
             return;
         }
-        // Back-end logic to handle registration
     };
 
     return (
         <div className="login-container">
             <div className="login-card">
                 <h2 className="login-title">JOIN US, <br /> FUTURE CHESS MASTER</h2>
-                <form onSubmit={handleSubmit}>
+                <form onSubmit={handleRegister}>
                     <div className="mb-3">
                         <input
                             type="text"
