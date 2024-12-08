@@ -20,6 +20,7 @@ namespace CHESSPROJ.Controllers
         private static ErrorMessages badMove = ErrorMessages.Move_notation_cannot_be_empty;
         private readonly IStockfishService _stockfishService;
         private readonly IDatabaseUtilities dbUtilities;
+        private readonly ILogger<ChessController> logger;
 
         // Dependency Injection through constructor
         public ChessController(IStockfishService stockfishService, IDatabaseUtilities dbUtilities, ILogger<ChessController> logger)
@@ -27,22 +28,58 @@ namespace CHESSPROJ.Controllers
             _stockfishService = stockfishService;
             this.dbUtilities = dbUtilities;
             this.logger = logger;
+        }
+
+        private async Task<OperationResult<T>> PerformDatabaseOperation<T>(Func<Task<T>> operation) where T : class
+        {
+            try
+            {
+                var result = await operation();
+
+                if (result == null)
+                {
+                    return OperationResult<T>.Failure("error null");
+                }
+
+                //great success
+                return OperationResult<T>.Success(result);
             }
-        
+            catch (DatabaseOperationException ex)
+            {
+                //something bad happened
+                logger.LogError(ex, "{message}", ex.Message);
+                return OperationResult<T>.Failure("error");
+            }
+            catch (Exception ex)
+            {
+                //if error is not database
+                logger.LogError(ex, "{message}", ex.Message);
+                return OperationResult<T>.Failure("weird error");
+            }
+        }
+
+
         [HttpPost("create-game")]
         public async Task<IActionResult> CreateGame([FromBody] CreateGameReqDto req)
         {
-            _stockfishService.SetLevel(req.aiDifficulty); //default set to 5, need to see what level does
-
+            _stockfishService.SetLevel(req.aiDifficulty);
             Game game = Game.CreateGameFactory(Guid.NewGuid(), req.gameDifficulty, req.aiDifficulty, 3);
-            System.Console.WriteLine(req.aiDifficulty + " " + req.gameDifficulty);
-            if (await dbUtilities.AddGame(game))
+
+            try
             {
-                return Ok(new { GameId = game.GameId });
+                if (await dbUtilities.AddGame(game))
+                {
+                    return Ok(new { GameId = game.GameId });
+                }
+                else
+                {
+                    throw new DatabaseOperationException("Failed to add the game to the database.");
+                }
             }
-            else
+            catch (DatabaseOperationException ex)
             {
-                return NotFound($"{gameNotFound.ToString()}");        // return "DB error" here
+                logger.LogError(ex, "error while adding game to database {message}", ex.Message);
+                return StatusCode(500, new { Error = ex.Message });
             }
         }
         
@@ -70,7 +107,7 @@ namespace CHESSPROJ.Controllers
 
         // POST: api/chessgame/{gameId}/move
         [HttpPost("{gameId}/move")]
-        public async Task<IActionResult> MakeMove(string gameId, [FromBody] MoveDto moveNotation)       // extractina is JSON post info i MoveDto record'a
+        public async Task<IActionResult> MakeMove(string gameId, [FromBody] MoveDto moveNotation)
         {
 
             var game = await dbUtilities.GetGameById(gameId);
@@ -117,6 +154,7 @@ namespace CHESSPROJ.Controllers
                 if(game.Lives <= 0){
                     game.IsRunning = false; 
                     game.Lives = 0; //kad nebutu negative in db
+                    game.WLD = 0;
                 }
                 game.HandleBlackout();
 
@@ -126,6 +164,21 @@ namespace CHESSPROJ.Controllers
             }
         }
 
+        [HttpGet("games")]
+        public async Task<IActionResult> GetAllGames()
+        {
+            GamesList gamesList = new GamesList(await dbUtilities.GetGamesList());
 
+            GamesList games = new GamesList(gamesList);
+            List<Game> gamesWithMoves = new List<Game>();
+
+           foreach (var game in games.GetCustomEnumerator())
+            {
+                // custom filtering using IEnumerable
+                gamesWithMoves.Add(game);
+            }
+            
+            return Ok(gamesWithMoves);
+        }
     }
 }
