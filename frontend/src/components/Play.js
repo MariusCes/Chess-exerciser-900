@@ -20,6 +20,65 @@ function Play() {
   const [health, setHealth] = useState(10);
   const [timer, setTimer] = useState(0);
 
+  // This saves to localStorage
+  useEffect(() => {
+    if (isGameCreated) {
+      localStorage.setItem('chessGameState', JSON.stringify({
+        // Here you say which variables to keep an eye on for change
+        gameID,
+        fen,
+        moveList,
+        health,
+        timer,
+        turnBlack,
+        aiDifficulty,
+        memoryDifficulty,
+        isGameCreated
+      }));
+    }
+  }, [
+    // Here you say what to write into the localStorage save
+    gameID, 
+    fen, 
+    moveList, 
+    health, 
+    timer, 
+    turnBlack, 
+    aiDifficulty, 
+    memoryDifficulty, 
+    isGameCreated
+  ]);
+  
+  // On component load, restore the game state
+  useEffect(() => {
+    const savedGameState = localStorage.getItem('chessGameState');
+    if (savedGameState) {
+      const parsedState = JSON.parse(savedGameState);
+      setGameID(parsedState.gameID);
+      setFen(parsedState.fen);
+      setMoveList(parsedState.moveList);
+      setHealth(parsedState.health);
+      setTimer(parsedState.timer);
+      setTurnBlack(parsedState.turnBlack);
+      setAiDifficulty(parsedState.aiDifficulty);
+      setMemoryDifficulty(parsedState.memoryDifficulty);
+      setIsGameCreated(parsedState.isGameCreated);
+    }
+  }, []);
+
+  const resetGame = () => {
+    // Clear the localStorage to reset the game state
+    localStorage.removeItem('chessGameState');
+  
+    // Reset the component's state to initial values  
+    setGameID(null);
+    setIsGameCreated(false);
+    setMoveList([]);
+    setHealth([100, 100]);
+    setTimer(0);
+  };
+  
+
   const createGame = async () => {
     setTimer(0);
       setMoveList([]);
@@ -260,6 +319,7 @@ function Play() {
               <button onClick={mockCreateGame} className="btn btn-success me-2">
                 Mock create game
               </button>
+              <button onClick={resetGame} className="btn btn-danger">Reset Game</button>
             </div>
           </div>
         </div>
