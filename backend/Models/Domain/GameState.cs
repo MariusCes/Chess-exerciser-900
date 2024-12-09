@@ -1,0 +1,13 @@
+using System;
+
+namespace backend.Models.Domain;
+
+public class GameState
+{
+    public Guid GameId { get; set; }
+    public int CurrentLives { get; set; }
+    public int CurrentBlackout { get; set; }
+    public Boolean TurnBlack { get; set; }
+    public int? WLD { get; set; }  // Win(1)/Lose(0)/Draw(2)
+    public Game Game { get; set; }
+}

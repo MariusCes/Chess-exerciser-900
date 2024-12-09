@@ -5,29 +5,27 @@ using Microsoft.EntityFrameworkCore;
 using backend.Utilities;
 using Microsoft.Extensions.Logging;
 using System.Text.Json;
+using backend.Models.ViewModels;
+using Microsoft.AspNetCore.Identity;
 
 namespace CHESSPROJ.Utilities
 {
     public class DatabaseUtilities : IDatabaseUtilities
     {
         private readonly ChessDbContext dbContext;
-        private User tempUser;
+        private readonly UserManager<User> _userManager;
+        private readonly SignInManager<User> _signInManager;
 
-        public DatabaseUtilities(ChessDbContext dbContext, UserSingleton userSingleton) 
+        public DatabaseUtilities(ChessDbContext dbContext, UserManager<User> userManager, SignInManager<User> signInManager)
         {
             this.dbContext = dbContext;
-            tempUser = userSingleton.GetUser();
-            dbContext.SaveChanges();
+
+            _userManager = userManager;
+            _signInManager = signInManager;
         }
 
-        public async Task<bool> AddGame(Game newGame) 
+        public async Task<bool> AddGame(Game newGame)
         {
-            // dooooont please
-            dbContext.Entry(tempUser).State = EntityState.Unchanged;
-
-            newGame.UserId = tempUser.Id;
-            newGame.User = tempUser;
-
             var game = await GetGameById(newGame.GameId.ToString());
             if (game == null)
             {
@@ -38,13 +36,74 @@ namespace CHESSPROJ.Utilities
             else return false;
         }
 
-        public async Task AddUser(User newUser) 
+        public async Task<bool> AddUser(RegisterViewModel newUser)
         {
-            await dbContext.Users.AddAsync(newUser);
-            await dbContext.SaveChangesAsync();
+            using var transaction = await dbContext.Database.BeginTransactionAsync();
+            try
+            {
+                // Create the User entity
+                var user = new User
+                {
+                    UserName = newUser.UserName,
+                    Email = newUser.Email,
+                    ProfileLifespan = DateTime.UtcNow
+                };
+
+                // Create the user with Identity
+                var result = await _userManager.CreateAsync(user, newUser.Password);
+
+                if (result.Succeeded)
+                {
+                    // Create associated UserStats
+                    var userStats = new UserStats
+                    {
+                        UserId = user.Id,
+                        Rating = 500,
+                        GamesPlayed = 0,
+                        GamesWon = 0,
+                        GamesLost = 0,
+                        GamesDrawn = 0
+                    };
+
+                    // Add UserStats to context
+                    await dbContext.UserStats.AddAsync(userStats);
+                    await dbContext.SaveChangesAsync();
+
+                    await transaction.CommitAsync();
+                    return true;
+                }
+
+                await transaction.RollbackAsync();
+                return false;
+            }
+            catch (Exception)
+            {
+                await transaction.RollbackAsync();
+                return false;
+            }
         }
 
-        public async Task<Game?> GetGameById(string gameId) 
+        public async Task<bool> LogInUser(LoginViewModel model)
+        {
+            //can get user as a nullable instance therefore there are two of the same stuff
+            var user = await _userManager.FindByEmailAsync(model.Email);
+            if (user == null)
+                return false;
+            var result = await _signInManager.CheckPasswordSignInAsync(user, model.Password, false);
+            if (result.Succeeded)
+            {
+                return true;
+            }
+            else return false;
+        }
+
+        public async Task<User> GetUserByEmail(LoginViewModel model)
+        {
+            var user = await _userManager.FindByEmailAsync(model.Email);
+            return user;
+        }
+
+        public async Task<Game?> GetGameById(string gameId)
         {
             var game = await dbContext.Games.FirstOrDefaultAsync(g => g.GameId.ToString() == gameId);
             if (game == null)
@@ -91,7 +150,7 @@ namespace CHESSPROJ.Utilities
         // Retrieve all games as a List<Game>
         public async Task<List<Game>> GetGamesList()
         {
-                dbContext.Games.ToQueryString();
+            dbContext.Games.ToQueryString();
 
             List<Game> gamesList = await dbContext.Games.ToListAsync();
 
