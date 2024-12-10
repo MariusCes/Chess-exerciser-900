@@ -7,5 +7,10 @@ namespace CHESSPROJ.Controllers
         void SetPosition(string movesMade, string move);
         bool IsMoveCorrect(string currentPosition ,string move);
         string GetFen();
+
+        string GetEvalType();
+        int GetEvalVal();
+
+        void SetFENPosition(string movesMade);
     }
 }

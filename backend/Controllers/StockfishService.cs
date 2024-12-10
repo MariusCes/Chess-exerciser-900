@@ -38,6 +38,20 @@ namespace CHESSPROJ.Services
                 return "Error getting the FEN" + ex;
             }
         }
+        //cia pasakys mate, jei bus mate, pretty simple, grazina string
+        public string GetEvalType()
+        {
+                var EvalType = _stockfish.GetEvaluation().Type;
+                
+                return EvalType;
+        }
+        //cia pasakys kuri puse padare ta mate, jei minusas, tai juoda, jei pliusas, tai balta
+        public int GetEvalVal()
+        {
+                var EvalValue = _stockfish.GetEvaluation().Value;
+                
+                return EvalValue;
+        }
 
 
         public string GetBestMove()
@@ -55,6 +69,11 @@ namespace CHESSPROJ.Services
         public bool IsCheck()
         {
             return _stockfish.IsCheck();
+        }
+
+        public void SetFENPosition(string movesMade)
+        {
+            _stockfish.SetFenPosition(movesMade);
         }
 
     }

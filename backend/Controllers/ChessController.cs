@@ -56,7 +56,6 @@ namespace CHESSPROJ.Controllers
             _stockfishService.SetLevel(req.aiDifficulty); //default set to 5, need to see what level does
 
             Game game = Game.CreateGameFactory(Guid.NewGuid(), req.gameDifficulty, req.aiDifficulty, 3);
-            System.Console.WriteLine(req.aiDifficulty + " " + req.gameDifficulty);
             if (await dbUtilities.AddGame(game))
             {
                 return Ok(new { GameId = game.GameId });
@@ -129,8 +128,34 @@ namespace CHESSPROJ.Controllers
 
                 game.MovesArraySerialized = JsonSerializer.Serialize(MovesArray);
                 await dbUtilities.UpdateGame(game);
+                
+                
+                //cia testing jei mate
+                //Win - 1 Lose - 0 Draw - 2
 
-                return Ok(new { wrongMove = false, botMove, currentPosition = currentPosition, fenPosition, game.TurnBlack });
+                if(_stockfishService.GetEvalType() == "mate"){
+                    if(_stockfishService.GetEvalVal() > 0){
+                        //reiskia baltas padare mate
+                        game.WLD = 1;
+                    }else{
+                        //reiskia juodas padare mate
+                        game.WLD = 0;
+                    }
+                game.IsRunning = false;
+                //nu jei mate tai game tikrai over
+                }
+                //ALSO PRIDEJAU PRIE RETURN TA WLD, TAI TURETU GAUTI FRONT TA DALYKA DABAR!!!!!! IR ALSO AR ZAIDIMAS EINA, GAL SIEK TIEK PAKEIST
+
+
+                return Ok(new { //refractor kad ez skaityt
+                    wrongMove = false,
+                    botMove,
+                    currentPosition = currentPosition,
+                    fenPosition,
+                    game.TurnBlack,
+                    game.WLD,
+                    game.IsRunning
+                    }); 
             }
             else
             {
@@ -143,11 +168,19 @@ namespace CHESSPROJ.Controllers
 
                 await dbUtilities.UpdateGame(game);
 
-                return Ok(new { wrongMove = true, lives = game.Lives, game.IsRunning, game.TurnBlack }); // we box here :) (fight club reference)
+                //refractorinau return kad lengviau skaityt
+                return Ok(new {
+                wrongMove = true,
+                lives = game.Lives,
+                game.IsRunning,
+                game.TurnBlack
+                }); // we box here :) (fight club reference)
             }
         }
 
-        [HttpGet("games")]
+
+        //idk cia kazkas error dabar ne svarbu, turetu veikti naujausiame main
+       /* [HttpGet("games")]
         public async Task<IActionResult> GetAllGames()
         {
             var result = await PerformDatabaseOperation(async () => await dbUtilities.GetGamesList());
@@ -168,5 +201,6 @@ namespace CHESSPROJ.Controllers
             
             return Ok(gamesWithMoves);
         }
+        */
     }
 }

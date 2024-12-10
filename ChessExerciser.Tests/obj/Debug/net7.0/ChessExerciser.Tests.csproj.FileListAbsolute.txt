@@ -1,0 +1,9 @@
+C:\VU\Chess-exerciser-900\ChessExerciser.Tests\bin\Debug\net7.0\.msCoverageSourceRootsMapping_ChessExerciser.Tests
+C:\VU\Chess-exerciser-900\ChessExerciser.Tests\bin\Debug\net7.0\CoverletSourceRootsMapping_ChessExerciser.Tests
+C:\VU\Chess-exerciser-900\ChessExerciser.Tests\obj\Debug\net7.0\ChessExerciser.Tests.csproj.AssemblyReference.cache
+C:\VU\Chess-exerciser-900\ChessExerciser.Tests\obj\Debug\net7.0\MvcTestingAppManifest.json
+C:\VU\Chess-exerciser-900\ChessExerciser.Tests\obj\Debug\net7.0\ChessExerciser.Tests.GeneratedMSBuildEditorConfig.editorconfig
+C:\VU\Chess-exerciser-900\ChessExerciser.Tests\obj\Debug\net7.0\ChessExerciser.Tests.AssemblyInfoInputs.cache
+C:\VU\Chess-exerciser-900\ChessExerciser.Tests\obj\Debug\net7.0\ChessExerciser.Tests.AssemblyInfo.cs
+C:\VU\Chess-exerciser-900\ChessExerciser.Tests\obj\Debug\net7.0\ChessExerciser.Tests.csproj.CoreCompileInputs.cache
+C:\VU\Chess-exerciser-900\ChessExerciser.Tests\obj\Debug\net7.0\ChessExerciser.Tests.sourcelink.json
