@@ -29,6 +29,7 @@ public class ChessControllerIntegrationTests
     private readonly JsonSerializerOptions _jsonOptions;
     private readonly Mock<IStockfishService> _mockStockfishService;
     private readonly Mock<IDatabaseUtilities> _mockDbUtilities;
+    private readonly Mock<ILogger<ChessController>> _mockLogger;
 
     public ChessControllerIntegrationTests()
     {
@@ -36,7 +37,8 @@ public class ChessControllerIntegrationTests
         {
             PropertyNameCaseInsensitive = true
         };
-
+        
+        _mockLogger = new Mock<ILogger<ChessController>>();
         _mockStockfishService = new Mock<IStockfishService>();
         _mockDbUtilities = new Mock<IDatabaseUtilities>();
 

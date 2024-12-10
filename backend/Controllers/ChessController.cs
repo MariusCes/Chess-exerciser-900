@@ -40,7 +40,10 @@ namespace CHESSPROJ.Controllers
             {
                 if (await dbUtilities.AddGame(game))
                 {
-                    return Ok(new { GameId = game.GameId });
+                    var PostCreateGameResponseDTO = new PostCreateGameResponseDTO {
+                    GameId = game.GameId.ToString()
+                };
+                    return Ok(PostCreateGameResponseDTO);
                 }
                 else
                 {
@@ -61,21 +64,26 @@ namespace CHESSPROJ.Controllers
             if (game == null)
                 return NotFound("Game not found.");
 
-            var moves = game.MovesArray ?? new List<string>();
+            List<string> moves = new List<string>();
+            if (game.MovesArraySerialized != null)
+            {
+                moves = JsonSerializer.Deserialize<List<string>>(game.MovesArraySerialized);
+            }
+
             var response = new GetMovesHistoryResponseDTO 
             {
                 MovesArray = moves
             };
             
             return Ok(response);
-        }
+}
+
 
         // POST: api/chessgame/{gameId}/move
         [HttpPost("{gameId}/move")]
         public async Task<IActionResult> MakeMove(string gameId, [FromBody] MoveDto moveNotation)
         {
-
-            var game = await dbUtilities.GetGameById(gameId);
+            Game game = await dbUtilities.GetGameById(gameId);
             if (game == null)
             {
                 return NotFound($"{gameNotFound.ToString()}");
@@ -110,8 +118,16 @@ namespace CHESSPROJ.Controllers
 
                 game.MovesArraySerialized = JsonSerializer.Serialize(MovesArray);
                 await dbUtilities.UpdateGame(game);
+                
+                var postMoveResponseDTO = new PostMoveResponseDTO {
+                    WrongMove = false,
+                    BotMove = botMove,
+                    CurrentPosition = currentPosition,
+                    FenPosition = fenPosition,
+                    TurnBlack = game.TurnBlack
+                };
 
-                return Ok(new { wrongMove = false, botMove, currentPosition = currentPosition, fenPosition, game.TurnBlack });
+                return Ok(postMoveResponseDTO);
             }
             else
             {
@@ -124,8 +140,15 @@ namespace CHESSPROJ.Controllers
                 game.HandleBlackout();
 
                 await dbUtilities.UpdateGame(game);
-
-                return Ok(new { wrongMove = true, lives = game.Lives, game.IsRunning, game.TurnBlack }); // we box here :) (fight club reference)
+                
+                var postMoveResponseDTO = new PostMoveResponseDTO {
+                    WrongMove = true,
+                    Lives = game.Lives,
+                    IsRunning = game.IsRunning,
+                    TurnBlack = game.TurnBlack
+                };
+                
+                return Ok(postMoveResponseDTO); // we box here :) (fight club reference)
             }
         }
 
@@ -137,13 +160,16 @@ namespace CHESSPROJ.Controllers
             GamesList games = new GamesList(gamesList);
             List<Game> gamesWithMoves = new List<Game>();
 
-           foreach (var game in games.GetCustomEnumerator())
-            {
+            foreach (var game in games.GetCustomEnumerator())
+        {
                 // custom filtering using IEnumerable
                 gamesWithMoves.Add(game);
             }
+            var getAllGamesResponseDTO = new GetAllGamesResponseDTO {
+                GamesList = gamesWithMoves
+            };
+            return Ok(getAllGamesResponseDTO);
             
-            return Ok(gamesWithMoves);
         }
 
         [HttpGet("{userId}/games")]

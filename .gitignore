@@ -26,5 +26,5 @@ yarn-error.log*
 /backend/Migrations/
 /backend/obj/
 /backend/appsettings.json
-
+**/obj/
 .vs/
