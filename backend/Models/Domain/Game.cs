@@ -1,13 +1,12 @@
 using System;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Json;
 using backend.Models.GameStruct;
 
-namespace backend.Models.Domain
+namespace backend.Models.Domain 
 {
     public class Game
-    {
-        private GameStartStruct _gameStartStruct;
-        
+    {   
         public Guid GameId { get; set; }
         public string? MovesArraySerialized { get; set; }
         public Boolean IsRunning { get; set; }
@@ -19,30 +18,41 @@ namespace backend.Models.Domain
         public GameConfiguration GameConfiguration { get; set; }
         public GameState GameState { get; set; }
 
-        public Game() { }
+        // Default constructor ensures GameState and GameConfiguration are never null
+        public Game()
+        {
+        }
 
         public Game(Guid id, int difficulty, int botRating, int lives)
         {
             GameId = id;
-            _gameStartStruct = new GameStartStruct(difficulty, botRating);
             IsRunning = true;
-            
-            GameConfiguration = new GameConfiguration
-            {
-                GameId = id,
-                Difficulty = difficulty,
-                BotRating = botRating,
-                InitialLives = lives,
-                BlackoutFrequency = GetBlackoutFrequency(difficulty)
-            };
 
-            GameState = new GameState
+            try
             {
-                GameId = id,
-                CurrentLives = lives,
-                CurrentBlackout = GetBlackoutFrequency(difficulty),
-                TurnBlack = false
-            };
+                GameConfiguration = new GameConfiguration();
+                GameConfiguration.GameId = id;
+                GameConfiguration.Difficulty = difficulty;
+                GameConfiguration.BotRating = botRating;
+                GameConfiguration.InitialLives = lives;
+                GameConfiguration.BlackoutFrequency = GetBlackoutFrequency(difficulty);
+
+                // Initialize GameState
+                GameState = new GameState();
+                GameState.GameId = id;
+                GameState.CurrentLives = lives;
+                GameState.CurrentBlackout = GetBlackoutFrequency(difficulty);
+                GameState.TurnBlack = false;
+            }
+            catch (Exception ex)
+            {
+                throw new InvalidOperationException($"Failed to initialize game components: {ex.Message}", ex);
+            }
+        }
+
+        public static Game CreateGameFactory(Guid guid, int difficulty, int botRating, int lives)
+        {
+            return new Game(guid, difficulty, botRating, lives);
         }
 
         private int GetBlackoutFrequency(int difficulty) => difficulty switch
@@ -52,49 +62,5 @@ namespace backend.Models.Domain
             3 => 6,
             _ => 3
         };
-
-        public static Game CreateGameFactory(Guid guid, int difficulty, int botRating, int lives)
-        {
-            return new Game(guid, difficulty, botRating, lives);
-        }
-
-        public void HandleBlackout()
-        {
-            GameState.CurrentBlackout--;
-            if (GameState.CurrentBlackout == 0)
-            {
-                GameState.TurnBlack = true;
-                GameState.CurrentBlackout = GameConfiguration.BlackoutFrequency;
-            }
-            else
-            {
-                GameState.TurnBlack = false;
-            }
-        }
-
-        // Helper properties to maintain compatibility with existing code
-        public int Lives
-        {
-            get => GameState.CurrentLives;
-            set => GameState.CurrentLives = value;
-        }
-
-        public bool TurnBlack
-        {
-            get => GameState.TurnBlack;
-            set => GameState.TurnBlack = value;
-        }
-
-        public int Blackout
-        {
-            get => GameState.CurrentBlackout;
-            set => GameState.CurrentBlackout = value;
-        }
-
-        public int ?WLD
-        {
-            get => GameState.WLD;
-            set => GameState.WLD = value;
-        }
     }
 }

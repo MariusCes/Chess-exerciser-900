@@ -13,8 +13,9 @@ namespace backend.Utilities
         public Task<bool> AddGame(Game newGame);
         public Task<bool> AddUser(RegisterViewModel newUser);
         public Task<Game?> GetGameById(string gameId);
-        public Task UpdateGame(Game game);
+        public Task UpdateGame(Game game, GameState gameState);
         public Task<List<Game>> GetGamesList();
+        public Task<GameState?> GetStateById(string gameId);
         public Task<bool> LogInUser(LoginViewModel model);
         public Task<User> GetUserByEmail(LoginViewModel model);
     }

@@ -12,6 +12,7 @@ using Microsoft.Extensions.Logging;
 using backend.Models.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using backend.Controllers;
+using System.Security.Claims;
 
 namespace CHESSPROJ.Controllers
 {
@@ -43,7 +44,8 @@ namespace CHESSPROJ.Controllers
         {
             _stockfishService.SetLevel(req.aiDifficulty);
             Game game = Game.CreateGameFactory(Guid.NewGuid(), req.gameDifficulty, req.aiDifficulty, 3);
-
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            game.UserId = userId;
             try
             {
                 if (await dbUtilities.AddGame(game))
@@ -76,11 +78,11 @@ namespace CHESSPROJ.Controllers
             {
                 moves = JsonSerializer.Deserialize<List<string>>(game.MovesArraySerialized);
             }
-            var response = new GetMovesHistoryResponseDTO 
+            var response = new GetMovesHistoryResponseDTO
             {
                 MovesArray = moves
             };
-            
+
             return Ok(response);
         }
 
@@ -89,12 +91,13 @@ namespace CHESSPROJ.Controllers
         [HttpPost("{gameId}/move")]
         public async Task<IActionResult> MakeMove(string gameId, [FromBody] MoveDto moveNotation)
         {
-
-            var game = await dbUtilities.GetGameById(gameId);
+            Game game = await dbUtilities.GetGameById(gameId);
             if (game == null)
             {
                 return NotFound($"{gameNotFound.ToString()}");
             }
+
+            GameState gameState = await dbUtilities.GetStateById(gameId);
 
             string move = moveNotation.move;
             // Validate move input
@@ -104,7 +107,6 @@ namespace CHESSPROJ.Controllers
             }
 
             List<string> MovesArray = new List<string>();
-
             if (game.MovesArraySerialized != null)
             {
                 MovesArray = JsonSerializer.Deserialize<List<string>>(game.MovesArraySerialized);
@@ -121,26 +123,34 @@ namespace CHESSPROJ.Controllers
                 string fenPosition = _stockfishService.GetFen();
                 currentPosition = string.Join(" ", MovesArray);
 
-                game.HandleBlackout();
+                gameState.HandleBlackout();
 
                 game.MovesArraySerialized = JsonSerializer.Serialize(MovesArray);
-                await dbUtilities.UpdateGame(game);
+                await dbUtilities.UpdateGame(game, gameState);
 
-                return Ok(new { wrongMove = false, botMove, currentPosition = currentPosition, fenPosition, game.TurnBlack });
+                Console.WriteLine($"Before returning - GameState is null: {game.GameState == null}");
+                if (game.GameState != null)
+                {
+                    Console.WriteLine($"CurrentLives in GameState: {game.GameState.CurrentLives}");
+                }
+                Console.WriteLine($"Lives property returns: {gameState.CurrentLives}");
+
+                return Ok(new { wrongMove = false, botMove, currentPosition = currentPosition, fenPosition, gameState.TurnBlack });
             }
             else
             {
-                game.Lives--; //minus life
-                if(game.Lives <= 0){
-                    game.IsRunning = false; 
-                    game.Lives = 0; //kad nebutu negative in db
-                    game.WLD = 0;
+                gameState.CurrentLives--; //minus life
+                if (gameState.CurrentLives <= 0)
+                {
+                    game.IsRunning = false;
+                    gameState.CurrentLives = 0; //kad nebutu negative in db
+                    gameState.WLD = 0;
                 }
-                game.HandleBlackout();
+                gameState.HandleBlackout();
 
-                await dbUtilities.UpdateGame(game);
+                await dbUtilities.UpdateGame(game, gameState);
 
-                return Ok(new { wrongMove = true, lives = game.Lives, game.IsRunning, game.TurnBlack }); // we box here :) (fight club reference)
+                return Ok(new { wrongMove = true, lives = gameState.CurrentLives, game.IsRunning, gameState.TurnBlack }); // we box here :) (fight club reference)
             }
         }
 
@@ -153,12 +163,12 @@ namespace CHESSPROJ.Controllers
             GamesList games = new GamesList(gamesList);
             List<Game> gamesWithMoves = new List<Game>();
 
-           foreach (var game in games.GetCustomEnumerator())
+            foreach (var game in games.GetCustomEnumerator())
             {
                 // custom filtering using IEnumerable
                 gamesWithMoves.Add(game);
             }
-            
+
             return Ok(gamesWithMoves);
         }
 
@@ -169,7 +179,7 @@ namespace CHESSPROJ.Controllers
             GamesList gamesList = new GamesList(await dbUtilities.GetGamesList());
             List<Game> userGames = new List<Game>();
 
-            foreach(var game in gamesList)
+            foreach (var game in gamesList)
             {
                 if (game.UserId.ToString() == userId)
                 {
@@ -180,12 +190,12 @@ namespace CHESSPROJ.Controllers
             return Ok(userGames);
         }
 
-         [HttpPost("register")]
+        [HttpPost("register")]
         public async Task<IActionResult> Register(RegisterViewModel model)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
-            
+
             if (await dbUtilities.AddUser(model))
             {
                 return Ok(new { message = "Registration successful" });

@@ -10,4 +10,4 @@ public class GameConfiguration
     public int InitialLives { get; set; }
     public int BlackoutFrequency { get; set; }
     public Game Game { get; set; }
-    }
+}

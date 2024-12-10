@@ -113,19 +113,29 @@ namespace CHESSPROJ.Utilities
             else return game;
         }
 
-        public async Task UpdateGame(Game game)
+        public async Task<GameState?> GetStateById(string gameId)
+        {
+            var state = await dbContext.GameStates.FirstOrDefaultAsync(g => g.GameId.ToString() == gameId);
+            if (state == null)
+            {
+                return null;
+            }
+            else return state;
+        }
+
+        public async Task UpdateGame(Game game, GameState gameState)
         {
             // Ensure the entity is tracked by the context
             var existingGame = await dbContext.Games.FirstOrDefaultAsync(g => g.GameId.ToString() == game.GameId.ToString());
-
+            var existingState = await dbContext.GameStates.FirstOrDefaultAsync(g => g.GameId.ToString() == game.GameId.ToString());
             if (existingGame != null)
             {
                 // If the entity exists, update its properties manually (or map the changes)
-                existingGame.Blackout = game.Blackout;
-                existingGame.Lives = game.Lives;
-                existingGame.TurnBlack = game.TurnBlack;
                 existingGame.MovesArraySerialized = game.MovesArraySerialized;
-
+                existingState.TurnBlack = gameState.TurnBlack;
+                existingState.CurrentLives = gameState.CurrentLives;
+                existingState.CurrentBlackout = gameState.CurrentBlackout;
+                existingState.WLD = existingState.WLD;
                 // Set the entity as modified if not already tracked
                 dbContext.Entry(existingGame).State = EntityState.Modified;
 

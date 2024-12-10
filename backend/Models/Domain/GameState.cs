@@ -10,4 +10,17 @@ public class GameState
     public Boolean TurnBlack { get; set; }
     public int? WLD { get; set; }  // Win(1)/Lose(0)/Draw(2)
     public Game Game { get; set; }
+
+    public void HandleBlackout()
+        {
+            CurrentBlackout--;
+            if (CurrentBlackout == 0)
+            {
+                TurnBlack = true;
+            }
+            else
+            {
+                TurnBlack = false;
+            }
+        }
 }
