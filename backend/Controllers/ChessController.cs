@@ -20,31 +20,40 @@ namespace CHESSPROJ.Controllers
         private static ErrorMessages badMove = ErrorMessages.Move_notation_cannot_be_empty;
         private readonly IStockfishService _stockfishService;
         private readonly IDatabaseUtilities dbUtilities;
+        private readonly ILogger<ChessController> logger;
 
         // Dependency Injection through constructor
-        public ChessController(IStockfishService stockfishService, IDatabaseUtilities dbUtilities)
+        public ChessController(IStockfishService stockfishService, IDatabaseUtilities dbUtilities, ILogger<ChessController> logger)
         {
             _stockfishService = stockfishService;
             this.dbUtilities = dbUtilities;
-            //this.dbUtilities.AddUser(demoUser);  hahahafoasfasokf
+            this.logger = logger;
         }
 
-        // /api/chess/create-game?skillLevel=10 smth like that for harder
         [HttpPost("create-game")]
         public async Task<IActionResult> CreateGame([FromBody] CreateGameReqDto req)
         {
-            _stockfishService.SetLevel(req.aiDifficulty); //default set to 5, need to see what level does
-
+            _stockfishService.SetLevel(req.aiDifficulty);
             Game game = Game.CreateGameFactory(Guid.NewGuid(), req.gameDifficulty, req.aiDifficulty, 3);
 
-            if (await dbUtilities.AddGame(game)) {
-
-                var PostCreateGameResponseDTO = new PostCreateGameResponseDTO {
+            try
+            {
+                if (await dbUtilities.AddGame(game))
+                {
+                    var PostCreateGameResponseDTO = new PostCreateGameResponseDTO {
                     GameId = game.GameId.ToString()
                 };
-                return Ok(PostCreateGameResponseDTO);  //TODO: All anonymous objects have to be converted to DTO  
-            } else {
-                return NotFound($"{gameNotFound.ToString()}");        // return "DB error" here
+                    return Ok(PostCreateGameResponseDTO);
+                }
+                else
+                {
+                    throw new DatabaseOperationException("Failed to add the game to the database.");
+                }
+            }
+            catch (DatabaseOperationException ex)
+            {
+                logger.LogError(ex, "error while adding game to database {message}", ex.Message);
+                return StatusCode(500, new { Error = ex.Message });
             }
         }
 
@@ -72,7 +81,7 @@ namespace CHESSPROJ.Controllers
 
         // POST: api/chessgame/{gameId}/move
         [HttpPost("{gameId}/move")]
-        public async Task<IActionResult> MakeMove(string gameId, [FromBody] MoveDto moveNotation)       // extractina is JSON post info i MoveDto record'a
+        public async Task<IActionResult> MakeMove(string gameId, [FromBody] MoveDto moveNotation)
         {
             Game game = await dbUtilities.GetGameById(gameId);
             if (game == null)
@@ -93,14 +102,9 @@ namespace CHESSPROJ.Controllers
             {
                 MovesArray = JsonSerializer.Deserialize<List<string>>(game.MovesArraySerialized);
             }
-
-            if (game.MovesArraySerialized != null)
-            {
-                MovesArray = JsonSerializer.Deserialize<List<string>>(game.MovesArraySerialized);
-            }
             string currentPosition = string.Join(" ", MovesArray);
 
-            if (_stockfishService.IsMoveCorrect(currentPosition, move))
+            if (_stockfishService.IsMoveCorrect(currentPosition, move) && game.IsRunning) //kad nebtuu kokiu shenaningans
             {
                 _stockfishService.SetPosition(currentPosition, move);
                 MovesArray.Add(move);
@@ -109,18 +113,8 @@ namespace CHESSPROJ.Controllers
                 MovesArray.Add(botMove);
                 string fenPosition = _stockfishService.GetFen();
                 currentPosition = string.Join(" ", MovesArray);
-                game.Blackout--;
-                if (game.Blackout == 0)
-                {
-                    game.TurnBlack = true;
-                    game.Blackout = 3;
-                }
-                else
-                {
-                    game.TurnBlack = false;
-                }
 
-                game.MovesArraySerialized = JsonSerializer.Serialize(MovesArray);
+                game.HandleBlackout();
 
                 game.MovesArraySerialized = JsonSerializer.Serialize(MovesArray);
                 await dbUtilities.UpdateGame(game);
@@ -138,20 +132,12 @@ namespace CHESSPROJ.Controllers
             else
             {
                 game.Lives--; //minus life
-                game.Blackout--;
-                if (game.Lives == 0)
-                {
-                    game.IsRunning = false;
+                if(game.Lives <= 0){
+                    game.IsRunning = false; 
+                    game.Lives = 0; //kad nebutu negative in db
+                    game.WLD = 0;
                 }
-                if (game.Blackout == 0)
-                {
-                    game.TurnBlack = true;
-                    game.Blackout = 3;
-                }
-                else
-                {
-                    game.TurnBlack = false;
-                }
+                game.HandleBlackout();
 
                 await dbUtilities.UpdateGame(game);
                 
@@ -184,6 +170,23 @@ namespace CHESSPROJ.Controllers
             };
             return Ok(getAllGamesResponseDTO);
             
+        }
+
+        [HttpGet("{userId}/games")]
+        public async Task<IActionResult> GetUserGames(string userId)
+        {
+            GamesList gamesList = new GamesList(await dbUtilities.GetGamesList());
+            List<Game> userGames = new List<Game>();
+
+            foreach(var game in gamesList)
+            {
+                if (game.UserId.ToString() == userId)
+                {
+                    userGames.Add(game);
+                }
+            }
+
+            return Ok(userGames);
         }
     }
 }
