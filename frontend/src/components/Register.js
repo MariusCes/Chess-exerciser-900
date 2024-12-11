@@ -9,11 +9,37 @@ const Register = () => {
     const [confirmPassword, setConfirmPassword] = useState('');
     const [showPassword, setShowPassword] = useState(false);
 
-    const handleRegister = (e) => {
+    const handleRegister = async (e) => {
         e.preventDefault();
+
+
         if (password !== confirmPassword) {
             alert("Passwords do not match!");
             return;
+        }
+
+        const response = await fetch(
+            "http://localhost:5030/api/chess/register",
+            {
+                method: "POST",
+                body: JSON.stringify({
+                    UserName: username,
+                    Email: email,
+                    Password: password,
+                    ConfirmPassword: confirmPassword
+                }),
+                headers: {
+                    "Content-type": "application/json",
+                },
+            }
+        );
+
+        const data = await response.json();
+
+        if (data.message !== null) {
+            alert("register successful! go log-in!");
+        } else {
+            alert("Something is wrong. Try again!");
         }
     };
 

@@ -3,8 +3,12 @@ import "../styles/Play.css";
 import Board from "./Board";
 import GameOver from "./GameOver";
 import { Dropdown, DropdownButton, Button } from "react-bootstrap";
+import { useAuth } from './AuthContext';
 
 function Play() {
+
+    const { token } = useAuth(); // is konteksto istraukta tokenas
+
   const [move, setMove] = useState(""); // labelis tam judesiui kuri useris submittina
   const [moveList, setMoveList] = useState([]);
   const [loading, setLoading] = useState(false); // loading screen...? ar kazkur status update
@@ -83,7 +87,8 @@ function Play() {
     setTimer(0);
       setMoveList([]);
       setFen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
-    setHealth(health);
+      setHealth(health);
+
     const response = await fetch(
       "http://localhost:5030/api/chess/create-game",
       {
@@ -93,7 +98,8 @@ function Play() {
           aiDifficulty,
         }),
         headers: {
-          "Content-type": "application/json; charset=UTF-8",
+            "Content-type": "application/json; charset=UTF-8",
+            Authorization: `Bearer ${token}`, // uuuuuu yaaaa. token babyyy
         },
       }
     );
@@ -121,7 +127,8 @@ function Play() {
           move: userMove.toLowerCase(),
         }),
         headers: {
-          "Content-type": "application/json; charset=UTF-8",
+            "Content-type": "application/json; charset=UTF-8",
+            Authorization: `Bearer ${token}`,
         },
       }
     );
