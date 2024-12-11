@@ -130,14 +130,14 @@ namespace CHESSPROJ.Controllers
                 gameState.HandleBlackout();
 
                 game.MovesArraySerialized = JsonSerializer.Serialize(MovesArray);
-                await dbUtilities.UpdateGame(game);
+                await dbUtilities.UpdateGame(game, gameState);
                 
                 var postMoveResponseDTO = new PostMoveResponseDTO {
                     WrongMove = false,
                     BotMove = botMove,
                     CurrentPosition = currentPosition,
                     FenPosition = fenPosition,
-                    TurnBlack = game.TurnBlack
+                    TurnBlack = gameState.TurnBlack
                 };
 
                 return Ok(postMoveResponseDTO);
@@ -158,7 +158,7 @@ namespace CHESSPROJ.Controllers
                 var postMoveResponseDTO = new PostMoveResponseDTO {
                     WrongMove = true,
                     Lives = gameState.CurrentLives,
-                    IsRunning = gameState.IsRunning,
+                    IsRunning = game.IsRunning,
                     TurnBlack = gameState.TurnBlack
                 };
                 
