@@ -3,5 +3,7 @@ dotnet add package Microsoft.AspNetCore.Authentication.JwtBearer --version 7.0.2
 
 add to appsetting.json
 "Jwt": {
-    "Key": "c#Y36*5edy?S*P2EUmDVUvN+uNz&pcE%EkH"
-}
+    "Key": "c#Y36*5edy?S*P2EUmDVUvN+uNz&pcE%EkH",
+    "Issuer": "ChessExerciser900",
+    "Audience": "ARE_YOU_NOT_ENTERTAINED"
+  }
