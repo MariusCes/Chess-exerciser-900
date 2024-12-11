@@ -90,7 +90,7 @@ public class ChessControllerIntegrationTests
         // Arrange
         var gamesList = new List<Game>
         {
-            new Game(Guid.NewGuid(), 1, 5, 3)
+            new Game(Guid.NewGuid(), 1, 5, 3, GameConfiguration)
             {
                 MovesArraySerialized = JsonSerializer.Serialize(new List<string> { "e2e4" })
             }
@@ -137,7 +137,7 @@ public class ChessControllerIntegrationTests
     {
         // Arrange
         var gameId = Guid.NewGuid();
-        var game = new Game(gameId, 1, 5, 3)
+        var game = new Game(gameId, 1, 5, 3, GameConfiguration)
         {
             MovesArraySerialized = JsonSerializer.Serialize(new List<string> { "e2e4" })
         };
@@ -165,7 +165,7 @@ public class ChessControllerIntegrationTests
     {
         // Arrange
         var gameId = Guid.NewGuid();
-        var game = new Game(gameId, 1, 5, 3)
+        var game = new Game(gameId, 1, 5, 3, GameConfiguration)
         {
             MovesArraySerialized = JsonSerializer.Serialize(new List<string>()),
             IsRunning = true,
@@ -200,7 +200,7 @@ public class ChessControllerIntegrationTests
     {
         // Arrange
         var gameId = Guid.NewGuid();
-        var game = new Game(gameId, 1, 5, 3)
+        var game = new Game(gameId, 1, 5, 3, GameConfiguration)
         {
             MovesArraySerialized = JsonSerializer.Serialize(new List<string>()),
             IsRunning = true,

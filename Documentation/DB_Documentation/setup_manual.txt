@@ -15,31 +15,3 @@
 HOW TO MAKE A MIGRATION RUN THESE COMMANDS
 1. dotnet ef migrations add "Initial Migration"
 2. dotnet ef database update
-
-CREATE TABLE [Users] (
-          [Id] uniqueidentifier NOT NULL,
-          [Username] nvarchar(max) NOT NULL,
-          [Password] nvarchar(max) NOT NULL,
-          CONSTRAINT [PK_Users] PRIMARY KEY ([Id])
-      );
-
-CREATE TABLE [Games] (
-            [GameId] uniqueidentifier NOT NULL,
-            [MovesArraySerialized] nvarchar(max) NOT NULL,
-            [Lives] int NOT NULL,
-            [IsRunning] bit NOT NULL,
-            [StartOfGame] time NOT NULL,
-            [EndOfGame] time NOT NULL,
-            [WLD] int NOT NULL,
-            [Blackout] int NOT NULL,
-            [TurnBlack] bit NOT NULL,
-            [UserId] uniqueidentifier NOT NULL,
-            [BotRating] int NOT NULL,
-            [Difficulty] int NOT NULL,
-            CONSTRAINT [PK_Games] PRIMARY KEY ([GameId]),
-            CONSTRAINT [FK_Games_Users_UserId] FOREIGN KEY ([UserId]) REFERENCES [Users] ([Id]) ON DELETE CASCADE
-        );
-
---to insert the dummy user into db
-INSERT INTO dbo.Users (Id, Username, Password)
-VALUES ('7097194a-84a3-4010-9bf8-028f4869c54f', 'BNW', '12amGANG');
