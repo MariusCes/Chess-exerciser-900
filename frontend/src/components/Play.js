@@ -24,7 +24,8 @@ function Play() {
   const [gameStatus, setGameStatus] = useState(null);
   const [health, setHealth] = useState(10);
   const [timer, setTimer] = useState(0);
-  
+  const [developerMode, setDeveloperMode] = useState(false);
+
   // This saves to localStorage
   useEffect(() => {
     if (isGameCreated) {
@@ -43,17 +44,17 @@ function Play() {
     }
   }, [
     // Here you say what to write into the localStorage save
-    gameID, 
-    fen, 
-    moveList, 
-    health, 
-    timer, 
-    turnBlack, 
-    aiDifficulty, 
-    memoryDifficulty, 
+    gameID,
+    fen,
+    moveList,
+    health,
+    timer,
+    turnBlack,
+    aiDifficulty,
+    memoryDifficulty,
     isGameCreated
   ]);
-  
+
   // On component load, restore the game state
   useEffect(() => {
     const savedGameState = localStorage.getItem('chessGameState');
@@ -74,7 +75,7 @@ function Play() {
   const resetGame = () => {
     // Clear the localStorage to reset the game state
     localStorage.removeItem('chessGameState');
-  
+
     // Reset the component's state to initial values  
     setGameID(null);
     setIsGameCreated(false);
@@ -140,8 +141,8 @@ function Play() {
       setFen(data.fenPosition); // to be tested
       setTurnBlack(data.turnBlack); // to be tested???
     } else {
-        setMove("Bad move!");
-        decreaseHealth(10) // visada po 1 health nuima
+      setMove("Bad move!");
+      decreaseHealth(10) // visada po 1 health nuima
     }
   };
 
@@ -155,27 +156,26 @@ function Play() {
       return newHealth;
     });
   };
-  
+
   useEffect(() => {
     let interval;
-  
+
     if (isGameCreated && !gameStatus) {
       interval = setInterval(() => {
         setTimer((prevTimer) => prevTimer + 1);
       }, 1000);
     }
-  
+
     return () => {
       clearInterval(interval); // Stops the timer, but does not reset it
     };
   }, [isGameCreated, gameStatus]);
 
   return (
-    <div className="relative min-h-screen overflow-x-hidden">
+    <div className="relative min-h-screen overflow-x-hidden pt-5">
       <main
-        className={`relative ${
-          gameStatus ? "blur" : ""
-        } transition-all duration-300`}
+        className={`relative ${gameStatus ? "blur" : ""
+          } transition-all duration-300`}
       >
         <DifficultySelectors
           aiDifficulty={aiDifficulty}
@@ -198,13 +198,23 @@ function Play() {
             />
             <Timer seconds={timer} />
             <HealthBar health={health} />
-            <MoveList moves={moveList} />
+            <MoveList moves={moveList} developerMode={developerMode} />
             <TestButtons
               setGameStatus={setGameStatus}
               decreaseHealth={decreaseHealth}
               mockCreateGame={mockCreateGame}
               resetGame={resetGame}
+              developerMode={developerMode}
+              togglePieceVisibility={togglePieceVisibility}
             />
+            <label className="flex items-center space-x-2">
+              <input
+                type="checkbox"
+                checked={developerMode}
+                onChange={(e) => setDeveloperMode(e.target.checked)}
+              />
+              <span>Developer Mode</span>
+            </label>
           </div>
         </div>
       </main>
@@ -214,7 +224,7 @@ function Play() {
           <GameOver
             status={gameStatus}
             moveList={moveList}
-            onPlayAgain={mockCreateGame}
+            onPlayAgain={createGame}
             onClose={() => {
               setGameStatus(null);
               setIsGameCreated(false);

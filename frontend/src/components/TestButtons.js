@@ -4,8 +4,13 @@ export const TestButtons = ({
   setGameStatus, 
   decreaseHealth, 
   mockCreateGame, 
-  resetGame
+  resetGame,
+  developerMode,
+  togglePieceVisibility
 }) => {
+
+  if (!developerMode) return null;
+  
   return (
     <>
       <div className="test-buttons mt-3">
@@ -41,6 +46,9 @@ export const TestButtons = ({
         </button>
         <button onClick={resetGame} className="btn btn-danger">Reset Game</button>
       </div>
+      <button onClick={togglePieceVisibility} className="btn btn-secondary">
+          Toggle Piece Visibility
+        </button>
     </>
   );
 };
