@@ -1,0 +1,9 @@
+package: dotnet add package Microsoft.AspNetCore.Identity.UI --version 7.0.20
+dotnet add package Microsoft.AspNetCore.Authentication.JwtBearer --version 7.0.20
+
+add to appsetting.json
+"Jwt": {
+    "Key": "c#Y36*5edy?S*P2EUmDVUvN+uNz&pcE%EkH",
+    "Issuer": "ChessExerciser900",
+    "Audience": "ARE_YOU_NOT_ENTERTAINED"
+  }

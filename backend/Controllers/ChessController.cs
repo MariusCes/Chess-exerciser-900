@@ -9,6 +9,10 @@ using Stockfish.NET;
 using backend.Data;
 using backend.Utilities;
 using Microsoft.Extensions.Logging;
+using backend.Models.ViewModels;
+using Microsoft.AspNetCore.Authorization;
+using backend.Controllers;
+using System.Security.Claims;
 
 namespace CHESSPROJ.Controllers
 {
@@ -18,29 +22,38 @@ namespace CHESSPROJ.Controllers
     {
         private static ErrorMessages gameNotFound = ErrorMessages.Game_not_found;
         private static ErrorMessages badMove = ErrorMessages.Move_notation_cannot_be_empty;
+
+        private static ErrorMessages registeringError = ErrorMessages.Bad_request;
         private readonly IStockfishService _stockfishService;
         private readonly IDatabaseUtilities dbUtilities;
+        private readonly IJwtService _jwtService;
         private readonly ILogger<ChessController> logger;
 
         // Dependency Injection through constructor
-        public ChessController(IStockfishService stockfishService, IDatabaseUtilities dbUtilities, ILogger<ChessController> logger)
+        public ChessController(IStockfishService stockfishService, IDatabaseUtilities dbUtilities, ILogger<ChessController> logger, IJwtService jwtService)
         {
             _stockfishService = stockfishService;
             this.dbUtilities = dbUtilities;
             this.logger = logger;
+            _jwtService = jwtService;
         }
 
+        [Authorize]
         [HttpPost("create-game")]
         public async Task<IActionResult> CreateGame([FromBody] CreateGameReqDto req)
         {
             _stockfishService.SetLevel(req.aiDifficulty);
             Game game = Game.CreateGameFactory(Guid.NewGuid(), req.gameDifficulty, req.aiDifficulty, 3);
-
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            game.UserId = userId;
             try
             {
                 if (await dbUtilities.AddGame(game))
                 {
-                    return Ok(new { GameId = game.GameId });
+                    var PostCreateGameResponseDTO = new PostCreateGameResponseDTO {
+                    GameId = game.GameId.ToString()
+                };
+                    return Ok(PostCreateGameResponseDTO);
                 }
                 else
                 {
@@ -54,6 +67,7 @@ namespace CHESSPROJ.Controllers
             }
         }
 
+        [Authorize]
         [HttpGet("{gameId}/history")]
         public async Task<IActionResult> GetMovesHistory(string gameId)
         {
@@ -61,25 +75,33 @@ namespace CHESSPROJ.Controllers
             if (game == null)
                 return NotFound("Game not found.");
 
-            var moves = game.MovesArray ?? new List<string>();
+            List<string> moves = new List<string>();
+            if (game.MovesArraySerialized != null)
+            {
+                moves = JsonSerializer.Deserialize<List<string>>(game.MovesArraySerialized);
+            }
+
             var response = new GetMovesHistoryResponseDTO 
             {
                 MovesArray = moves
             };
-            
+
             return Ok(response);
-        }
+}
+
 
         // POST: api/chessgame/{gameId}/move
+        [Authorize]
         [HttpPost("{gameId}/move")]
         public async Task<IActionResult> MakeMove(string gameId, [FromBody] MoveDto moveNotation)
         {
-
-            var game = await dbUtilities.GetGameById(gameId);
+            Game game = await dbUtilities.GetGameById(gameId);
             if (game == null)
             {
                 return NotFound($"{gameNotFound.ToString()}");
             }
+
+            GameState gameState = await dbUtilities.GetStateById(gameId);
 
             string move = moveNotation.move;
             // Validate move input
@@ -89,7 +111,6 @@ namespace CHESSPROJ.Controllers
             }
 
             List<string> MovesArray = new List<string>();
-
             if (game.MovesArraySerialized != null)
             {
                 MovesArray = JsonSerializer.Deserialize<List<string>>(game.MovesArraySerialized);
@@ -106,29 +127,46 @@ namespace CHESSPROJ.Controllers
                 string fenPosition = _stockfishService.GetFen();
                 currentPosition = string.Join(" ", MovesArray);
 
-                game.HandleBlackout();
+                gameState.HandleBlackout();
 
                 game.MovesArraySerialized = JsonSerializer.Serialize(MovesArray);
-                await dbUtilities.UpdateGame(game);
+                await dbUtilities.UpdateGame(game, gameState);
+                
+                var postMoveResponseDTO = new PostMoveResponseDTO {
+                    WrongMove = false,
+                    BotMove = botMove,
+                    CurrentPosition = currentPosition,
+                    FenPosition = fenPosition,
+                    TurnBlack = gameState.TurnBlack
+                };
 
-                return Ok(new { wrongMove = false, botMove, currentPosition = currentPosition, fenPosition, game.TurnBlack });
+                return Ok(postMoveResponseDTO);
             }
             else
             {
-                game.Lives--; //minus life
-                if(game.Lives <= 0){
-                    game.IsRunning = false; 
-                    game.Lives = 0; //kad nebutu negative in db
-                    game.WLD = 0;
+                gameState.CurrentLives--; //minus life
+                if (gameState.CurrentLives <= 0)
+                {
+                    game.IsRunning = false;
+                    gameState.CurrentLives = 0; //kad nebutu negative in db
+                    gameState.WLD = 0;
                 }
-                game.HandleBlackout();
+                gameState.HandleBlackout();
 
-                await dbUtilities.UpdateGame(game);
-
-                return Ok(new { wrongMove = true, lives = game.Lives, game.IsRunning, game.TurnBlack }); // we box here :) (fight club reference)
+                await dbUtilities.UpdateGame(game, gameState);
+                
+                var postMoveResponseDTO = new PostMoveResponseDTO {
+                    WrongMove = true,
+                    Lives = gameState.CurrentLives,
+                    IsRunning = game.IsRunning,
+                    TurnBlack = gameState.TurnBlack
+                };
+                
+                return Ok(postMoveResponseDTO); // we box here :) (fight club reference)
             }
         }
 
+        [Authorize]
         [HttpGet("games")]
         public async Task<IActionResult> GetAllGames()
         {
@@ -137,22 +175,26 @@ namespace CHESSPROJ.Controllers
             GamesList games = new GamesList(gamesList);
             List<Game> gamesWithMoves = new List<Game>();
 
-           foreach (var game in games.GetCustomEnumerator())
-            {
+            foreach (var game in games.GetCustomEnumerator())
+        {
                 // custom filtering using IEnumerable
                 gamesWithMoves.Add(game);
             }
+            var getAllGamesResponseDTO = new GetAllGamesResponseDTO {
+                GamesList = gamesWithMoves
+            };
+            return Ok(getAllGamesResponseDTO);
             
-            return Ok(gamesWithMoves);
         }
 
+        [Authorize]
         [HttpGet("{userId}/games")]
         public async Task<IActionResult> GetUserGames(string userId)
         {
             GamesList gamesList = new GamesList(await dbUtilities.GetGamesList());
             List<Game> userGames = new List<Game>();
 
-            foreach(var game in gamesList)
+            foreach (var game in gamesList)
             {
                 if (game.UserId.ToString() == userId)
                 {
@@ -161,6 +203,35 @@ namespace CHESSPROJ.Controllers
             }
 
             return Ok(userGames);
+        }
+
+        [HttpPost("register")]
+        public async Task<IActionResult> Register(RegisterViewModel model)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            if (await dbUtilities.AddUser(model))
+            {
+                return Ok(new { message = "Registration successful" });
+            }
+
+            return BadRequest($"{registeringError.ToString()}");
+        }
+
+        [HttpPost("login")]
+        public async Task<IActionResult> Login(LoginViewModel model)
+        {
+            if (await dbUtilities.LogInUser(model))
+            {
+                var user = await dbUtilities.GetUserByEmail(model);
+                var token = _jwtService.GenerateToken(user);
+                return Ok(new { token, user.UserName, user.Email });
+            }
+            else
+            {
+                return BadRequest("Invalid credentials");
+            }
         }
     }
 }

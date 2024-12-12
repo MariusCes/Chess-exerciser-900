@@ -29,6 +29,7 @@ public class ChessControllerIntegrationTests
     private readonly JsonSerializerOptions _jsonOptions;
     private readonly Mock<IStockfishService> _mockStockfishService;
     private readonly Mock<IDatabaseUtilities> _mockDbUtilities;
+    private readonly Mock<ILogger<ChessController>> _mockLogger;
 
     public ChessControllerIntegrationTests()
     {
@@ -36,7 +37,8 @@ public class ChessControllerIntegrationTests
         {
             PropertyNameCaseInsensitive = true
         };
-
+        
+        _mockLogger = new Mock<ILogger<ChessController>>();
         _mockStockfishService = new Mock<IStockfishService>();
         _mockDbUtilities = new Mock<IDatabaseUtilities>();
 
@@ -88,7 +90,7 @@ public class ChessControllerIntegrationTests
         // Arrange
         var gamesList = new List<Game>
         {
-            new Game(Guid.NewGuid(), 1, 5, 3)
+            new Game(Guid.NewGuid(), 1, 5, 3, GameConfiguration)
             {
                 MovesArraySerialized = JsonSerializer.Serialize(new List<string> { "e2e4" })
             }
@@ -135,7 +137,7 @@ public class ChessControllerIntegrationTests
     {
         // Arrange
         var gameId = Guid.NewGuid();
-        var game = new Game(gameId, 1, 5, 3)
+        var game = new Game(gameId, 1, 5, 3, GameConfiguration)
         {
             MovesArraySerialized = JsonSerializer.Serialize(new List<string> { "e2e4" })
         };
@@ -163,7 +165,7 @@ public class ChessControllerIntegrationTests
     {
         // Arrange
         var gameId = Guid.NewGuid();
-        var game = new Game(gameId, 1, 5, 3)
+        var game = new Game(gameId, 1, 5, 3, GameConfiguration)
         {
             MovesArraySerialized = JsonSerializer.Serialize(new List<string>()),
             IsRunning = true,
@@ -198,7 +200,7 @@ public class ChessControllerIntegrationTests
     {
         // Arrange
         var gameId = Guid.NewGuid();
-        var game = new Game(gameId, 1, 5, 3)
+        var game = new Game(gameId, 1, 5, 3, GameConfiguration)
         {
             MovesArraySerialized = JsonSerializer.Serialize(new List<string>()),
             IsRunning = true,

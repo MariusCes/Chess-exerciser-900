@@ -1,19 +1,40 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import '../styles/Login.css';
+import { useAuth } from './AuthContext';
 
 const Login = () => {
-    const [username, setUsername] = useState('');
+    const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [showPassword, setShowPassword] = useState(false);
     const navigate = useNavigate(); // Allows to use the navigate(directory) command
+    const { setToken } = useAuth(); // issiemam is konteksto setToken
 
     const handleLogin = async (e) => {
         e.preventDefault();
 
-        if (username === "testuser" && password === "password123") {
+        const response = await fetch(
+            "http://localhost:5030/api/chess/login",
+            {
+                method: "POST",
+                body: JSON.stringify({
+                    Email: email,
+                    Password: password
+                }),
+                headers: {
+                    "Content-type": "application/json; charset=UTF-8",
+                },
+            }
+        );
+
+        const data = await response.json();
+
+        if (data.token !== null) {
+
+            setToken(data.token); // i konteksta irasom tokena
+
             localStorage.setItem("isLoggedIn", "true");
-            localStorage.setItem("username", username);
+            localStorage.setItem("email", email);
             alert("Login successful!");
             navigate("/play"); // Go to play screen after successful login
         } else {
@@ -30,9 +51,9 @@ const Login = () => {
                         <input 
                             type="text" 
                             className="form-control login-input" 
-                            placeholder="Username"
-                            value={username}
-                            onChange={(e) => setUsername(e.target.value)}
+                            placeholder="Email"
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
                         />
                     </div>
                     <div className="mb-3">

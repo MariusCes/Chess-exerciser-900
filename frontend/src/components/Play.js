@@ -9,8 +9,12 @@ import GameControls from "./GameControls";
 import DifficultySelectors from "./DifficultySelectors";
 import TestButtons from "./TestButtons";
 
+import { useAuth } from './AuthContext';
 
 function Play() {
+
+    const { token } = useAuth(); // is konteksto istraukta tokenas
+
   const [move, setMove] = useState(""); // labelis tam judesiui kuri useris submittina
   const [moveList, setMoveList] = useState([]);
   const [isGameCreated, setIsGameCreated] = useState(false); // jei nesukurtas zaidimas negali submittinti judesiu
@@ -90,9 +94,10 @@ function Play() {
 
   const createGame = async () => {
     setTimer(0);
-    setMoveList([]);
-    setFen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
-    setHealth(health);
+      setMoveList([]);
+      setFen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
+      setHealth(health);
+
     const response = await fetch(
       "http://localhost:5030/api/chess/create-game",
       {
@@ -102,7 +107,8 @@ function Play() {
           aiDifficulty,
         }),
         headers: {
-          "Content-type": "application/json; charset=UTF-8",
+            "Content-type": "application/json; charset=UTF-8",
+            Authorization: `Bearer ${token}`, // uuuuuu yaaaa. token babyyy
         },
       }
     );
@@ -130,7 +136,8 @@ function Play() {
           move: userMove.toLowerCase(),
         }),
         headers: {
-          "Content-type": "application/json; charset=UTF-8",
+            "Content-type": "application/json; charset=UTF-8",
+            Authorization: `Bearer ${token}`,
         },
       }
     );
