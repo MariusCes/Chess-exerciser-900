@@ -1,16 +1,28 @@
 import React, { useState, useEffect } from "react";
 import "../styles/History.css";
+import { useAuth } from './AuthContext';
 
 const History = () => {
+    const { token } = useAuth(); // is konteksto istraukta tokenas
+
     const [games, setGames] = useState([]);
     const [expandedGame, setExpandedGame] = useState(null); // Tracks the expanded game ID
     const [gameMoves, setGameMoves] = useState({}); // Stores move lists for each game ID
     const [loadingStates, setLoadingStates] = useState({}); // Tracks loading state for each game ID
 
     const getGames = async () => {
-        const response = await fetch("http://localhost:5030/api/chess/7097194a-84a3-4010-9bf8-028f4869c54f/games");
+        const response = await fetch(
+            "http://localhost:5030/api/chess/7097194a-84a3-4010-9bf8-028f4869c54f/games",
+            {
+                method: "GET", // Optional, as GET is the default
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${token}`, // Add Bearer token here
+                },
+            }
+        );
         const data = await response.json();
-        setGames(data);
+        setGames(data); // Update state with fetched data
     };
 
     useEffect(() => {
