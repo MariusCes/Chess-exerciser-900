@@ -14,8 +14,8 @@ public class Game
     public string? MovesArraySerialized { get; set; }
     public int Lives { get; set; }
     public Boolean IsRunning { get; set; }
-    public DateTime? StartTime { get; set; }
-    public DateTime? EndTime { get; set; }
+    public TimeSpan StartOfGame { get; set; }
+    public TimeSpan EndOfGame { get; set; }
     public int WLD { get; set; } //Win - 1 Lose - 0 Draw - 2
     public int Blackout { get; set; }
     public Boolean TurnBlack { get; set; }
@@ -32,10 +32,6 @@ public class Game
 
     // Navigation property to the User entity
     public User User { get; set; }
-
-    public int? TotalTimeInSeconds => EndTime.HasValue && StartTime.HasValue 
-    ? (int)(EndTime.Value - StartTime.Value).TotalSeconds 
-    : null;
 
     public Game() { }
     public Game(Guid id, int difficulty, int botRating, int lives)

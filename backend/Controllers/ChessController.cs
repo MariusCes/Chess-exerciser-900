@@ -56,6 +56,20 @@ namespace CHESSPROJ.Controllers
             _stockfishService.SetLevel(req.aiDifficulty); //default set to 5, need to see what level does
 
             Game game = Game.CreateGameFactory(Guid.NewGuid(), req.gameDifficulty, req.aiDifficulty, 3);
+
+           //cia testavimui
+           /*
+            List<string> initialMoves = new List<string>
+            {
+                "a2a4", "b7b5", "a4b5", "c7c6", "b5c6", "c8b7", "c6b7", "d8a5"
+            };
+
+            // Set the initial moves on Stockfish and the game object
+            string initialPosition = string.Join(" ", initialMoves);
+            _stockfishService.SetPosition(initialPosition, "");
+
+            game.MovesArraySerialized = JsonSerializer.Serialize(initialMoves);
+            */
             if (await dbUtilities.AddGame(game))
             {
                 return Ok(new { GameId = game.GameId });
