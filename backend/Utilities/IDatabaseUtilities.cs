@@ -18,5 +18,7 @@ namespace backend.Utilities
         public Task<GameState?> GetStateById(string gameId);
         public Task<bool> LogInUser(LoginViewModel model);
         public Task<User> GetUserByEmail(LoginViewModel model);
+        public Task<bool> FindIfUsernameExists(RegisterViewModel model);
+        public Task<bool> FindIfEmailExists(RegisterViewModel model);
     }
 }
