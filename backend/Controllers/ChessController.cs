@@ -50,7 +50,10 @@ namespace CHESSPROJ.Controllers
             {
                 if (await dbUtilities.AddGame(game))
                 {
-                    return Ok(new { GameId = game.GameId });
+                    var PostCreateGameResponseDTO = new PostCreateGameResponseDTO {
+                    GameId = game.GameId.ToString()
+                };
+                    return Ok(PostCreateGameResponseDTO);
                 }
                 else
                 {
@@ -73,18 +76,19 @@ namespace CHESSPROJ.Controllers
                 return NotFound("Game not found.");
 
             List<string> moves = new List<string>();
-
             if (game.MovesArraySerialized != null)
             {
                 moves = JsonSerializer.Deserialize<List<string>>(game.MovesArraySerialized);
             }
-            var response = new GetMovesHistoryResponseDTO
+
+            var response = new GetMovesHistoryResponseDTO 
             {
                 MovesArray = moves
             };
 
             return Ok(response);
-        }
+}
+
 
         // POST: api/chessgame/{gameId}/move
         [Authorize]
@@ -127,15 +131,16 @@ namespace CHESSPROJ.Controllers
 
                 game.MovesArraySerialized = JsonSerializer.Serialize(MovesArray);
                 await dbUtilities.UpdateGame(game, gameState);
+                
+                var postMoveResponseDTO = new PostMoveResponseDTO {
+                    WrongMove = false,
+                    BotMove = botMove,
+                    CurrentPosition = currentPosition,
+                    FenPosition = fenPosition,
+                    TurnBlack = gameState.TurnBlack
+                };
 
-                Console.WriteLine($"Before returning - GameState is null: {game.GameState == null}");
-                if (game.GameState != null)
-                {
-                    Console.WriteLine($"CurrentLives in GameState: {game.GameState.CurrentLives}");
-                }
-                Console.WriteLine($"Lives property returns: {gameState.CurrentLives}");
-
-                return Ok(new { wrongMove = false, botMove, currentPosition = currentPosition, fenPosition, gameState.TurnBlack });
+                return Ok(postMoveResponseDTO);
             }
             else
             {
@@ -148,9 +153,43 @@ namespace CHESSPROJ.Controllers
                 }
                 gameState.HandleBlackout();
 
-                await dbUtilities.UpdateGame(game, gameState);
+                if(_stockfishService.GetEvalType() == "mate"){
+                    if(_stockfishService.GetEvalVal() > 0){
+                        //reiskia baltas padare mate
+                        gameState.WLD = 1;
+                    }else{
+                        //reiskia juodas padare mate
+                        gameState.WLD = 0;
+                    }
+                    //nu jei mate tai game tikrai over
+                    game.IsRunning = false;
+                        var postMoveResponseDTO = new PostMoveResponseDTO {
+                            WrongMove = true,
+                            Lives = gameState.CurrentLives,
+                            IsRunning = game.IsRunning,
+                            TurnBlack = gameState.TurnBlack,
+                            GameWLD = (int)gameState.WLD
 
-                return Ok(new { wrongMove = true, lives = gameState.CurrentLives, game.IsRunning, gameState.TurnBlack }); // we box here :) (fight club reference)
+                        };
+
+                    await dbUtilities.UpdateGame(game, gameState);
+                    
+                    return Ok(postMoveResponseDTO); // we box here :) (fight club reference)
+                    
+                }else{
+                    //nereik wld
+                    var postMoveResponseDTO = new PostMoveResponseDTO {
+                        WrongMove = true,
+                        Lives = gameState.CurrentLives,
+                        IsRunning = game.IsRunning,
+                        TurnBlack = gameState.TurnBlack
+                    };
+
+                    await dbUtilities.UpdateGame(game, gameState);
+                    return Ok(postMoveResponseDTO); // we box here :) (fight club reference)
+
+                }
+
             }
         }
 
@@ -164,12 +203,15 @@ namespace CHESSPROJ.Controllers
             List<Game> gamesWithMoves = new List<Game>();
 
             foreach (var game in games.GetCustomEnumerator())
-            {
+        {
                 // custom filtering using IEnumerable
                 gamesWithMoves.Add(game);
             }
-
-            return Ok(gamesWithMoves);
+            var getAllGamesResponseDTO = new GetAllGamesResponseDTO {
+                GamesList = gamesWithMoves
+            };
+            return Ok(getAllGamesResponseDTO);
+            
         }
 
         [Authorize]
