@@ -11,6 +11,9 @@ using Microsoft.Extensions.Logging;
 using System;
 using System.Text.Json;
 using backend.Errors;
+using backend.Controllers;
+using System.Security.Claims;
+using Microsoft.AspNetCore.Http;
 
 namespace ChessExerciser.Tests
 {
@@ -20,14 +23,28 @@ namespace ChessExerciser.Tests
         private readonly Mock<IDatabaseUtilities> _mockDbUtilities;
         private readonly Mock<ILogger<ChessController>> _mockLogger;
         private readonly ChessController _controller;
+        private readonly Mock<IJwtService> _mockJwtService;
 
         public ChessControllerTests()
         {
             _mockStockfishService = new Mock<IStockfishService>();
             _mockDbUtilities = new Mock<IDatabaseUtilities>();
             _mockLogger = new Mock<ILogger<ChessController>>();
-            _controller = new ChessController(_mockStockfishService.Object, _mockDbUtilities.Object, _mockLogger.Object);
+            _mockJwtService = new Mock<IJwtService>();
+            _controller = new ChessController(_mockStockfishService.Object, _mockDbUtilities.Object, _mockLogger.Object, _mockJwtService.Object);
             
+            var user = new ClaimsPrincipal(new ClaimsIdentity(new Claim[]
+            {
+                new Claim(ClaimTypes.NameIdentifier, "user-id"),
+                new Claim(ClaimTypes.Email, "user-email"),
+                new Claim(ClaimTypes.Name, "user-name"),
+            }, "mock"));
+
+            // Set the controller context
+            _controller.ControllerContext = new ControllerContext
+            {
+                HttpContext = new DefaultHttpContext { User = user }
+            };
         }
 
         [Fact]

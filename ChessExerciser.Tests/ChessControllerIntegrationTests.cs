@@ -1,61 +1,41 @@
-
-using System.Net.Http;
 using System.Text;
 using System.Text.Json;
-using System.Threading.Tasks;
-using Xunit;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.InMemory;
 using backend.DTOs;
 using backend.Models.Domain;
 using backend.Data;
 using backend.Utilities;
 using FluentAssertions;
 using Moq;
-using Stockfish.NET;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.Logging;
 using CHESSPROJ.Controllers;
-using Microsoft.VisualStudio.TestPlatform.TestHost;
+using Microsoft.AspNetCore.Authentication;
 
-namespace ChessExerciser.Tests;
-
-public class ChessControllerIntegrationTests
+namespace ChessExerciser.Tests
 {
-    private readonly WebApplicationFactory<Program> _factory;
-    private readonly HttpClient _client;
-    private readonly JsonSerializerOptions _jsonOptions;
-    private readonly Mock<IStockfishService> _mockStockfishService;
-    private readonly Mock<IDatabaseUtilities> _mockDbUtilities;
-    private readonly Mock<ILogger<ChessController>> _mockLogger;
-
-    public ChessControllerIntegrationTests()
+    public class ChessControllerIntegrationTests : IClassFixture<WebApplicationFactory<Program>>
     {
-        _jsonOptions = new JsonSerializerOptions
+        private readonly HttpClient _client;
+        private readonly JsonSerializerOptions _jsonOptions;
+        private readonly Mock<IStockfishService> _mockStockfishService;
+        private readonly Mock<IDatabaseUtilities> _mockDbUtilities;
+        private readonly Mock<ILogger<ChessController>> _mockLogger;
+
+        public ChessControllerIntegrationTests(WebApplicationFactory<Program> factory)
         {
-            PropertyNameCaseInsensitive = true
-        };
-        
-        _mockLogger = new Mock<ILogger<ChessController>>();
-        _mockStockfishService = new Mock<IStockfishService>();
-        _mockDbUtilities = new Mock<IDatabaseUtilities>();
+            _jsonOptions = new JsonSerializerOptions
+            {
+                PropertyNameCaseInsensitive = true
+            };
 
-        // Setup mock StockfishService
-        _mockStockfishService.Setup(s => s.IsMoveCorrect(It.IsAny<string>(), It.IsAny<string>()))
-            .Returns(true);
-        _mockStockfishService.Setup(s => s.GetBestMove())
-            .Returns("e7e5");
-        _mockStockfishService.Setup(s => s.GetFen())
-            .Returns("rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq e3 0 1");
+            _mockLogger = new Mock<ILogger<ChessController>>();
+            _mockStockfishService = new Mock<IStockfishService>();
+            _mockDbUtilities = new Mock<IDatabaseUtilities>();
 
-        // Setup mock DatabaseUtilities
-        _mockDbUtilities.Setup(d => d.AddGame(It.IsAny<Game>()))
-            .ReturnsAsync(true);
-
-        _factory = new WebApplicationFactory<Program>()
-            .WithWebHostBuilder(builder =>
+            _client = factory.WithWebHostBuilder(builder =>
             {
                 builder.ConfigureTestServices(services =>
                 {
@@ -78,11 +58,13 @@ public class ChessControllerIntegrationTests
                     // Add mocked services
                     services.AddSingleton(_mockStockfishService.Object);
                     services.AddSingleton(_mockDbUtilities.Object);
-                });
-            });
 
-        _client = _factory.CreateClient();
-    }
+                    // Add test authentication
+                    services.AddAuthentication("Test")
+                        .AddScheme<AuthenticationSchemeOptions, TestAuthHandler>("Test", options => { });
+                });
+            }).CreateClient();
+        }
 
     [Fact]
     public async Task GetAllGames_ShouldReturnGamesList()
@@ -90,7 +72,7 @@ public class ChessControllerIntegrationTests
         // Arrange
         var gamesList = new List<Game>
         {
-            new Game(Guid.NewGuid(), 1, 5, 3, GameConfiguration)
+            new Game(Guid.NewGuid(), 1, 5, 3)
             {
                 MovesArraySerialized = JsonSerializer.Serialize(new List<string> { "e2e4" })
             }
@@ -137,7 +119,7 @@ public class ChessControllerIntegrationTests
     {
         // Arrange
         var gameId = Guid.NewGuid();
-        var game = new Game(gameId, 1, 5, 3, GameConfiguration)
+        var game = new Game(gameId, 1, 5, 3)
         {
             MovesArraySerialized = JsonSerializer.Serialize(new List<string> { "e2e4" })
         };
@@ -165,17 +147,16 @@ public class ChessControllerIntegrationTests
     {
         // Arrange
         var gameId = Guid.NewGuid();
-        var game = new Game(gameId, 1, 5, 3, GameConfiguration)
+        var game = new Game(gameId, 1, 5, 3)
         {
             MovesArraySerialized = JsonSerializer.Serialize(new List<string>()),
             IsRunning = true,
-            Lives = 3
         };
 
         _mockDbUtilities.Setup(d => d.GetGameById(gameId.ToString()))
             .ReturnsAsync(game);
 
-        _mockDbUtilities.Setup(d => d.UpdateGame(It.IsAny<Game>()))
+        _mockDbUtilities.Setup(d => d.UpdateGame(It.IsAny<Game>(), It.IsAny<GameState>()))
             .Returns(Task.CompletedTask);
 
         var moveRequest = new MoveDto("e2e4");
@@ -200,17 +181,16 @@ public class ChessControllerIntegrationTests
     {
         // Arrange
         var gameId = Guid.NewGuid();
-        var game = new Game(gameId, 1, 5, 3, GameConfiguration)
+        var game = new Game(gameId, 1, 5, 3)
         {
             MovesArraySerialized = JsonSerializer.Serialize(new List<string>()),
             IsRunning = true,
-            Lives = 3
         };
 
         _mockDbUtilities.Setup(d => d.GetGameById(gameId.ToString()))
             .ReturnsAsync(game);
 
-        _mockDbUtilities.Setup(d => d.UpdateGame(It.IsAny<Game>()))
+        _mockDbUtilities.Setup(d => d.UpdateGame(It.IsAny<Game>(), It.IsAny<GameState>()))
             .Returns(Task.CompletedTask);
 
         _mockStockfishService.Setup(s => s.IsMoveCorrect(It.IsAny<string>(), It.IsAny<string>()))
@@ -235,7 +215,7 @@ public class ChessControllerIntegrationTests
 
     public void Dispose()
     {
-        _factory?.Dispose();
+
         _client?.Dispose();
     }
-}
+}}
