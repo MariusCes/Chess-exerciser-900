@@ -27,7 +27,7 @@ function Play() {
   const [aiDifficulty, setAiDifficulty] = useState(""); // State for selected difficulty
   const [memoryDifficulty, setMemoryDifficulty] = useState("");
   const [gameStatus, setGameStatus] = useState(null);
-  const [health, setHealth] = useState(10);
+  const [health, setHealth] = useState(100);
   const [timer, setTimer] = useState(0);
   const [developerMode, setDeveloperMode] = useState(false);
   const [showLoginRequired, setShowLoginRequired] = useState(false);
