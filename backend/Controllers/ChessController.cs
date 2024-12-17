@@ -153,16 +153,43 @@ namespace CHESSPROJ.Controllers
                 }
                 gameState.HandleBlackout();
 
-                await dbUtilities.UpdateGame(game, gameState);
-                
-                var postMoveResponseDTO = new PostMoveResponseDTO {
-                    WrongMove = true,
-                    Lives = gameState.CurrentLives,
-                    IsRunning = game.IsRunning,
-                    TurnBlack = gameState.TurnBlack
-                };
-                
-                return Ok(postMoveResponseDTO); // we box here :) (fight club reference)
+                if(_stockfishService.GetEvalType() == "mate"){
+                    if(_stockfishService.GetEvalVal() > 0){
+                        //reiskia baltas padare mate
+                        gameState.WLD = 1;
+                    }else{
+                        //reiskia juodas padare mate
+                        gameState.WLD = 0;
+                    }
+                    //nu jei mate tai game tikrai over
+                    game.IsRunning = false;
+                        var postMoveResponseDTO = new PostMoveResponseDTO {
+                            WrongMove = true,
+                            Lives = gameState.CurrentLives,
+                            IsRunning = game.IsRunning,
+                            TurnBlack = gameState.TurnBlack,
+                            GameWLD = (int)gameState.WLD
+
+                        };
+
+                    await dbUtilities.UpdateGame(game, gameState);
+                    
+                    return Ok(postMoveResponseDTO); // we box here :) (fight club reference)
+                    
+                }else{
+                    //nereik wld
+                    var postMoveResponseDTO = new PostMoveResponseDTO {
+                        WrongMove = true,
+                        Lives = gameState.CurrentLives,
+                        IsRunning = game.IsRunning,
+                        TurnBlack = gameState.TurnBlack
+                    };
+
+                    await dbUtilities.UpdateGame(game, gameState);
+                    return Ok(postMoveResponseDTO); // we box here :) (fight club reference)
+
+                }
+
             }
         }
 
