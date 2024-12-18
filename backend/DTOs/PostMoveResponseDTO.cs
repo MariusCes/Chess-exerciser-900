@@ -15,5 +15,8 @@ namespace backend.DTOs
         public int Lives { get; set; }
         public Boolean IsRunning { get; set; }
         public int GameWLD { get; set; }
+
+        public TimeSpan Duration { get; set; }
+        
     }
 }

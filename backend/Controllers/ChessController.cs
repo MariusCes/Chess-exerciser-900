@@ -103,6 +103,7 @@ namespace CHESSPROJ.Controllers
 
             GameState gameState = await dbUtilities.GetStateById(gameId);
 
+            game.Duration = moveNotation.gameTime;
             string move = moveNotation.move;
             // Validate move input
             if (string.IsNullOrEmpty(move))
@@ -168,8 +169,8 @@ namespace CHESSPROJ.Controllers
                             Lives = gameState.CurrentLives,
                             IsRunning = game.IsRunning,
                             TurnBlack = gameState.TurnBlack,
-                            GameWLD = (int)gameState.WLD
-
+                            GameWLD = (int)gameState.WLD,
+                            Duration = game.Duration
                         };
 
                     await dbUtilities.UpdateGame(game, gameState);
