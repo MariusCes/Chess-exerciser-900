@@ -29,6 +29,8 @@ namespace CHESSPROJ.Controllers
         private readonly IJwtService _jwtService;
         private readonly ILogger<ChessController> logger;
 
+        public int reset;
+
         // Dependency Injection through constructor
         public ChessController(IStockfishService stockfishService, IDatabaseUtilities dbUtilities, ILogger<ChessController> logger, IJwtService jwtService)
         {
@@ -44,8 +46,24 @@ namespace CHESSPROJ.Controllers
         {
             _stockfishService.SetLevel(req.aiDifficulty);
             Game game = Game.CreateGameFactory(Guid.NewGuid(), req.gameDifficulty, req.aiDifficulty, 3);
+            game.IsRunning = true;
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             game.UserId = userId;
+
+                       //cia testavimui
+            /*
+            List<string> initialMoves = new List<string>
+            {
+                "e2e3", "g7g5", "a2a3", "f7f6"
+            };
+
+            // Set the initial moves on Stockfish and the game object
+            string initialPosition = string.Join(" ", initialMoves);
+            _stockfishService.SetPosition(initialPosition, "");
+
+            game.MovesArraySerialized = JsonSerializer.Serialize(initialMoves);
+            */
+
             try
             {
                 if (await dbUtilities.AddGame(game))
@@ -102,7 +120,9 @@ namespace CHESSPROJ.Controllers
             }
 
             GameState gameState = await dbUtilities.GetStateById(gameId);
-
+            reset = gameState.CurrentBlackout;
+            System.Console.WriteLine("THIS IS RESET" + reset);
+            game.Duration = moveNotation.gameTime;
             string move = moveNotation.move;
             // Validate move input
             if (string.IsNullOrEmpty(move))
@@ -130,17 +150,44 @@ namespace CHESSPROJ.Controllers
                 gameState.HandleBlackout();
 
                 game.MovesArraySerialized = JsonSerializer.Serialize(MovesArray);
-                await dbUtilities.UpdateGame(game, gameState);
-                
-                var postMoveResponseDTO = new PostMoveResponseDTO {
-                    WrongMove = false,
-                    BotMove = botMove,
-                    CurrentPosition = currentPosition,
-                    FenPosition = fenPosition,
-                    TurnBlack = gameState.TurnBlack
-                };
 
-                return Ok(postMoveResponseDTO);
+                if(_stockfishService.GetEvalType() == "mate"){
+                    System.Console.WriteLine(_stockfishService.GetEvalVal());
+                    System.Console.WriteLine(_stockfishService.GetEvalType());
+                    if(_stockfishService.GetEvalVal() >= 0){
+                        //reiskia baltas padare mate
+                        gameState.WLD = 1;
+                    }else{
+                        //reiskia juodas padare mate
+                        gameState.WLD = 0;
+                    }
+                    //nu jei mate tai game tikrai over
+                    game.IsRunning = false; 
+                    await dbUtilities.UpdateGame(game, gameState);
+                        var postMoveResponseDTO = new PostMoveResponseDTO {
+                            WrongMove = false,
+                            BotMove = botMove,
+                            Lives = gameState.CurrentLives,
+                            IsRunning = game.IsRunning,
+                            TurnBlack = false, //kad matytum final board jei buvo mate
+                            FenPosition = fenPosition,
+                            GameWLD = (int)gameState.WLD,
+                            CurrentPosition = currentPosition,
+                            Duration = game.Duration
+                        };
+                        return Ok(postMoveResponseDTO);
+                }else{
+                    await dbUtilities.UpdateGame(game, gameState);  
+                    var postMoveResponseDTO = new PostMoveResponseDTO {
+                        WrongMove = false,
+                        BotMove = botMove,
+                        IsRunning = true,
+                        CurrentPosition = currentPosition,
+                        FenPosition = fenPosition,
+                        TurnBlack = gameState.TurnBlack
+                    };
+                    return Ok(postMoveResponseDTO);
+                }
             }
             else
             {
@@ -150,46 +197,22 @@ namespace CHESSPROJ.Controllers
                     game.IsRunning = false;
                     gameState.CurrentLives = 0; //kad nebutu negative in db
                     gameState.WLD = 0;
+
                 }
                 gameState.HandleBlackout();
 
-                if(_stockfishService.GetEvalType() == "mate"){
-                    if(_stockfishService.GetEvalVal() > 0){
-                        //reiskia baltas padare mate
-                        gameState.WLD = 1;
-                    }else{
-                        //reiskia juodas padare mate
-                        gameState.WLD = 0;
-                    }
-                    //nu jei mate tai game tikrai over
-                    game.IsRunning = false;
-                        var postMoveResponseDTO = new PostMoveResponseDTO {
-                            WrongMove = true,
-                            Lives = gameState.CurrentLives,
-                            IsRunning = game.IsRunning,
-                            TurnBlack = gameState.TurnBlack,
-                            GameWLD = (int)gameState.WLD
-
-                        };
-
-                    await dbUtilities.UpdateGame(game, gameState);
-                    
-                    return Ok(postMoveResponseDTO); // we box here :) (fight club reference)
-                    
-                }else{
-                    //nereik wld
-                    var postMoveResponseDTO = new PostMoveResponseDTO {
+                var postMoveResponseDTO = new PostMoveResponseDTO {
                         WrongMove = true,
                         Lives = gameState.CurrentLives,
                         IsRunning = game.IsRunning,
-                        TurnBlack = gameState.TurnBlack
-                    };
+                        TurnBlack = gameState.TurnBlack,
+                        GameWLD = (int)gameState.WLD,
+                        Duration = game.Duration
 
-                    await dbUtilities.UpdateGame(game, gameState);
-                    return Ok(postMoveResponseDTO); // we box here :) (fight club reference)
+                };
 
-                }
-
+                await dbUtilities.UpdateGame(game, gameState);
+                return Ok(postMoveResponseDTO); // we box here :) (fight club reference)
             }
         }
          
