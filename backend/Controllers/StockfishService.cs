@@ -1,5 +1,4 @@
 using CHESSPROJ.Controllers;
-using CHESSPROJ.StockfishServiceExtensions;
 using Stockfish.NET;
 
 namespace CHESSPROJ.Services
@@ -51,6 +50,7 @@ namespace CHESSPROJ.Services
             _stockfish.SetPosition(currentPosition);
             return _stockfish.IsMoveCorrect(move);
         }
+
 
                 //cia pasakys mate, jei bus mate, pretty simple, grazina string
         public string GetEvalType()
