@@ -41,7 +41,7 @@ namespace CHESSPROJ.Services
 
         public string GetBestMove()
         {
-            return _stockfish.GetBestMoveTime(200);
+            return _stockfish.GetBestMove();
         }
 
         public bool IsMoveCorrect(string currentPosition, string move)
@@ -66,11 +66,5 @@ namespace CHESSPROJ.Services
                 
                 return EvalValue;
         }
-
-        public bool IsCheck()
-        {
-            return _stockfish.IsCheck();
-        }
-
     }
 }

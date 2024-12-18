@@ -33,7 +33,7 @@ public class StockfishServiceTests
 
         // Assert
         _mockStockfish.VerifySet(x => x.SkillLevel = level, Times.Once);
-        _mockStockfish.VerifySet(x => x.Depth = 3, Times.Once);
+        _mockStockfish.VerifySet(x => x.Depth = 1, Times.Once);
     }
 
     [Fact]
