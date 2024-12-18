@@ -9,7 +9,7 @@ namespace backend.Models.Domain
     {   
         public Guid GameId { get; set; }
         public string? MovesArraySerialized { get; set; }
-        public Boolean IsRunning { get; set; }
+        public Boolean IsRunning { get; set; } = true;
         public TimeSpan Duration { get; set; }
         
         // Navigation properties
