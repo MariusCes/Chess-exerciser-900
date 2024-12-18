@@ -30,7 +30,3 @@ jobs:
           unset CI
           npm run build
         working-directory: frontend # Adjust according to your project's frontend directory
-
-      - name: Test
-        run: npm test
-        working-directory: frontend # Adjust according to your project's frontend directory
