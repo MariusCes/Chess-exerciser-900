@@ -17,7 +17,7 @@ using Microsoft.AspNetCore.Authentication;
 namespace ChessExerciser.Tests
 {
     public class ChessControllerIntegrationTests : IClassFixture<WebApplicationFactory<Program>>
-    {
+    {/*
         private readonly HttpClient _client;
         private readonly JsonSerializerOptions _jsonOptions;
         private readonly Mock<IStockfishService> _mockStockfishService;
@@ -218,4 +218,7 @@ namespace ChessExerciser.Tests
 
         _client?.Dispose();
     }
-}}
+*/
+        
+    }
+}

@@ -1,5 +1,4 @@
 using CHESSPROJ.Controllers;
-using CHESSPROJ.StockfishServiceExtensions;
 using Stockfish.NET;
 
 namespace CHESSPROJ.Services
@@ -51,11 +50,7 @@ namespace CHESSPROJ.Services
             _stockfish.SetPosition(currentPosition);
             return _stockfish.IsMoveCorrect(move);
         }
-
-        public bool IsCheck()
-        {
-            return _stockfish.IsCheck();
-        }
+        
 
     }
 }
