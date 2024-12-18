@@ -29,6 +29,8 @@ namespace CHESSPROJ.Controllers
         private readonly IJwtService _jwtService;
         private readonly ILogger<ChessController> logger;
 
+        public int reset;
+
         // Dependency Injection through constructor
         public ChessController(IStockfishService stockfishService, IDatabaseUtilities dbUtilities, ILogger<ChessController> logger, IJwtService jwtService)
         {
@@ -45,9 +47,9 @@ namespace CHESSPROJ.Controllers
             _stockfishService.SetLevel(req.aiDifficulty);
             Game game = Game.CreateGameFactory(Guid.NewGuid(), req.gameDifficulty, req.aiDifficulty, 3);
             game.IsRunning = true;
-            System.Console.WriteLine(game.IsRunning);
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             game.UserId = userId;
+
             try
             {
                 if (await dbUtilities.AddGame(game))
@@ -104,7 +106,8 @@ namespace CHESSPROJ.Controllers
             }
 
             GameState gameState = await dbUtilities.GetStateById(gameId);
-
+            reset = gameState.CurrentBlackout;
+            System.Console.WriteLine("THIS IS RESET" + reset);
             game.Duration = moveNotation.gameTime;
             string move = moveNotation.move;
             // Validate move input

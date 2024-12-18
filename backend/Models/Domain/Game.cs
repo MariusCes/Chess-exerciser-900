@@ -42,6 +42,7 @@ namespace backend.Models.Domain
                 GameState.GameId = id;
                 GameState.CurrentLives = lives;
                 GameState.CurrentBlackout = GetBlackoutFrequency(difficulty);
+                GameState.InitialBlackout = GetBlackoutFrequency(difficulty);
                 GameState.TurnBlack = false;
             }
             catch (Exception ex)
@@ -55,12 +56,13 @@ namespace backend.Models.Domain
             return new Game(guid, difficulty, botRating, lives);
         }
 
-        private int GetBlackoutFrequency(int difficulty) => difficulty switch
+        public int GetBlackoutFrequency(int difficulty) => difficulty switch
         {
             1 => 6,
             2 => 4,
             3 => 2,
             _ => 3
         };
+        
     }
 }
