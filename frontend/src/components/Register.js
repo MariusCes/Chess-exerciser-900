@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import '../styles/Login.css';
 
 const Register = () => {
@@ -8,6 +8,8 @@ const Register = () => {
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
     const [showPassword, setShowPassword] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
+    const navigate = useNavigate();
 
     const handleRegister = async (e) => {
         e.preventDefault();
@@ -17,33 +19,54 @@ const Register = () => {
             return;
         }
 
-        const response = await fetch(
-            "http://localhost:5030/api/chess/register",
-            {
-                method: "POST",
-                body: JSON.stringify({
-                    UserName: username,
-                    Email: email,
-                    Password: password,
-                    ConfirmPassword: confirmPassword
-                }),
-                headers: {
-                    "Content-type": "application/json",
-                },
+        // Start loading
+        setIsLoading(true);
+
+        try {
+            const response = await fetch(
+                "http://localhost:5030/api/chess/register",
+                {
+                    method: "POST",
+                    body: JSON.stringify({
+                        UserName: username,
+                        Email: email,
+                        Password: password,
+                        ConfirmPassword: confirmPassword
+                    }),
+                    headers: {
+                        "Content-type": "application/json",
+                    },
+                }
+            );
+
+            const data = await response.json();
+
+            // Simulate a minimum loading time
+            await new Promise(resolve => setTimeout(resolve, 1000));
+
+            if (data.message !== null) {
+                alert("Registration successful! Please log in.");
+                navigate("/login");
+            } else {
+                alert("Something is wrong. Try again!");
             }
-        );
-
-        const data = await response.json();
-
-        if (data.message !== null) {
-            alert("register successful! go log-in!");
-        } else {
-            alert("Something is wrong. Try again!");
+        } catch (error) {
+            alert("An error occurred. Please try again.");
+        } finally {
+            // Stop loading
+            setIsLoading(false);
         }
     };
 
     return (
         <div className="login-container">
+            {isLoading && (
+                <div className="loading-overlay">
+                    <div className="spinner-border text-light" role="status">
+                        <span className="visually-hidden">Loading...</span>
+                    </div>
+                </div>
+            )}
             <div className="login-card">
                 <h2 className="login-title">JOIN US, <br /> FUTURE CHESS MASTER</h2>
                 <form onSubmit={handleRegister}>

@@ -7,41 +7,61 @@ const Login = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [showPassword, setShowPassword] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
     const navigate = useNavigate();
     const { setToken } = useAuth();
 
     const handleLogin = async (e) => {
         e.preventDefault();
+        
+        // Start loading
+        setIsLoading(true);
 
-        const response = await fetch(
-            "http://localhost:5030/api/chess/login",
-            {
-                method: "POST",
-                body: JSON.stringify({
-                    Email: email,
-                    Password: password
-                }),
-                headers: {
-                    "Content-type": "application/json; charset=UTF-8",
-                },
+        try {
+            const response = await fetch(
+                "http://localhost:5030/api/chess/login",
+                {
+                    method: "POST",
+                    body: JSON.stringify({
+                        Email: email,
+                        Password: password
+                    }),
+                    headers: {
+                        "Content-type": "application/json; charset=UTF-8",
+                    },
+                }
+            );
+
+            const data = await response.json();
+
+            // Simulate a minimum loading time
+            await new Promise(resolve => setTimeout(resolve, 1000));
+
+            if (data.token !== null) {
+                setToken(data.token);
+                localStorage.setItem("isLoggedIn", "true");
+                localStorage.setItem("email", email);
+                alert("Login successful!");
+                navigate("/play");
+            } else {
+                alert("Invalid credentials. Please try again.");
             }
-        );
-
-        const data = await response.json();
-
-        if (data.token !== null) {
-            setToken(data.token);
-            localStorage.setItem("isLoggedIn", "true");
-            localStorage.setItem("email", email);
-            alert("Login successful!");
-            navigate("/play");
-        } else {
-            alert("Invalid credentials. Please try again.");
+        } catch (error) {
+            alert("An error occurred. Please try again.");
+        } finally {
+            // Stop loading
+            setIsLoading(false);
         }
     };
 
     return (
         <div className="login-container">
+            {isLoading && (
+                <div className="loading-overlay">
+                    <div className="spinner-border text-light" role="status">
+                    </div>
+                </div>
+            )}
             <div className="login-card">
                 <h2 className="login-title">WELCOME BACK, <br /> CHESS MASTER</h2>
                 <form onSubmit={handleLogin}>
