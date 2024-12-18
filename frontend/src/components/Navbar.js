@@ -21,7 +21,7 @@ const Navbar = () => {
                     {isLoggedIn ? (
                         <>
                             <span className="navbar-text username-cool">
-                                Welcome, {username}
+                                Welcome, Chess Master!
                             </span>
                             <button
                                 className="btn btn-link nav-link logout-button"
