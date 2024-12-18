@@ -119,12 +119,19 @@ function Play() {
   };
 
   const postMove = async (userMove) => {
+    const gameTime = `${Math.floor(timer / 3600)
+      .toString()
+      .padStart(2, "0")}:${Math.floor((timer % 3600) / 60)
+      .toString()
+      .padStart(2, "0")}:${(timer % 60).toString().padStart(2, "0")}`;
+
     const response = await fetch(
       "http://localhost:5030/api/chess/" + gameID + "/move",
       {
         method: "POST",
         body: JSON.stringify({
           move: userMove.toLowerCase(),
+          gameTime,
         }),
         headers: {
             "Content-type": "application/json; charset=UTF-8",

@@ -57,9 +57,9 @@ namespace backend.Models.Domain
 
         private int GetBlackoutFrequency(int difficulty) => difficulty switch
         {
-            1 => 2,
+            1 => 6,
             2 => 4,
-            3 => 6,
+            3 => 2,
             _ => 3
         };
     }

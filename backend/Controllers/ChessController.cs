@@ -146,11 +146,14 @@ namespace CHESSPROJ.Controllers
                     game.IsRunning = false; 
                     await dbUtilities.UpdateGame(game, gameState);
                         var postMoveResponseDTO = new PostMoveResponseDTO {
-                            WrongMove = true,
+                            WrongMove = false,
+                            BotMove = botMove,
                             Lives = gameState.CurrentLives,
                             IsRunning = game.IsRunning,
-                            TurnBlack = gameState.TurnBlack,
+                            TurnBlack = false, //kad matytum final board jei buvo mate
+                            FenPosition = fenPosition,
                             GameWLD = (int)gameState.WLD,
+                            CurrentPosition = currentPosition,
                             Duration = game.Duration
                         };
                         return Ok(postMoveResponseDTO);

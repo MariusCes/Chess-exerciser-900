@@ -18,7 +18,7 @@ namespace CHESSPROJ.Services
         public void SetLevel(int level)
         {
             _stockfish.SkillLevel = level;
-            _stockfish.Depth = 3;
+            _stockfish.Depth = 1;
             
         }
 
