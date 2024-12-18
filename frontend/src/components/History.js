@@ -77,8 +77,8 @@ const History = () => {
                                 className={`game-item ${game.wld === 1
                                     ? "game-won"
                                     : game.wld === 0
-                                        ? "game-lost"
-                                        : "game-draw"
+                                        ? "game-draw"
+                                        : "game-lost"
                                     }`}
                                 onClick={() => toggleGameDetails(game.gameId, game.movesArraySerialized)}
                             >
@@ -87,15 +87,15 @@ const History = () => {
                                         className={`game-result ${game.wld === 1
                                             ? "game-won"
                                             : game.wld === 0
-                                                ? "game-lost"
-                                                : "game-draw"
+                                                ? "game-draw"
+                                                : "game-lost"
                                             }`}
                                     >
                                         {game.wld === 1
                                             ? "Victory"
                                             : game.wld === 0
-                                                ? "Defeat"
-                                                : "Draw"}
+                                                ? "Draw"
+                                                : "Defeat"}
                                     </span>
                                 </div>
 
