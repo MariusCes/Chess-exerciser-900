@@ -49,8 +49,8 @@ const Login = () => {
 
             if (data.token !== null) {
                 setToken(data.token);
-                localStorage.setItem("isLoggedIn", "true");
-                localStorage.setItem("email", email);
+                sessionStorage.setItem("isLoggedIn", "true");
+
                 
                 showNotification("Login successful! Redirecting...", "success");
                 

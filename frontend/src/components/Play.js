@@ -14,7 +14,7 @@ import { useAuth } from './AuthContext';
 
 function Play() {
 
-    const { token } = useAuth(); // is konteksto istraukta tokenas
+  const { token } = useAuth(); // is konteksto istraukta tokenas
 
   const [move, setMove] = useState(""); // labelis tam judesiui kuri useris submittina
   const [moveList, setMoveList] = useState([]);
@@ -31,12 +31,13 @@ function Play() {
   const [timer, setTimer] = useState(0);
   const [developerMode, setDeveloperMode] = useState(false);
   const [showLoginRequired, setShowLoginRequired] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+
 
   // This saves to localStorage
   useEffect(() => {
     if (isGameCreated) {
-      localStorage.setItem('chessGameState', JSON.stringify({
-        // Here you say which variables to keep an eye on for change
+      sessionStorage.setItem('chessGameState', JSON.stringify({
         gameID,
         fen,
         moveList,
@@ -48,22 +49,11 @@ function Play() {
         isGameCreated
       }));
     }
-  }, [
-    // Here you say what to write into the localStorage save
-    gameID,
-    fen,
-    moveList,
-    health,
-    timer,
-    turnBlack,
-    aiDifficulty,
-    memoryDifficulty,
-    isGameCreated
-  ]);
+  }, [gameID, fen, moveList, health, timer, turnBlack, aiDifficulty, memoryDifficulty, isGameCreated]);
 
   // On component load, restore the game state
   useEffect(() => {
-    const savedGameState = localStorage.getItem('chessGameState');
+    const savedGameState = sessionStorage.getItem('chessGameState');
     if (savedGameState) {
       const parsedState = JSON.parse(savedGameState);
       setGameID(parsedState.gameID);
@@ -79,14 +69,11 @@ function Play() {
   }, []);
 
   const resetGame = () => {
-    // Clear the localStorage to reset the game state
-    localStorage.removeItem('chessGameState');
-
-    // Reset the component's state to initial values  
+    sessionStorage.removeItem('chessGameState');
     setGameID(null);
     setIsGameCreated(false);
     setMoveList([]);
-    setHealth(100);;
+    setHealth(100);
     setTimer(0);
   };
 
@@ -102,28 +89,37 @@ function Play() {
     }
 
     setTimer(0);
-      setMoveList([]);
-      setFen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
-      setHealth(health);
+    setMoveList([]);
+    setFen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
+    setHealth(health);
 
-    const response = await fetch(
-      "http://localhost:5030/api/chess/create-game",
-      {
-        method: "POST",
-        body: JSON.stringify({
-          gameDifficulty: memoryDifficulty, // same as =>  aiDifficulty: aiDifficulty,
-          aiDifficulty,
-        }),
-        headers: {
+    setIsLoading(true);
+
+
+    try {
+      const response = await fetch(
+        "http://localhost:5030/api/chess/create-game",
+        {
+          method: "POST",
+          body: JSON.stringify({
+            gameDifficulty: memoryDifficulty,
+            aiDifficulty,
+          }),
+          headers: {
             "Content-type": "application/json; charset=UTF-8",
-            Authorization: `Bearer ${token}`, // uuuuuu yaaaa. token babyyy
-        },
-      }
-    );
-    const data = await response.json(); // unboxing
-    setGameStatus(null);
-    setGameID(data.gameId);
-    setIsGameCreated(true);
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      const data = await response.json();
+      setGameStatus(null);
+      setGameID(data.gameId);
+      setIsGameCreated(true);
+    } catch (error) {
+      console.error("Error creating game:", error);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const mockCreateGame = () => {
@@ -139,34 +135,44 @@ function Play() {
     const gameTime = `${Math.floor(timer / 3600)
       .toString()
       .padStart(2, "0")}:${Math.floor((timer % 3600) / 60)
-      .toString()
-      .padStart(2, "0")}:${(timer % 60).toString().padStart(2, "0")}`;
-
-    const response = await fetch(
-      "http://localhost:5030/api/chess/" + gameID + "/move",
-      {
-        method: "POST",
-        body: JSON.stringify({
-          move: userMove.toLowerCase(),
-          gameTime,
-        }),
-        headers: {
+        .toString()
+        .padStart(2, "0")}:${(timer % 60).toString().padStart(2, "0")}`;
+  
+    setIsLoading(true);
+  
+    try {
+      const response = await fetch(
+        "http://localhost:5030/api/chess/" + gameID + "/move",
+        {
+          method: "POST",
+          body: JSON.stringify({
+            move: userMove.toLowerCase(),
+            gameTime,
+          }),
+          headers: {
             "Content-type": "application/json; charset=UTF-8",
             Authorization: `Bearer ${token}`,
-        },
+          },
+        }
+      );
+  
+      const data = await response.json();
+  
+      if (data.wrongMove === false) {
+        setMoveList((prevMoves) => [...prevMoves, userMove, data.botMove]);
+        setFen(data.fenPosition);
+        setTurnBlack(data.turnBlack);
+      } else {
+        setMove("Bad move!");
+        decreaseHealth(10);
       }
-    );
-
-    const data = await response.json();
-    if (data.wrongMove === false) {
-      setMoveList((prevMoves) => [...prevMoves, userMove, data.botMove]);
-      setFen(data.fenPosition); // to be tested
-      setTurnBlack(data.turnBlack); // to be tested???
-    } else {
-      setMove("Bad move!");
-      decreaseHealth(10) // visada po 1 health nuima
+    } catch (error) {
+      console.error("Error posting move:", error);
+    } finally {
+      setIsLoading(false);
     }
   };
+  
 
   const decreaseHealth = (amount) => {
     setHealth((prevHealth) => {
@@ -199,6 +205,14 @@ function Play() {
         className={`relative ${gameStatus ? "blur" : ""
           } transition-all duration-300`}
       >
+        {/* Loading Overlay */}
+        {isLoading && (
+          <div className="loading-overlay">
+            <div className="spinner-border text-light" role="status">
+              <span className="visually-hidden">Loading...</span>
+            </div>
+          </div>
+        )}
         <DifficultySelectors
           aiDifficulty={aiDifficulty}
           setAiDifficulty={setAiDifficulty}
@@ -240,7 +254,6 @@ function Play() {
           </div>
         </div>
       </main>
-
       {gameStatus && (
         <div className="fixed inset-0 z-50 flex items-center justify-center">
           <GameOver
@@ -254,7 +267,7 @@ function Play() {
           />
         </div>
       )}
-          {showLoginRequired && (
+      {showLoginRequired && (
         <div className="fixed inset-0 z-50 flex items-center justify-center">
           <LoginPrompt
             onClose={() => setShowLoginRequired(false)}
