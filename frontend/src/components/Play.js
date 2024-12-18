@@ -33,62 +33,47 @@ function Play() {
   const [showLoginRequired, setShowLoginRequired] = useState(false);
 
   // This saves to localStorage
-  useEffect(() => {
+ useEffect(() => {
     if (isGameCreated) {
-      localStorage.setItem('chessGameState', JSON.stringify({
-        // Here you say which variables to keep an eye on for change
-        gameID,
-        fen,
-        moveList,
-        health,
-        timer,
-        turnBlack,
-        aiDifficulty,
-        memoryDifficulty,
-        isGameCreated
-      }));
+        sessionStorage.setItem('chessGameState', JSON.stringify({
+            gameID,
+            fen,
+            moveList,
+            health,
+            timer,
+            turnBlack,
+            aiDifficulty,
+            memoryDifficulty,
+            isGameCreated
+        }));
     }
-  }, [
-    // Here you say what to write into the localStorage save
-    gameID,
-    fen,
-    moveList,
-    health,
-    timer,
-    turnBlack,
-    aiDifficulty,
-    memoryDifficulty,
-    isGameCreated
-  ]);
+}, [gameID, fen, moveList, health, timer, turnBlack, aiDifficulty, memoryDifficulty, isGameCreated]);
 
   // On component load, restore the game state
   useEffect(() => {
-    const savedGameState = localStorage.getItem('chessGameState');
+    const savedGameState = sessionStorage.getItem('chessGameState');
     if (savedGameState) {
-      const parsedState = JSON.parse(savedGameState);
-      setGameID(parsedState.gameID);
-      setFen(parsedState.fen);
-      setMoveList(parsedState.moveList);
-      setHealth(parsedState.health);
-      setTimer(parsedState.timer);
-      setTurnBlack(parsedState.turnBlack);
-      setAiDifficulty(parsedState.aiDifficulty);
-      setMemoryDifficulty(parsedState.memoryDifficulty);
-      setIsGameCreated(parsedState.isGameCreated);
+        const parsedState = JSON.parse(savedGameState);
+        setGameID(parsedState.gameID);
+        setFen(parsedState.fen);
+        setMoveList(parsedState.moveList);
+        setHealth(parsedState.health);
+        setTimer(parsedState.timer);
+        setTurnBlack(parsedState.turnBlack);
+        setAiDifficulty(parsedState.aiDifficulty);
+        setMemoryDifficulty(parsedState.memoryDifficulty);
+        setIsGameCreated(parsedState.isGameCreated);
     }
-  }, []);
+}, []);
 
-  const resetGame = () => {
-    // Clear the localStorage to reset the game state
-    localStorage.removeItem('chessGameState');
-
-    // Reset the component's state to initial values  
-    setGameID(null);
-    setIsGameCreated(false);
-    setMoveList([]);
-    setHealth(100);;
-    setTimer(0);
-  };
+const resetGame = () => {
+  sessionStorage.removeItem('chessGameState');
+  setGameID(null);
+  setIsGameCreated(false);
+  setMoveList([]);
+  setHealth(100);
+  setTimer(0);
+};
 
   const togglePieceVisibility = () => {
     setTurnBlack(!turnBlack);

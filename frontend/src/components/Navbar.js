@@ -4,12 +4,13 @@ import '../styles/Navbar.css';
 const Navbar = () => {
     const navigate = useNavigate();
 
-    const isLoggedIn = localStorage.getItem("isLoggedIn") === "true";
-    const username = localStorage.getItem("username");
+    const isLoggedIn = sessionStorage.getItem("isLoggedIn") === "true";
+    const username = sessionStorage.getItem("username");
 
     const handleLogout = () => {
-        localStorage.removeItem("isLoggedIn");
-        localStorage.removeItem("username");
+        sessionStorage.removeItem("isLoggedIn");
+        sessionStorage.removeItem("username");
+        sessionStorage.removeItem("token");
         navigate("/login");
     };
 
