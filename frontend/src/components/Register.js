@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import '../styles/Login.css';
 
@@ -9,13 +9,23 @@ const Register = () => {
     const [confirmPassword, setConfirmPassword] = useState('');
     const [showPassword, setShowPassword] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
+    const [notification, setNotification] = useState(null);
     const navigate = useNavigate();
+
+    const showNotification = (message, type) => {
+        setNotification({ message, type });
+        
+        // Automatically clear notification after 3 seconds
+        setTimeout(() => {
+            setNotification(null);
+        }, 3000);
+    };
 
     const handleRegister = async (e) => {
         e.preventDefault();
 
         if (password !== confirmPassword) {
-            alert("Passwords do not match!");
+            showNotification("Passwords do not match!", "error");
             return;
         }
 
@@ -45,13 +55,17 @@ const Register = () => {
             await new Promise(resolve => setTimeout(resolve, 1000));
 
             if (data.message !== null) {
-                alert("Registration successful! Please log in.");
-                navigate("/login");
+                showNotification("Registration successful! Redirecting...", "success");
+                
+                // Redirect after a short delay to show the success message
+                setTimeout(() => {
+                    navigate("/login");
+                }, 2000);
             } else {
-                alert("Something is wrong. Try again!");
+                showNotification("Something went wrong. Please try again.", "error");
             }
         } catch (error) {
-            alert("An error occurred. Please try again.");
+            showNotification("An error occurred. Please try again.", "error");
         } finally {
             // Stop loading
             setIsLoading(false);
@@ -60,6 +74,30 @@ const Register = () => {
 
     return (
         <div className="login-container">
+            {notification && (
+                <div 
+                    className={`notification ${notification.type}`}
+                    style={{
+                        position: 'fixed',
+                        top: '20px',
+                        left: '50%',
+                        transform: 'translateX(-50%)',
+                        zIndex: 1000,
+                        padding: '10px 20px',
+                        borderRadius: '5px',
+                        color: 'white',
+                        backgroundColor: notification.type === 'success' 
+                            ? 'rgba(40, 167, 69, 0.8)' 
+                            : 'rgba(220, 53, 69, 0.8)',
+                        border: `1px solid ${notification.type === 'success' ? '#28a745' : '#dc3545'}`,
+                        boxShadow: '0 4px 6px rgba(0,0,0,0.1)',
+                        transition: 'all 0.3s ease'
+                    }}
+                >
+                    {notification.message}
+                </div>
+            )}
+
             {isLoading && (
                 <div className="loading-overlay">
                     <div className="spinner-border text-light" role="status">
@@ -67,6 +105,7 @@ const Register = () => {
                     </div>
                 </div>
             )}
+
             <div className="login-card">
                 <h2 className="login-title">JOIN US, <br /> FUTURE CHESS MASTER</h2>
                 <form onSubmit={handleRegister}>
