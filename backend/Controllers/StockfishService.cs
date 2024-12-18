@@ -50,7 +50,27 @@ namespace CHESSPROJ.Services
             _stockfish.SetPosition(currentPosition);
             return _stockfish.IsMoveCorrect(move);
         }
-        
+
+
+                //cia pasakys mate, jei bus mate, pretty simple, grazina string
+        public string GetEvalType()
+        {
+                var EvalType = _stockfish.GetEvaluation().Type;
+                
+                return EvalType;
+        }
+        //cia pasakys kuri puse padare ta mate, jei minusas, tai juoda, jei pliusas, tai balta
+        public int GetEvalVal()
+        {
+                var EvalValue = _stockfish.GetEvaluation().Value;
+                
+                return EvalValue;
+        }
+
+        public bool IsCheck()
+        {
+            return _stockfish.IsCheck();
+        }
 
     }
 }

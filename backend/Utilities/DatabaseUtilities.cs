@@ -97,6 +97,26 @@ namespace CHESSPROJ.Utilities
             else return false;
         }
 
+        public async Task<bool> FindIfUsernameExists(RegisterViewModel model)
+        {
+            var user = await _userManager.FindByNameAsync(model.UserName);
+            if (user == null)
+            {
+                return false;
+            }
+            return true;
+        }
+
+        public async Task<bool> FindIfEmailExists(RegisterViewModel model)
+        {
+            var user = await _userManager.FindByEmailAsync(model.Email);
+            if (user == null)
+            {
+                return false;
+            }
+            return true;
+        }
+
         public async Task<User> GetUserByEmail(LoginViewModel model)
         {
             var user = await _userManager.FindByEmailAsync(model.Email);
