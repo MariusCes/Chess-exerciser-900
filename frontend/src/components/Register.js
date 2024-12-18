@@ -12,7 +12,6 @@ const Register = () => {
     const handleRegister = async (e) => {
         e.preventDefault();
 
-
         if (password !== confirmPassword) {
             alert("Passwords do not match!");
             return;
@@ -83,14 +82,27 @@ const Register = () => {
                             value={confirmPassword}
                             onChange={(e) => setConfirmPassword(e.target.value)}
                         />
-                        <div className="form-check mt-2">
+                        <div className="d-flex align-items-center">
                             <input
                                 type="checkbox"
                                 className="form-check-input"
                                 id="showPassword"
                                 checked={showPassword}
                                 onChange={() => setShowPassword(!showPassword)}
+                                style={{ marginTop: 20 }}
                             />
+                            <label
+                                htmlFor="showPassword"
+                                className="text-muted small"
+                                style={{
+                                    fontSize: '0.7rem',
+                                    cursor: 'pointer',
+                                    lineHeight: 1,
+                                    marginBottom: 0
+                                }}
+                            >
+                                Show password
+                            </label>
                         </div>
                     </div>
                     <button
