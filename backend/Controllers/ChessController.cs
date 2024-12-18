@@ -51,6 +51,7 @@ namespace CHESSPROJ.Controllers
             game.UserId = userId;
 
                        //cia testavimui
+            /*
             List<string> initialMoves = new List<string>
             {
                 "e2e3", "g7g5", "a2a3", "f7f6"
@@ -61,6 +62,7 @@ namespace CHESSPROJ.Controllers
             _stockfishService.SetPosition(initialPosition, "");
 
             game.MovesArraySerialized = JsonSerializer.Serialize(initialMoves);
+            */
 
             try
             {
