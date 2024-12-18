@@ -50,6 +50,18 @@ namespace CHESSPROJ.Controllers
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             game.UserId = userId;
 
+                       //cia testavimui
+            List<string> initialMoves = new List<string>
+            {
+                "e2e3", "g7g5", "a2a3", "f7f6"
+            };
+
+            // Set the initial moves on Stockfish and the game object
+            string initialPosition = string.Join(" ", initialMoves);
+            _stockfishService.SetPosition(initialPosition, "");
+
+            game.MovesArraySerialized = JsonSerializer.Serialize(initialMoves);
+
             try
             {
                 if (await dbUtilities.AddGame(game))
@@ -138,7 +150,9 @@ namespace CHESSPROJ.Controllers
                 game.MovesArraySerialized = JsonSerializer.Serialize(MovesArray);
 
                 if(_stockfishService.GetEvalType() == "mate"){
-                    if(_stockfishService.GetEvalVal() > 0){
+                    System.Console.WriteLine(_stockfishService.GetEvalVal());
+                    System.Console.WriteLine(_stockfishService.GetEvalType());
+                    if(_stockfishService.GetEvalVal() >= 0){
                         //reiskia baltas padare mate
                         gameState.WLD = 1;
                     }else{
