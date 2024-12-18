@@ -17,7 +17,7 @@ namespace CHESSPROJ.Services
         public void SetLevel(int level)
         {
             _stockfish.SkillLevel = level;
-            _stockfish.Depth = 3;
+            _stockfish.Depth = 1; 
             
         }
 
@@ -41,7 +41,7 @@ namespace CHESSPROJ.Services
 
         public string GetBestMove()
         {
-            return _stockfish.GetBestMove();
+            return _stockfish.GetBestMoveTime(200);
         }
 
         public bool IsMoveCorrect(string currentPosition, string move)
