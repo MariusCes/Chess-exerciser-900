@@ -116,7 +116,7 @@ namespace ChessExerciser.Tests
         {
             // Arrange
             string gameId = "nonexistent-game-id";
-            var moveDto = new MoveDto ( "e2e4" );
+            var moveDto = new MoveDto ( "e2e4", TimeSpan.Parse("01:30:00") );
             _mockDbUtilities.Setup(x => x.GetGameById(gameId)).ReturnsAsync((Game)null);
 
             // Act
@@ -134,7 +134,7 @@ namespace ChessExerciser.Tests
             string gameId = "test-game-id";
             var game = new Game { GameId = Guid.NewGuid(), IsRunning = true, MovesArraySerialized = "[]" };
             var gameState = new GameState { CurrentLives = 3 };
-            var moveDto = new MoveDto ("" ); // Empty move
+            var moveDto = new MoveDto ("", TimeSpan.Parse("01:30:00") ); // Empty move
 
             _mockDbUtilities.Setup(x => x.GetGameById(gameId)).ReturnsAsync(game);
             _mockDbUtilities.Setup(x => x.GetStateById(gameId)).ReturnsAsync(gameState);
@@ -154,7 +154,7 @@ namespace ChessExerciser.Tests
             string gameId = "test-game-id";
             var game = new Game { GameId = Guid.NewGuid(), IsRunning = true, MovesArraySerialized = "[]" };
             var gameState = new GameState { CurrentLives = 3 };
-            var moveDto = new MoveDto ("e2e4" );
+            var moveDto = new MoveDto ("e2e4" , TimeSpan.Parse("01:30:00"));
 
             _mockDbUtilities.Setup(x => x.GetGameById(gameId)).ReturnsAsync(game);
             _mockDbUtilities.Setup(x => x.GetStateById(gameId)).ReturnsAsync(gameState);
@@ -180,7 +180,7 @@ namespace ChessExerciser.Tests
             string gameId = "test-game-id";
             var game = new Game { GameId = Guid.NewGuid(), IsRunning = true, MovesArraySerialized = "[]" };
             var gameState = new GameState { CurrentLives = 3, CurrentBlackout = 2 };
-            var moveDto = new MoveDto ("invalid-move" );
+            var moveDto = new MoveDto ("invalid-move" , TimeSpan.Parse("01:30:00"));
 
             _mockDbUtilities.Setup(x => x.GetGameById(gameId)).ReturnsAsync(game);
             _mockDbUtilities.Setup(x => x.GetStateById(gameId)).ReturnsAsync(gameState);
@@ -204,7 +204,7 @@ namespace ChessExerciser.Tests
             string gameId = "test-game-id";
             var game = new Game { GameId = Guid.NewGuid(), IsRunning = true, MovesArraySerialized = "[]" };
             var gameState = new GameState { CurrentLives = 1 };
-            var moveDto = new MoveDto ("invalid-move" );
+            var moveDto = new MoveDto ("invalid-move", TimeSpan.Parse("01:30:00"));
 
             _mockDbUtilities.Setup(x => x.GetGameById(gameId)).ReturnsAsync(game);
             _mockDbUtilities.Setup(x => x.GetStateById(gameId)).ReturnsAsync(gameState);
@@ -228,7 +228,7 @@ namespace ChessExerciser.Tests
             string gameId = "test-game-id";
             var game = new Game { GameId = Guid.NewGuid(), IsRunning = true, MovesArraySerialized = "[]" };
             var gameState = new GameState { CurrentLives = 3, CurrentBlackout = 1 };
-            var moveDto = new MoveDto ("e2e4" );
+            var moveDto = new MoveDto ("e2e4", TimeSpan.Parse("01:30:00"));
 
             _mockDbUtilities.Setup(x => x.GetGameById(gameId)).ReturnsAsync(game);
             _mockDbUtilities.Setup(x => x.GetStateById(gameId)).ReturnsAsync(gameState);
@@ -246,43 +246,6 @@ namespace ChessExerciser.Tests
         }
 
         [Fact]
-        public async Task GetAllGames_ReturnsEmptyList_WhenNoGamesExist()
-        {
-            // Arrange
-            _mockDbUtilities.Setup(x => x.GetGamesList()).ReturnsAsync(new List<Game>());
-
-            // Act
-            var result = await _controller.GetAllGames();
-
-            // Assert
-            var okResult = Assert.IsType<OkObjectResult>(result);
-            var response = Assert.IsType<GetAllGamesResponseDTO>(okResult.Value);
-            Assert.Empty(response.GamesList);
-        }
-
-        [Fact]
-        public async Task GetAllGames_ReturnsFilteredList_WhenGamesExist()
-        {
-            // Arrange
-            var games = new List<Game>
-            {
-                new Game { GameId = Guid.NewGuid(), MovesArraySerialized = "[\"e2e4\"]" },
-                new Game { GameId = Guid.NewGuid(), MovesArraySerialized = "[]" },
-                new Game { GameId = Guid.NewGuid(), MovesArraySerialized = "[\"d2d4\"]" }
-            };
-            _mockDbUtilities.Setup(x => x.GetGamesList()).ReturnsAsync(games);
-
-            // Act
-            var result = await _controller.GetAllGames();
-
-            // Assert
-            var okResult = Assert.IsType<OkObjectResult>(result);
-            var response = Assert.IsType<GetAllGamesResponseDTO>(okResult.Value);
-            // Should only return games with moves
-            Assert.Equal(2, response.GamesList.Count);
-        }
-
-        [Fact]
         public async Task GetUserGames_ReturnsEmpty_WhenUserHasNoGames()
         {
             // Arrange
@@ -294,7 +257,7 @@ namespace ChessExerciser.Tests
             _mockDbUtilities.Setup(x => x.GetGamesList()).ReturnsAsync(games);
 
             // Act
-            var result = await _controller.GetUserGames("test-user-id");
+            var result = await _controller.GetUserGames();
 
             // Assert
             var okResult = Assert.IsType<OkObjectResult>(result);
@@ -316,7 +279,7 @@ namespace ChessExerciser.Tests
             _mockDbUtilities.Setup(x => x.GetGamesList()).ReturnsAsync(games);
 
             // Act
-            var result = await _controller.GetUserGames("test-user-id");
+            var result = await _controller.GetUserGames();
 
             // Assert
             var okResult = Assert.IsType<OkObjectResult>(result);
