@@ -66,11 +66,5 @@ namespace CHESSPROJ.Services
                 
                 return EvalValue;
         }
-
-        public bool IsCheck()
-        {
-            return _stockfish.IsCheck();
-        }
-
     }
 }
