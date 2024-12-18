@@ -8,6 +8,7 @@ import MoveList from "./MoveList";
 import GameControls from "./GameControls";
 import DifficultySelectors from "./DifficultySelectors";
 import TestButtons from "./TestButtons";
+import LoginPrompt from "./LoginPrompt";
 
 import { useAuth } from './AuthContext';
 
@@ -26,9 +27,10 @@ function Play() {
   const [aiDifficulty, setAiDifficulty] = useState(""); // State for selected difficulty
   const [memoryDifficulty, setMemoryDifficulty] = useState("");
   const [gameStatus, setGameStatus] = useState(null);
-  const [health, setHealth] = useState(10);
+  const [health, setHealth] = useState(100);
   const [timer, setTimer] = useState(0);
   const [developerMode, setDeveloperMode] = useState(false);
+  const [showLoginRequired, setShowLoginRequired] = useState(false);
 
   // This saves to localStorage
   useEffect(() => {
@@ -93,6 +95,12 @@ function Play() {
   };
 
   const createGame = async () => {
+
+    if (!token) {
+      setShowLoginRequired(true);
+      return;
+    }
+
     setTimer(0);
       setMoveList([]);
       setFen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
@@ -243,6 +251,13 @@ function Play() {
               setGameStatus(null);
               setIsGameCreated(false);
             }}
+          />
+        </div>
+      )}
+          {showLoginRequired && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center">
+          <LoginPrompt
+            onClose={() => setShowLoginRequired(false)}
           />
         </div>
       )}
