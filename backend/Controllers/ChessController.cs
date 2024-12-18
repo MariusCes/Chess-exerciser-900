@@ -199,34 +199,14 @@ namespace CHESSPROJ.Controllers
                 return Ok(postMoveResponseDTO); // we box here :) (fight club reference)
             }
         }
-
+         
         [Authorize]
         [HttpGet("games")]
-        public async Task<IActionResult> GetAllGames()
-        {
-            GamesList gamesList = new GamesList(await dbUtilities.GetGamesList());
-
-            GamesList games = new GamesList(gamesList);
-            List<Game> gamesWithMoves = new List<Game>();
-
-            foreach (var game in games.GetCustomEnumerator())
-        {
-                // custom filtering using IEnumerable
-                gamesWithMoves.Add(game);
-            }
-            var getAllGamesResponseDTO = new GetAllGamesResponseDTO {
-                GamesList = gamesWithMoves
-            };
-            return Ok(getAllGamesResponseDTO);
-            
-        }
-
-        [Authorize]
-        [HttpGet("{userId}/games")]
-        public async Task<IActionResult> GetUserGames(string userId)
+        public async Task<IActionResult> GetUserGames()
         {
             GamesList gamesList = new GamesList(await dbUtilities.GetGamesList());
             List<Game> userGames = new List<Game>();
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
             foreach (var game in gamesList)
             {
