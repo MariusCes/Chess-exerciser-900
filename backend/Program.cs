@@ -25,7 +25,7 @@ builder.Services.AddCors(options =>
     options.AddPolicy("AllowStaticWebApp",
         builder =>
         {
-            builder.WithOrigins("brave-river-0952dfb10-67.centralus.4.azurestaticapps.net")   // Allow all origins
+            builder.WithOrigins("brave-river-0952dfb10-67.centralus.4.azurestaticapps.net", "brave-river-0952dfb10.4.azurestaticapps.net/")   // Allow all origins
                    .AllowAnyMethod()   // Allow all HTTP methods (GET, POST, etc.)
                    .AllowAnyHeader();  // Allow any headers
         });
