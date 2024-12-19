@@ -9,12 +9,12 @@ using CHESSPROJ.Utilities;
 using backend.Models.Domain;
 using Microsoft.AspNetCore.Identity;
 using backend.Models.ViewModels;
+using Microsoft.EntityFrameworkCore.Diagnostics;
 
 namespace ChessExerciser.Tests
 {
     public class DatabaseUtilitiesTests
     {
-        private readonly DbContextOptions<ChessDbContext> _dbOptions;
         private readonly ChessDbContext _context;
         private readonly Mock<UserManager<User>> _userManagerMock;
         private readonly Mock<SignInManager<User>> _signInManagerMock;
@@ -22,17 +22,18 @@ namespace ChessExerciser.Tests
 
         public DatabaseUtilitiesTests()
         {
-            // Setup in-memory database
-            _dbOptions = new DbContextOptionsBuilder<ChessDbContext>()
-                .UseInMemoryDatabase(databaseName: Guid.NewGuid().ToString()) // Use a unique DB for each test run
+            // Setup a unique in-memory database for each test run for isolation
+            var options = new DbContextOptionsBuilder<ChessDbContext>()
+                .UseInMemoryDatabase(databaseName: Guid.NewGuid().ToString())
+                .ConfigureWarnings(w => w.Ignore(InMemoryEventId.TransactionIgnoredWarning))
                 .Options;
 
-            _context = new ChessDbContext(_dbOptions);
-            
+            _context = new ChessDbContext(options);
+
             // Setup mocks for UserManager and SignInManager
             var userStoreMock = new Mock<IUserStore<User>>();
             _userManagerMock = new Mock<UserManager<User>>(
-                userStoreMock.Object, 
+                userStoreMock.Object,
                 null, null, null, null, null, null, null, null
             );
 
@@ -51,7 +52,6 @@ namespace ChessExerciser.Tests
         [Fact]
         public async Task AddGame_GameDoesNotExist_ShouldAddGame()
         {
-            // Arrange
             var newGame = new Game
             {
                 GameId = Guid.NewGuid(),
@@ -59,10 +59,8 @@ namespace ChessExerciser.Tests
                 IsRunning = true
             };
 
-            // Act
             var result = await _databaseUtilities.AddGame(newGame);
 
-            // Assert
             Assert.True(result);
             Assert.Equal(1, await _context.Games.CountAsync());
         }
@@ -70,7 +68,6 @@ namespace ChessExerciser.Tests
         [Fact]
         public async Task AddGame_GameAlreadyExists_ShouldReturnFalse()
         {
-            // Arrange
             var existingGameId = Guid.NewGuid();
             var existingGame = new Game { GameId = existingGameId, UserId = "testUser" };
             await _context.Games.AddAsync(existingGame);
@@ -78,10 +75,8 @@ namespace ChessExerciser.Tests
 
             var newGame = new Game { GameId = existingGameId, UserId = "anotherUser" };
 
-            // Act
             var result = await _databaseUtilities.AddGame(newGame);
 
-            // Assert
             Assert.False(result);
             Assert.Equal(1, await _context.Games.CountAsync());
         }
@@ -89,16 +84,13 @@ namespace ChessExerciser.Tests
         [Fact]
         public async Task GetGameById_GameExists_ShouldReturnGame()
         {
-            // Arrange
             var gameId = Guid.NewGuid();
             var game = new Game { GameId = gameId, UserId = "testUser" };
             await _context.Games.AddAsync(game);
             await _context.SaveChangesAsync();
 
-            // Act
             var retrievedGame = await _databaseUtilities.GetGameById(gameId.ToString());
 
-            // Assert
             Assert.NotNull(retrievedGame);
             Assert.Equal(gameId, retrievedGame.GameId);
         }
@@ -106,17 +98,13 @@ namespace ChessExerciser.Tests
         [Fact]
         public async Task GetGameById_GameDoesNotExist_ShouldReturnNull()
         {
-            // Act
             var retrievedGame = await _databaseUtilities.GetGameById(Guid.NewGuid().ToString());
-
-            // Assert
             Assert.Null(retrievedGame);
         }
-        
+
         [Fact]
         public async Task LogInUser_ValidCredentials_ShouldReturnTrue()
         {
-            // Arrange
             var user = new User { Id = "user123", UserName = "testUser", Email = "test@example.com" };
             await _context.Users.AddAsync(user);
             await _context.SaveChangesAsync();
@@ -131,34 +119,28 @@ namespace ChessExerciser.Tests
                 .Setup(x => x.CheckPasswordSignInAsync(user, "Pass@123", false))
                 .ReturnsAsync(SignInResult.Success);
 
-            // Act
             var result = await _databaseUtilities.LogInUser(loginModel);
 
-            // Assert
             Assert.True(result);
         }
 
         [Fact]
         public async Task LogInUser_InvalidCredentials_ShouldReturnFalse()
         {
-            // Arrange
             var loginModel = new LoginViewModel { Email = "unknown@example.com", Password = "Pass@123" };
 
             _userManagerMock
                 .Setup(x => x.FindByEmailAsync("unknown@example.com"))
                 .ReturnsAsync((User)null);
 
-            // Act
             var result = await _databaseUtilities.LogInUser(loginModel);
 
-            // Assert
             Assert.False(result);
         }
 
         [Fact]
         public async Task GetUserByEmail_UserExists_ShouldReturnUser()
         {
-            // Arrange
             var user = new User { Id = "user123", UserName = "testUser", Email = "test@example.com" };
             await _context.Users.AddAsync(user);
             await _context.SaveChangesAsync();
@@ -169,10 +151,8 @@ namespace ChessExerciser.Tests
                 .Setup(x => x.FindByEmailAsync("test@example.com"))
                 .ReturnsAsync(user);
 
-            // Act
             var retrievedUser = await _databaseUtilities.GetUserByEmail(loginModel);
 
-            // Assert
             Assert.NotNull(retrievedUser);
             Assert.Equal("testUser", retrievedUser.UserName);
         }
@@ -180,24 +160,20 @@ namespace ChessExerciser.Tests
         [Fact]
         public async Task GetUserByEmail_UserDoesNotExist_ShouldReturnNull()
         {
-            // Arrange
             var loginModel = new LoginViewModel { Email = "unknown@example.com", Password = "Pass@123" };
 
             _userManagerMock
                 .Setup(x => x.FindByEmailAsync("unknown@example.com"))
                 .ReturnsAsync((User)null);
 
-            // Act
             var retrievedUser = await _databaseUtilities.GetUserByEmail(loginModel);
 
-            // Assert
             Assert.Null(retrievedUser);
         }
 
         [Fact]
         public async Task GetGameStateById_StateExists_ShouldReturnState()
         {
-            // Arrange
             var gameId = Guid.NewGuid();
             var game = new Game { GameId = gameId, UserId = "testUser" };
             var state = new GameState { GameId = gameId, CurrentLives = 3, CurrentBlackout = 2 };
@@ -205,10 +181,8 @@ namespace ChessExerciser.Tests
             await _context.GameStates.AddAsync(state);
             await _context.SaveChangesAsync();
 
-            // Act
             var retrievedState = await _databaseUtilities.GetStateById(gameId.ToString());
 
-            // Assert
             Assert.NotNull(retrievedState);
             Assert.Equal(3, retrievedState.CurrentLives);
             Assert.Equal(2, retrievedState.CurrentBlackout);
@@ -217,17 +191,13 @@ namespace ChessExerciser.Tests
         [Fact]
         public async Task GetGameStateById_StateNotExists_ShouldReturnNull()
         {
-            // Act
             var retrievedState = await _databaseUtilities.GetStateById(Guid.NewGuid().ToString());
-
-            // Assert
             Assert.Null(retrievedState);
         }
 
         [Fact]
         public async Task UpdateGame_ExistingGame_ShouldUpdateProperties()
         {
-            // Arrange
             var gameId = Guid.NewGuid();
             var game = new Game { GameId = gameId, UserId = "testUser", MovesArraySerialized = "[]" };
             var state = new GameState { GameId = gameId, CurrentLives = 3, CurrentBlackout = 2, TurnBlack = false };
@@ -235,16 +205,13 @@ namespace ChessExerciser.Tests
             await _context.GameStates.AddAsync(state);
             await _context.SaveChangesAsync();
 
-            // Modify properties
             game.MovesArraySerialized = "[\"e2e4\"]";
             state.TurnBlack = true;
             state.CurrentLives = 1;
             state.CurrentBlackout = 1;
 
-            // Act
             await _databaseUtilities.UpdateGame(game, state);
 
-            // Assert - re-fetch from DB
             var updatedGame = await _context.Games.FirstOrDefaultAsync(g => g.GameId == gameId);
             var updatedState = await _context.GameStates.FirstOrDefaultAsync(gs => gs.GameId == gameId);
 
@@ -259,15 +226,12 @@ namespace ChessExerciser.Tests
         [Fact]
         public async Task GetGamesList_WhenGamesExist_ShouldReturnListOfGames()
         {
-            // Arrange
             await _context.Games.AddAsync(new Game { GameId = Guid.NewGuid(), UserId = "testUser" });
             await _context.Games.AddAsync(new Game { GameId = Guid.NewGuid(), UserId = "testUser2" });
             await _context.SaveChangesAsync();
 
-            // Act
             var gamesList = await _databaseUtilities.GetGamesList();
 
-            // Assert
             Assert.NotNull(gamesList);
             Assert.Equal(2, gamesList.Count);
         }
@@ -275,12 +239,125 @@ namespace ChessExerciser.Tests
         [Fact]
         public async Task GetGamesList_NoGames_ShouldReturnEmptyList()
         {
-            // Act
             var gamesList = await _databaseUtilities.GetGamesList();
 
-            // Assert
             Assert.NotNull(gamesList);
             Assert.Empty(gamesList);
+        }
+
+        // Additional Tests for AddUser, FindIfUsernameExists, FindIfEmailExists
+
+        [Fact]
+        public async Task AddUser_ValidUser_ShouldReturnTrue()
+        {
+            var registerModel = new RegisterViewModel
+            {
+                UserName = "newUser",
+                Email = "newUser@example.com",
+                Password = "Pass@123",
+                ConfirmPassword = "Pass@123"
+            };
+            _userManagerMock
+                .Setup(x => x.CreateAsync(It.IsAny<User>(), It.IsAny<string>()))
+                .ReturnsAsync(IdentityResult.Success)
+                .Callback<User, string>((u, p) =>
+                {
+                    // Manually add the user to the in-memory context since the mock won't do it automatically
+                    _context.Users.Add(u);
+                    _context.SaveChanges();
+                });
+
+            var result = await _databaseUtilities.AddUser(registerModel);
+
+            Assert.True(result);
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == "newUser@example.com");
+            Assert.NotNull(user);
+
+            var userStats = await _context.UserStats.FirstOrDefaultAsync(us => us.UserId == user.Id);
+            Assert.NotNull(userStats);
+            Assert.Equal(500, userStats.Rating);
+        }
+
+        [Fact]
+        public async Task AddUser_CreateUserFails_ShouldReturnFalse()
+        {
+            var registerModel = new RegisterViewModel
+            {
+                UserName = "failUser",
+                Email = "failUser@example.com",
+                Password = "Pass@123",
+                ConfirmPassword = "Pass@123"
+            };
+
+            _userManagerMock
+                .Setup(x => x.CreateAsync(It.IsAny<User>(), "Pass@123"))
+                .ReturnsAsync(IdentityResult.Failed(new IdentityError { Description = "Create failed" }));
+
+            var result = await _databaseUtilities.AddUser(registerModel);
+
+            Assert.False(result);
+            Assert.Null(await _context.Users.FirstOrDefaultAsync(u => u.Email == "failUser@example.com"));
+            Assert.Equal(0, await _context.UserStats.CountAsync());
+        }
+
+        [Fact]
+        public async Task FindIfUsernameExists_UserExists_ShouldReturnTrue()
+        {
+            var user = new User { Id = "userX", UserName = "existingUser", Email = "exist@example.com" };
+            await _context.Users.AddAsync(user);
+            await _context.SaveChangesAsync();
+
+            var model = new RegisterViewModel { UserName = "existingUser", Email = "dummy@example.com", Password = "Pass@123", ConfirmPassword = "Pass@123" };
+
+            _userManagerMock
+                .Setup(x => x.FindByNameAsync("existingUser"))
+                .ReturnsAsync(user);
+
+            var result = await _databaseUtilities.FindIfUsernameExists(model);
+            Assert.True(result);
+        }
+
+        [Fact]
+        public async Task FindIfUsernameExists_UserNotExists_ShouldReturnFalse()
+        {
+            var model = new RegisterViewModel { UserName = "nonExistentUser", Email = "dummy@example.com", Password = "Pass@123", ConfirmPassword = "Pass@123" };
+
+            _userManagerMock
+                .Setup(x => x.FindByNameAsync("nonExistentUser"))
+                .ReturnsAsync((User)null);
+
+            var result = await _databaseUtilities.FindIfUsernameExists(model);
+            Assert.False(result);
+        }
+
+        [Fact]
+        public async Task FindIfEmailExists_EmailExists_ShouldReturnTrue()
+        {
+            var user = new User { Id = "userY", UserName = "someUser", Email = "check@example.com" };
+            await _context.Users.AddAsync(user);
+            await _context.SaveChangesAsync();
+
+            var model = new RegisterViewModel { Email = "check@example.com", UserName = "dummy", Password = "Pass@123", ConfirmPassword = "Pass@123" };
+
+            _userManagerMock
+                .Setup(x => x.FindByEmailAsync("check@example.com"))
+                .ReturnsAsync(user);
+
+            var result = await _databaseUtilities.FindIfEmailExists(model);
+            Assert.True(result);
+        }
+
+        [Fact]
+        public async Task FindIfEmailExists_EmailNotExists_ShouldReturnFalse()
+        {
+            var model = new RegisterViewModel { Email = "unknown@example.com", UserName = "dummy", Password = "Pass@123", ConfirmPassword = "Pass@123" };
+
+            _userManagerMock
+                .Setup(x => x.FindByEmailAsync("unknown@example.com"))
+                .ReturnsAsync((User)null);
+
+            var result = await _databaseUtilities.FindIfEmailExists(model);
+            Assert.False(result);
         }
     }
 }
