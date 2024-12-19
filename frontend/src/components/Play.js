@@ -245,7 +245,7 @@ function Play() {
             />
             <Timer seconds={timer} />
             <HealthBar health={health} />
-            <MoveList moves={moveList} developerMode={developerMode} />
+            <MoveList moves={moveList}/>
             <TestButtons
               setGameStatus={setGameStatus}
               decreaseHealth={decreaseHealth}

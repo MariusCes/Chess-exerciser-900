@@ -1,7 +1,6 @@
 import React from 'react';
 
-export const MoveList = ({ moves, developerMode }) => {
-  if (!developerMode) return null;
+export const MoveList = ({ moves }) => {
   return (
     <div className="move-list-container">
       <ul className="move-list">
