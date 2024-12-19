@@ -163,11 +163,11 @@ function Play() {
         setFen(data.fenPosition);
         setTurnBlack(data.turnBlack);
 
-        if (data.gameStatus) {
+        if (data.wld !== undefined) {
           setGameStatus(
-            data.gameStatus === 1
+            data.wld === 1
               ? "win"
-              : data.gameStatus === 0
+              : data.wld === 0
                 ? "draw"
                 : "lose"
           );
