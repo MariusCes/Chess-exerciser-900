@@ -22,10 +22,10 @@ var builder = WebApplication.CreateBuilder(args);
 // Add CORS policy
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AllowAllOrigins",
+    options.AddPolicy("AllowStaticWebApp",
         builder =>
         {
-            builder.AllowAnyOrigin()   // Allow all origins
+            builder.WithOrigins("brave-river-0952dfb10-67.centralus.4.azurestaticapps.net")   // Allow all origins
                    .AllowAnyMethod()   // Allow all HTTP methods (GET, POST, etc.)
                    .AllowAnyHeader();  // Allow any headers
         });
@@ -108,7 +108,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-app.UseCors("AllowAllOrigins");
+app.UseCors("AllowStaticWebApp");
 
 app.UseAuthentication();
 app.UseAuthorization();

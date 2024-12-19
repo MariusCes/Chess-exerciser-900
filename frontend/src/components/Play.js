@@ -10,10 +10,9 @@ import DifficultySelectors from "./DifficultySelectors";
 import TestButtons from "./TestButtons";
 import LoginPrompt from "./LoginPrompt";
 
-import { useAuth } from './AuthContext';
+import { useAuth } from "./AuthContext";
 
 function Play() {
-
   const { token } = useAuth(); // is konteksto istraukta tokenas
 
   const [move, setMove] = useState(""); // labelis tam judesiui kuri useris submittina
@@ -33,27 +32,41 @@ function Play() {
   const [showLoginRequired, setShowLoginRequired] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
+  const apiUrl = process.env.REACT_APP_API_URL;
 
   // This saves to localStorage
   useEffect(() => {
     if (isGameCreated) {
-      sessionStorage.setItem('chessGameState', JSON.stringify({
-        gameID,
-        fen,
-        moveList,
-        health,
-        timer,
-        turnBlack,
-        aiDifficulty,
-        memoryDifficulty,
-        isGameCreated
-      }));
+      sessionStorage.setItem(
+        "chessGameState",
+        JSON.stringify({
+          gameID,
+          fen,
+          moveList,
+          health,
+          timer,
+          turnBlack,
+          aiDifficulty,
+          memoryDifficulty,
+          isGameCreated,
+        })
+      );
     }
-  }, [gameID, fen, moveList, health, timer, turnBlack, aiDifficulty, memoryDifficulty, isGameCreated]);
+  }, [
+    gameID,
+    fen,
+    moveList,
+    health,
+    timer,
+    turnBlack,
+    aiDifficulty,
+    memoryDifficulty,
+    isGameCreated,
+  ]);
 
   // On component load, restore the game state
   useEffect(() => {
-    const savedGameState = sessionStorage.getItem('chessGameState');
+    const savedGameState = sessionStorage.getItem("chessGameState");
     if (savedGameState) {
       const parsedState = JSON.parse(savedGameState);
       setGameID(parsedState.gameID);
@@ -69,7 +82,7 @@ function Play() {
   }, []);
 
   const resetGame = () => {
-    sessionStorage.removeItem('chessGameState');
+    sessionStorage.removeItem("chessGameState");
     setGameID(null);
     setIsGameCreated(false);
     setMoveList([]);
@@ -82,7 +95,6 @@ function Play() {
   };
 
   const createGame = async () => {
-
     if (!token) {
       setShowLoginRequired(true);
       return;
@@ -95,22 +107,18 @@ function Play() {
 
     setIsLoading(true);
 
-
     try {
-      const response = await fetch(
-        "http://localhost:5030/api/chess/create-game",
-        {
-          method: "POST",
-          body: JSON.stringify({
-            gameDifficulty: memoryDifficulty,
-            aiDifficulty,
-          }),
-          headers: {
-            "Content-type": "application/json; charset=UTF-8",
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+      const response = await fetch(`${apiUrl}/api/chess/create-game`, {
+        method: "POST",
+        body: JSON.stringify({
+          gameDifficulty: memoryDifficulty,
+          aiDifficulty,
+        }),
+        headers: {
+          "Content-type": "application/json; charset=UTF-8",
+          Authorization: `Bearer ${token}`,
+        },
+      });
       const data = await response.json();
       setGameStatus(null);
       setGameID(data.gameId);
@@ -135,29 +143,26 @@ function Play() {
     const gameTime = `${Math.floor(timer / 3600)
       .toString()
       .padStart(2, "0")}:${Math.floor((timer % 3600) / 60)
-        .toString()
-        .padStart(2, "0")}:${(timer % 60).toString().padStart(2, "0")}`;
-  
+      .toString()
+      .padStart(2, "0")}:${(timer % 60).toString().padStart(2, "0")}`;
+
     setIsLoading(true);
-  
+
     try {
-      const response = await fetch(
-        "http://localhost:5030/api/chess/" + gameID + "/move",
-        {
-          method: "POST",
-          body: JSON.stringify({
-            move: userMove.toLowerCase(),
-            gameTime,
-          }),
-          headers: {
-            "Content-type": "application/json; charset=UTF-8",
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-  
+      const response = await fetch(`${apiUrl}/api/chess` + gameID + "/move", {
+        method: "POST",
+        body: JSON.stringify({
+          move: userMove.toLowerCase(),
+          gameTime,
+        }),
+        headers: {
+          "Content-type": "application/json; charset=UTF-8",
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
       const data = await response.json();
-  
+
       if (data.wrongMove === false) {
         setMoveList((prevMoves) => [...prevMoves, userMove, data.botMove]);
         setFen(data.fenPosition);
@@ -165,14 +170,9 @@ function Play() {
 
         if (data.wld !== undefined) {
           setGameStatus(
-            data.wld === 1
-              ? "win"
-              : data.wld === 0
-                ? "draw"
-                : "lose"
+            data.wld === 1 ? "win" : data.wld === 0 ? "draw" : "lose"
           );
         }
-
       } else {
         setMove("Bad move!");
         decreaseHealth(10);
@@ -183,7 +183,6 @@ function Play() {
       setIsLoading(false);
     }
   };
-  
 
   const decreaseHealth = (amount) => {
     setHealth((prevHealth) => {
@@ -213,8 +212,9 @@ function Play() {
   return (
     <div className="relative min-h-screen overflow-x-hidden pt-5">
       <main
-        className={`relative ${gameStatus ? "blur" : ""
-          } transition-all duration-300`}
+        className={`relative ${
+          gameStatus ? "blur" : ""
+        } transition-all duration-300`}
       >
         {/* Loading Overlay */}
         {isLoading && (
@@ -245,7 +245,7 @@ function Play() {
             />
             <Timer seconds={timer} />
             <HealthBar health={health} />
-            <MoveList moves={moveList}/>
+            <MoveList moves={moveList} />
             <TestButtons
               setGameStatus={setGameStatus}
               decreaseHealth={decreaseHealth}
@@ -280,9 +280,7 @@ function Play() {
       )}
       {showLoginRequired && (
         <div className="fixed inset-0 z-50 flex items-center justify-center">
-          <LoginPrompt
-            onClose={() => setShowLoginRequired(false)}
-          />
+          <LoginPrompt onClose={() => setShowLoginRequired(false)} />
         </div>
       )}
     </div>
