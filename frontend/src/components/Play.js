@@ -162,6 +162,17 @@ function Play() {
         setMoveList((prevMoves) => [...prevMoves, userMove, data.botMove]);
         setFen(data.fenPosition);
         setTurnBlack(data.turnBlack);
+
+        if (data.wld !== undefined) {
+          setGameStatus(
+            data.wld === 1
+              ? "win"
+              : data.wld === 0
+                ? "draw"
+                : "lose"
+          );
+        }
+
       } else {
         setMove("Bad move!");
         decreaseHealth(10);
@@ -234,7 +245,7 @@ function Play() {
             />
             <Timer seconds={timer} />
             <HealthBar health={health} />
-            <MoveList moves={moveList} developerMode={developerMode} />
+            <MoveList moves={moveList}/>
             <TestButtons
               setGameStatus={setGameStatus}
               decreaseHealth={decreaseHealth}

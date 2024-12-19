@@ -1,17 +1,179 @@
-.home-logo {
-    margin-top: 200px;
-    width: 350px;
-    border: 10px solid transparent;
-    border-color: #8989ffbe;
-    border-style:dashed;
-    border-radius: 50%;
-    box-shadow: 0 10px 20px rgba(255, 65, 108, 0.8), 0 6px 20px rgba(255, 75, 43, 0.7);
-    transition: transform 0.5s ease, box-shadow 0.5s ease;
-
-}
-
-.home-logo:hover {
-    transform: scale(1.2) rotate(15deg);
-    box-shadow: 0 30px 60px rgba(255, 65, 108, 0.9), 0 15px 45px rgba(255, 75, 43, 0.8);
-}
-
+.home-container {
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+    perspective: 1000px;
+    position: relative;
+  }
+  
+  .home-container::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: radial-gradient(
+      circle at center,
+      rgba(26, 26, 26, 0.95) 0%,
+      rgba(26, 26, 26, 0.9) 20%,
+      rgba(26, 26, 26, 0.8) 40%,
+      rgba(26, 26, 26, 0.6) 60%,
+      rgba(26, 26, 26, 0.4) 80%,
+      rgba(26, 26, 26, 0.2) 100%
+    );
+    pointer-events: none;
+  }
+  
+  .title-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    opacity: 0;
+    transform: translateZ(-1000px);
+    transition: all 2s cubic-bezier(0.19, 1, 0.22, 1);
+    position: relative; 
+    z-index: 1;
+  }
+  
+  .title-container.show {
+    opacity: 1;
+    transform: translateZ(0);
+  }
+  
+  .chess-text {
+    font-size: 8rem;
+    font-weight: 900;
+    color: #fff;
+    text-shadow: 0 0 20px rgba(99, 179, 237, 0.5);
+    animation: glowPulse 3s infinite;
+    letter-spacing: 1rem;
+    transform: scale(0);
+    animation: scaleIn 1s cubic-bezier(0.19, 1, 0.22, 1) 0.5s forwards;
+    position: relative;
+  }
+  
+  .exerciser-text {
+    font-size: 6rem;
+    font-weight: 800;
+    color: #63b3ed;
+    letter-spacing: 0.5rem;
+    margin-top: -1rem;
+    transform: scale(0);
+    animation: scaleIn 1s cubic-bezier(0.19, 1, 0.22, 1) 1s forwards;
+  }
+  
+  .number-text {
+    font-size: 12rem;
+    font-weight: 900;
+    background: linear-gradient(45deg, #fff, #63b3ed);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    opacity: 0;
+    transform: translateY(50px);
+    animation: slideUp 1s cubic-bezier(0.19, 1, 0.22, 1) 1.5s forwards;
+  }
+  
+  .home-container::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: radial-gradient(
+      circle at center,
+      transparent 0%,
+      transparent 60%,
+      rgba(0, 0, 0, 0.4) 100%
+    );
+    pointer-events: none;
+  }
+  
+  @keyframes glowPulse {
+    0% {
+      text-shadow: 0 0 20px rgba(99, 179, 237, 0.5);
+    }
+    50% {
+      text-shadow: 0 0 40px rgba(99, 179, 237, 0.8);
+    }
+    100% {
+      text-shadow: 0 0 20px rgba(99, 179, 237, 0.5);
+    }
+  }
+  
+  @keyframes scaleIn {
+    from {
+      transform: scale(0);
+    }
+    to {
+      transform: scale(1);
+    }
+  }
+  
+  @keyframes slideUp {
+    from {
+      opacity: 0;
+      transform: translateY(50px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  
+  .chess-text::before,
+  .chess-text::after {
+    content: 'CHESS';
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    left: 0;
+    text-shadow: 2px 0 #63b3ed;
+    animation: glitch 3s infinite alternate-reverse;
+  }
+  
+  .chess-text::before {
+    clip-path: polygon(0 0, 100% 0, 100% 45%, 0 45%);
+    transform: translate(-2px, -2px);
+  }
+  
+  .chess-text::after {
+    clip-path: polygon(0 55%, 100% 55%, 100% 100%, 0 100%);
+    transform: translate(2px, 2px);
+  }
+  
+  @keyframes glitch {
+    0% {
+      transform: translate(0);
+    }
+    20% {
+      transform: translate(-2px, 2px);
+    }
+    40% {
+      transform: translate(-2px, -2px);
+    }
+    60% {
+      transform: translate(2px, 2px);
+    }
+    80% {
+      transform: translate(2px, -2px);
+    }
+    100% {
+      transform: translate(0);
+    }
+  }
+  
+  @media (max-width: 768px) {
+    .chess-text {
+      font-size: 4rem;
+    }
+    .exerciser-text {
+      font-size: 3rem;
+    }
+    .number-text {
+      font-size: 6rem;
+    }
+  }
