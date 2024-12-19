@@ -4,7 +4,6 @@
 ## Get latest from `dotnet new gitignore`
 
 obj
-appsettings.Development.json
 logs
 
 # dotenv files
