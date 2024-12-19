@@ -162,6 +162,17 @@ function Play() {
         setMoveList((prevMoves) => [...prevMoves, userMove, data.botMove]);
         setFen(data.fenPosition);
         setTurnBlack(data.turnBlack);
+
+        if (data.gameStatus) {
+          setGameStatus(
+            data.gameStatus === 1
+              ? "win"
+              : data.gameStatus === 0
+                ? "draw"
+                : "lose"
+          );
+        }
+
       } else {
         setMove("Bad move!");
         decreaseHealth(10);

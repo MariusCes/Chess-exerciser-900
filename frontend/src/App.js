@@ -1,5 +1,5 @@
 import React from "react";
-import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
+import { BrowserRouter as Router, Route, Routes, Navigate } from "react-router-dom";
 import Navbar from "./components/Navbar";
 import About from "./components/About";
 import Home from "./components/Home";
@@ -16,12 +16,15 @@ function App() {
       <Router>
         <Navbar />
         <Routes>
+          <Route path="/" element={<Navigate replace to="/home" />} />
           <Route path="/home" element={<Home />} />
           <Route path="/about" element={<About />} />
           <Route path="/history" element={<History />} />
           <Route path="/play" element={<Play />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
+          {/* Redirect all unknown urls to home */}
+          <Route path="*" element={<Navigate replace to="/home" />} />
         </Routes>
       </Router>
     </div>
