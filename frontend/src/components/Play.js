@@ -168,7 +168,7 @@ function Play() {
         setFen(data.fenPosition);
         setTurnBlack(data.turnBlack);
 
-        if (data.wld !== undefined) {
+        if (data.isRunning === false) {
           setGameStatus(
             data.wld === 1 ? "win" : data.wld === 0 ? "draw" : "lose"
           );
