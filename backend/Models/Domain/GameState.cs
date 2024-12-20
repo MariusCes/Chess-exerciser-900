@@ -15,7 +15,7 @@ public class GameState
     public void HandleBlackout()
         {
             CurrentBlackout--;
-            if (CurrentBlackout <= 0)
+            if (CurrentBlackout == 0)
             {
                 TurnBlack = true;
                 CurrentBlackout = InitialBlackout;

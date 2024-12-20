@@ -163,15 +163,16 @@ function Play() {
         setFen(data.fenPosition);
         setTurnBlack(data.turnBlack);
 
-        if (data.wld !== undefined) {
-          setGameStatus(
-            data.wld === 1
-              ? "win"
-              : data.wld === 0
-                ? "draw"
-                : "lose"
-          );
+        if (data.isRunning === false) {
+          if (data.wld === 1) {
+            setGameStatus("win");
+          } else if (data.wld === 0) {
+            setGameStatus("lose");
+          } else {
+            setGameStatus("draw");
+          }
         }
+        
 
       } else {
         setMove("Bad move!");
@@ -226,7 +227,7 @@ function Play() {
         )}
         <DifficultySelectors
           aiDifficulty={aiDifficulty}
-          setAiDifficulty={setAiDifficulty}
+          setAiDifficulty={setAiDifficulty} 
           memoryDifficulty={memoryDifficulty}
           setMemoryDifficulty={setMemoryDifficulty}
           createGame={createGame}

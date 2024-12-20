@@ -26,7 +26,7 @@ const Login = () => {
         
         // Start loading
         setIsLoading(true);
-
+    
         try {
             const response = await fetch(
                 "http://localhost:5030/api/chess/login",
@@ -41,24 +41,25 @@ const Login = () => {
                     },
                 }
             );
-
+    
             const data = await response.json();
-
+    
             // Simulate a minimum loading time
             await new Promise(resolve => setTimeout(resolve, 1000));
-
-            if (data.token !== null) {
+    
+            // Check if the login is successful
+            if (response.ok && data.token) {
                 setToken(data.token);
                 sessionStorage.setItem("isLoggedIn", "true");
-
-                
+    
                 showNotification("Login successful! Redirecting...", "success");
-                
+    
                 // Redirect after a short delay to show the success message
                 setTimeout(() => {
                     navigate("/play");
                 }, 2000);
             } else {
+                // Handle invalid credentials or failed login
                 showNotification("Invalid credentials. Please try again.", "error");
             }
         } catch (error) {
@@ -68,6 +69,7 @@ const Login = () => {
             setIsLoading(false);
         }
     };
+    
 
     return (
         <div className="login-container">
