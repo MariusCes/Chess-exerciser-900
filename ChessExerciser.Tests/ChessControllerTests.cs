@@ -4,10 +4,9 @@ using Microsoft.Extensions.Logging;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 using System.Threading.Tasks;
-using backend.Controllers;
 using backend.DTOs;
 using backend.Models.Domain;
-using backend.Utilities;
+using backend.Services;
 using System.Collections.Generic;
 using System;
 using Microsoft.AspNetCore.Http;
@@ -18,27 +17,17 @@ namespace ChessExerciser.Tests
 {
     public class ChessControllerTests
     {
-        private readonly Mock<IStockfishService> _mockStockfishService;
-        private readonly Mock<IDatabaseUtilities> _mockDbUtilities;
-        private readonly Mock<IJwtService> _mockJwtService;
+        private readonly Mock<IGameService> _mockGameService;
         private readonly Mock<ILogger<ChessController>> _mockLogger;
         private readonly ChessController _controller;
 
         public ChessControllerTests()
         {
-            _mockStockfishService = new Mock<IStockfishService>();
-            _mockDbUtilities = new Mock<IDatabaseUtilities>();
-            _mockJwtService = new Mock<IJwtService>();
+            _mockGameService = new Mock<IGameService>();
             _mockLogger = new Mock<ILogger<ChessController>>();
 
-            _controller = new ChessController(
-                _mockStockfishService.Object,
-                _mockDbUtilities.Object,
-                _mockLogger.Object,
-                _mockJwtService.Object
-            );
+            _controller = new ChessController(_mockGameService.Object, _mockLogger.Object);
 
-            // Mock user context
             var user = new ClaimsPrincipal(new ClaimsIdentity(new Claim[] {
                 new Claim(ClaimTypes.NameIdentifier, "test-user-id")
             }, "mock"));
@@ -51,14 +40,12 @@ namespace ChessExerciser.Tests
         [Fact]
         public async Task CreateGame_ReturnsOk_WhenGameIsCreatedSuccessfully()
         {
-            // Arrange
-            var request = new CreateGameReqDto (3,2 );
-            _mockDbUtilities.Setup(x => x.AddGame(It.IsAny<Game>())).ReturnsAsync(true);
+            var request = new CreateGameReqDto(3, 2);
+            _mockGameService.Setup(x => x.CreateGameAsync(request, "test-user-id"))
+                .ReturnsAsync(new PostCreateGameResponseDTO { GameId = Guid.NewGuid().ToString() });
 
-            // Act
             var result = await _controller.CreateGame(request);
 
-            // Assert
             var okResult = Assert.IsType<OkObjectResult>(result);
             var response = Assert.IsType<PostCreateGameResponseDTO>(okResult.Value);
             Assert.NotNull(response.GameId);
@@ -67,14 +54,12 @@ namespace ChessExerciser.Tests
         [Fact]
         public async Task CreateGame_ReturnsServerError_WhenDatabaseFails()
         {
-            // Arrange
-            var request = new CreateGameReqDto ( 3,2 );
-            _mockDbUtilities.Setup(x => x.AddGame(It.IsAny<Game>())).ReturnsAsync(false);
+            var request = new CreateGameReqDto(3, 2);
+            _mockGameService.Setup(x => x.CreateGameAsync(request, "test-user-id"))
+                .ThrowsAsync(new backend.Errors.DatabaseOperationException("Failed to add the game to the database."));
 
-            // Act
             var result = await _controller.CreateGame(request);
 
-            // Assert
             var errorResult = Assert.IsType<ObjectResult>(result);
             Assert.Equal(500, errorResult.StatusCode);
         }
@@ -82,14 +67,11 @@ namespace ChessExerciser.Tests
         [Fact]
         public async Task GetMovesHistory_ReturnsNotFound_WhenGameDoesNotExist()
         {
-            // Arrange
-            string gameId = "nonexistent-game-id";
-            _mockDbUtilities.Setup(x => x.GetGameById(gameId)).ReturnsAsync((Game)null);
+            _mockGameService.Setup(x => x.GetMovesHistoryAsync("nonexistent-game-id"))
+                .ReturnsAsync((GetMovesHistoryResponseDTO?)null);
 
-            // Act
-            var result = await _controller.GetMovesHistory(gameId);
+            var result = await _controller.GetMovesHistory("nonexistent-game-id");
 
-            // Assert
             var notFoundResult = Assert.IsType<NotFoundObjectResult>(result);
             Assert.Equal("Game not found.", notFoundResult.Value);
         }
@@ -97,15 +79,11 @@ namespace ChessExerciser.Tests
         [Fact]
         public async Task GetMovesHistory_ReturnsOk_WhenGameExists()
         {
-            // Arrange
-            string gameId = "test-game-id";
-            var game = new Game { MovesArraySerialized = "[\"e2e4\",\"e7e5\"]" };
-            _mockDbUtilities.Setup(x => x.GetGameById(gameId)).ReturnsAsync(game);
+            _mockGameService.Setup(x => x.GetMovesHistoryAsync("test-game-id"))
+                .ReturnsAsync(new GetMovesHistoryResponseDTO { MovesArray = new List<string> { "e2e4", "e7e5" } });
 
-            // Act
-            var result = await _controller.GetMovesHistory(gameId);
+            var result = await _controller.GetMovesHistory("test-game-id");
 
-            // Assert
             var okResult = Assert.IsType<OkObjectResult>(result);
             var response = Assert.IsType<GetMovesHistoryResponseDTO>(okResult.Value);
             Assert.Equal(new List<string> { "e2e4", "e7e5" }, response.MovesArray);
@@ -114,58 +92,35 @@ namespace ChessExerciser.Tests
         [Fact]
         public async Task MakeMove_ReturnsNotFound_WhenGameDoesNotExist()
         {
-            // Arrange
-            string gameId = "nonexistent-game-id";
-            var moveDto = new MoveDto ( "e2e4", TimeSpan.Parse("01:30:00") );
-            _mockDbUtilities.Setup(x => x.GetGameById(gameId)).ReturnsAsync((Game)null);
+            var moveDto = new MoveDto("e2e4", TimeSpan.Parse("01:30:00"));
+            _mockGameService.Setup(x => x.MakeMoveAsync("nonexistent-game-id", moveDto))
+                .ReturnsAsync((PostMoveResponseDTO?)null);
 
-            // Act
-            var result = await _controller.MakeMove(gameId, moveDto);
+            var result = await _controller.MakeMove("nonexistent-game-id", moveDto);
 
-            // Assert
-            var notFoundResult = Assert.IsType<NotFoundObjectResult>(result);
-            Assert.Equal("Game_not_found", notFoundResult.Value);
+            Assert.IsType<NotFoundObjectResult>(result);
         }
 
         [Fact]
         public async Task MakeMove_ReturnsBadRequest_WhenMoveIsEmpty()
         {
-            // Arrange
-            string gameId = "test-game-id";
-            var game = new Game { GameId = Guid.NewGuid(), IsRunning = true, MovesArraySerialized = "[]" };
-            var gameState = new GameState { CurrentLives = 3 };
-            var moveDto = new MoveDto ("", TimeSpan.Parse("01:30:00") ); // Empty move
+            var moveDto = new MoveDto("", TimeSpan.Parse("01:30:00"));
 
-            _mockDbUtilities.Setup(x => x.GetGameById(gameId)).ReturnsAsync(game);
-            _mockDbUtilities.Setup(x => x.GetStateById(gameId)).ReturnsAsync(gameState);
+            var result = await _controller.MakeMove("test-game-id", moveDto);
 
-            // Act
-            var result = await _controller.MakeMove(gameId, moveDto);
-
-            // Assert
             var badRequestResult = Assert.IsType<BadRequestObjectResult>(result);
-            Assert.Contains("Move_notation_cannot_be_empty", badRequestResult.Value.ToString());
+            Assert.Contains("Move_notation_cannot_be_empty", badRequestResult.Value!.ToString());
         }
 
         [Fact]
         public async Task MakeMove_ReturnsOk_WhenMoveIsValid()
         {
-            // Arrange
-            string gameId = "test-game-id";
-            var game = new Game { GameId = Guid.NewGuid(), IsRunning = true, MovesArraySerialized = "[]" };
-            var gameState = new GameState { CurrentLives = 3 };
-            var moveDto = new MoveDto ("e2e4" , TimeSpan.Parse("01:30:00"));
+            var moveDto = new MoveDto("e2e4", TimeSpan.Parse("01:30:00"));
+            _mockGameService.Setup(x => x.MakeMoveAsync("test-game-id", moveDto))
+                .ReturnsAsync(new PostMoveResponseDTO { WrongMove = false, BotMove = "e7e5", FenPosition = "some-fen-string" });
 
-            _mockDbUtilities.Setup(x => x.GetGameById(gameId)).ReturnsAsync(game);
-            _mockDbUtilities.Setup(x => x.GetStateById(gameId)).ReturnsAsync(gameState);
-            _mockStockfishService.Setup(x => x.IsMoveCorrect(It.IsAny<string>(), moveDto.move)).Returns(true);
-            _mockStockfishService.Setup(x => x.GetBestMove()).Returns("e7e5");
-            _mockStockfishService.Setup(x => x.GetFen()).Returns("some-fen-string");
+            var result = await _controller.MakeMove("test-game-id", moveDto);
 
-            // Act
-            var result = await _controller.MakeMove(gameId, moveDto);
-
-            // Assert
             var okResult = Assert.IsType<OkObjectResult>(result);
             var response = Assert.IsType<PostMoveResponseDTO>(okResult.Value);
             Assert.False(response.WrongMove);
@@ -176,90 +131,56 @@ namespace ChessExerciser.Tests
         [Fact]
         public async Task MakeMove_ReturnsOk_WhenMoveIsInvalid_AndReducesLives()
         {
-            // Arrange
-            string gameId = "test-game-id";
-            var game = new Game { GameId = Guid.NewGuid(), IsRunning = true, MovesArraySerialized = "[]" };
-            var gameState = new GameState { CurrentLives = 3, CurrentBlackout = 2 };
-            var moveDto = new MoveDto ("invalid-move" , TimeSpan.Parse("01:30:00"));
+            var moveDto = new MoveDto("invalid-move", TimeSpan.Parse("01:30:00"));
+            _mockGameService.Setup(x => x.MakeMoveAsync("test-game-id", moveDto))
+                .ReturnsAsync(new PostMoveResponseDTO { WrongMove = true, Lives = 2, IsRunning = true });
 
-            _mockDbUtilities.Setup(x => x.GetGameById(gameId)).ReturnsAsync(game);
-            _mockDbUtilities.Setup(x => x.GetStateById(gameId)).ReturnsAsync(gameState);
-            _mockStockfishService.Setup(x => x.IsMoveCorrect(It.IsAny<string>(), moveDto.move)).Returns(false);
+            var result = await _controller.MakeMove("test-game-id", moveDto);
 
-            // Act
-            var result = await _controller.MakeMove(gameId, moveDto);
-
-            // Assert
             var okResult = Assert.IsType<OkObjectResult>(result);
             var response = Assert.IsType<PostMoveResponseDTO>(okResult.Value);
             Assert.True(response.WrongMove);
-            Assert.Equal(2, response.Lives); // Lives should decrement from 3 to 2
-            Assert.True(response.IsRunning); // Game should still be running
+            Assert.Equal(2, response.Lives);
+            Assert.True(response.IsRunning);
         }
 
         [Fact]
         public async Task MakeMove_EndsGame_WhenLivesReachZero()
         {
-            // Arrange
-            string gameId = "test-game-id";
-            var game = new Game { GameId = Guid.NewGuid(), IsRunning = true, MovesArraySerialized = "[]" };
-            var gameState = new GameState { CurrentLives = 1 };
-            var moveDto = new MoveDto ("invalid-move", TimeSpan.Parse("01:30:00"));
+            var moveDto = new MoveDto("invalid-move", TimeSpan.Parse("01:30:00"));
+            _mockGameService.Setup(x => x.MakeMoveAsync("test-game-id", moveDto))
+                .ReturnsAsync(new PostMoveResponseDTO { WrongMove = true, Lives = 0, IsRunning = false });
 
-            _mockDbUtilities.Setup(x => x.GetGameById(gameId)).ReturnsAsync(game);
-            _mockDbUtilities.Setup(x => x.GetStateById(gameId)).ReturnsAsync(gameState);
-            _mockStockfishService.Setup(x => x.IsMoveCorrect(It.IsAny<string>(), moveDto.move)).Returns(false);
+            var result = await _controller.MakeMove("test-game-id", moveDto);
 
-            // Act
-            var result = await _controller.MakeMove(gameId, moveDto);
-
-            // Assert
             var okResult = Assert.IsType<OkObjectResult>(result);
             var response = Assert.IsType<PostMoveResponseDTO>(okResult.Value);
-            Assert.True(response.WrongMove);
             Assert.Equal(0, response.Lives);
-            Assert.False(response.IsRunning); // Game should end
+            Assert.False(response.IsRunning);
         }
 
         [Fact]
         public async Task MakeMove_HandlesBlackoutCorrectly()
         {
-            // Arrange
-            string gameId = "test-game-id";
-            var game = new Game { GameId = Guid.NewGuid(), IsRunning = true, MovesArraySerialized = "[]" };
-            var gameState = new GameState { CurrentLives = 3, CurrentBlackout = 1 };
-            var moveDto = new MoveDto ("e2e4", TimeSpan.Parse("01:30:00"));
+            var moveDto = new MoveDto("e2e4", TimeSpan.Parse("01:30:00"));
+            _mockGameService.Setup(x => x.MakeMoveAsync("test-game-id", moveDto))
+                .ReturnsAsync(new PostMoveResponseDTO { WrongMove = false, TurnBlack = true });
 
-            _mockDbUtilities.Setup(x => x.GetGameById(gameId)).ReturnsAsync(game);
-            _mockDbUtilities.Setup(x => x.GetStateById(gameId)).ReturnsAsync(gameState);
-            _mockStockfishService.Setup(x => x.IsMoveCorrect(It.IsAny<string>(), moveDto.move)).Returns(true);
-            _mockStockfishService.Setup(x => x.GetBestMove()).Returns("e7e5");
-            _mockStockfishService.Setup(x => x.GetFen()).Returns("fen-position");
+            var result = await _controller.MakeMove("test-game-id", moveDto);
 
-            // Act
-            var result = await _controller.MakeMove(gameId, moveDto);
-
-            // Assert
             var okResult = Assert.IsType<OkObjectResult>(result);
             var response = Assert.IsType<PostMoveResponseDTO>(okResult.Value);
-            Assert.True(response.TurnBlack); // Because CurrentBlackout should have triggered a blackout
+            Assert.True(response.TurnBlack);
         }
 
         [Fact]
         public async Task GetUserGames_ReturnsEmpty_WhenUserHasNoGames()
         {
-            // Arrange
-            var games = new List<Game>
-            {
-                new Game { UserId = "other-user-id", MovesArraySerialized = "[\"e2e4\"]" }
-            };
+            _mockGameService.Setup(x => x.GetUserGamesAsync("test-user-id"))
+                .ReturnsAsync(new List<Game>());
 
-            _mockDbUtilities.Setup(x => x.GetGamesList()).ReturnsAsync(games);
-
-            // Act
             var result = await _controller.GetUserGames();
 
-            // Assert
             var okResult = Assert.IsType<OkObjectResult>(result);
             var userGames = Assert.IsType<List<Game>>(okResult.Value);
             Assert.Empty(userGames);
@@ -268,144 +189,98 @@ namespace ChessExerciser.Tests
         [Fact]
         public async Task GetUserGames_ReturnsGames_WhenUserHasGames()
         {
-            // Arrange
-            var games = new List<Game>
-            {
-                new Game { UserId = "test-user-id", MovesArraySerialized = "[\"e2e4\"]" },
-                new Game { UserId = "test-user-id", MovesArraySerialized = "[]" },
-                new Game { UserId = "other-user-id", MovesArraySerialized = "[\"d2d4\"]" }
-            };
+            _mockGameService.Setup(x => x.GetUserGamesAsync("test-user-id"))
+                .ReturnsAsync(new List<Game> {
+                    new Game { UserId = "test-user-id" },
+                    new Game { UserId = "test-user-id" }
+                });
 
-            _mockDbUtilities.Setup(x => x.GetGamesList()).ReturnsAsync(games);
-
-            // Act
             var result = await _controller.GetUserGames();
 
-            // Assert
             var okResult = Assert.IsType<OkObjectResult>(result);
             var userGames = Assert.IsType<List<Game>>(okResult.Value);
-            // Should return 2 games (even those without moves) because we're not filtering here
             Assert.Equal(2, userGames.Count);
         }
 
         [Fact]
         public async Task Register_ReturnsOk_WhenUserIsRegisteredSuccessfully()
         {
-            // Arrange
-            var model = new RegisterViewModel 
-            { 
-                UserName = "testuser", 
-                Email = "test@example.com", 
-                Password = "Passw0rd!", 
-                ConfirmPassword = "Passw0rd!" 
+            var model = new RegisterViewModel
+            {
+                UserName = "testuser",
+                Email = "test@example.com",
+                Password = "Passw0rd!",
+                ConfirmPassword = "Passw0rd!"
             };
-            _mockDbUtilities.Setup(x => x.AddUser(model)).ReturnsAsync(true);
+            _mockGameService.Setup(x => x.RegisterAsync(model))
+                .ReturnsAsync(new RegisterResult(true));
 
-            // Act
             var result = await _controller.Register(model);
 
-            // Assert
             var okResult = Assert.IsType<OkObjectResult>(result);
-
-            // Serialize the actual response
-            var jsonResponse = System.Text.Json.JsonSerializer.Serialize(okResult.Value);
-
-            // Expected serialized response
-            var expectedJson = System.Text.Json.JsonSerializer.Serialize(new { message = "Registration successful" });
-
-            // Compare serialized responses
-            Assert.Equal(expectedJson, jsonResponse);
+            var json = System.Text.Json.JsonSerializer.Serialize(okResult.Value);
+            var expected = System.Text.Json.JsonSerializer.Serialize(new { message = "Registration successful" });
+            Assert.Equal(expected, json);
         }
-
 
         [Fact]
         public async Task Register_ReturnsBadRequest_WhenModelIsInvalid()
         {
-            // Arrange
             var model = new RegisterViewModel { UserName = "", Email = "", Password = "", ConfirmPassword = "" };
             _controller.ModelState.AddModelError("Error", "Invalid data");
 
-            // Act
             var result = await _controller.Register(model);
 
-            // Assert
             var badRequestResult = Assert.IsType<BadRequestObjectResult>(result);
-
-            // Deserialize the SerializableError for validation
             var serializableError = Assert.IsType<SerializableError>(badRequestResult.Value);
-
-            // Validate the error key and message
             Assert.True(serializableError.ContainsKey("Error"));
             var errorMessages = serializableError["Error"] as string[];
             Assert.NotNull(errorMessages);
             Assert.Contains("Invalid data", errorMessages);
         }
 
-
         [Fact]
-        public async Task Register_ReturnsBadRequest_WhenDatabaseFailsToAddUser()
+        public async Task Register_ReturnsBadRequest_WhenRegistrationFails()
         {
-            // Arrange
             var model = new RegisterViewModel { UserName = "testuser", Email = "test@example.com", Password = "Passw0rd!", ConfirmPassword = "Passw0rd!" };
-            _mockDbUtilities.Setup(x => x.AddUser(model)).ReturnsAsync(false);
+            _mockGameService.Setup(x => x.RegisterAsync(model))
+                .ReturnsAsync(new RegisterResult(false, "Registration failed"));
 
-            // Act
             var result = await _controller.Register(model);
 
-            // Assert
             var badRequestResult = Assert.IsType<BadRequestObjectResult>(result);
-            Assert.Contains("Bad_request", badRequestResult.Value.ToString());
+            Assert.Contains("Registration failed", badRequestResult.Value!.ToString());
         }
-        
+
         [Fact]
         public async Task Login_ReturnsOk_WhenCredentialsAreValid()
         {
-            // Arrange
             var model = new LoginViewModel { Email = "test@example.com", Password = "Passw0rd!" };
-            var user = new User { Id = "test-user-id", UserName = "testuser", Email = "test@example.com" };
-            _mockDbUtilities.Setup(x => x.LogInUser(model)).ReturnsAsync(true);
-            _mockDbUtilities.Setup(x => x.GetUserByEmail(model)).ReturnsAsync(user);
-            _mockJwtService.Setup(x => x.GenerateToken(user)).Returns("valid-jwt-token");
+            _mockGameService.Setup(x => x.LoginAsync(model))
+                .ReturnsAsync(new LoginResult("valid-jwt-token", "testuser", "test@example.com"));
 
-            // Act
             var result = await _controller.Login(model);
 
-            // Assert
             var okResult = Assert.IsType<OkObjectResult>(result);
-            Assert.NotNull(okResult.Value);
-
-            // Serialize and inspect the response
             var json = System.Text.Json.JsonSerializer.Serialize(okResult.Value);
             var response = System.Text.Json.JsonSerializer.Deserialize<Dictionary<string, string>>(json);
-
-            Assert.Equal("valid-jwt-token", response["token"]);
-            Assert.Equal("testuser", response["UserName"]);
-            Assert.Equal("test@example.com", response["Email"]);
+            Assert.Equal("valid-jwt-token", response!["token"]);
+            Assert.Equal("testuser", response["userName"]);
+            Assert.Equal("test@example.com", response["email"]);
         }
-
-
-
 
         [Fact]
         public async Task Login_ReturnsBadRequest_WhenCredentialsAreInvalid()
         {
-            // Arrange
             var model = new LoginViewModel { Email = "invalid@example.com", Password = "wrongpass" };
-            _mockDbUtilities.Setup(x => x.LogInUser(model)).ReturnsAsync(false);
+            _mockGameService.Setup(x => x.LoginAsync(model))
+                .ReturnsAsync((LoginResult?)null);
 
-            // Act
             var result = await _controller.Login(model);
 
-            // Assert
             var badRequestResult = Assert.IsType<BadRequestObjectResult>(result);
-
-            // Serialize the response for inspection
             var json = System.Text.Json.JsonSerializer.Serialize(badRequestResult.Value);
-
-            // Validate against the expected serialized string
-            var expectedJson = System.Text.Json.JsonSerializer.Serialize("Invalid credentials");
-            Assert.Equal(expectedJson, json);
+            Assert.Equal(System.Text.Json.JsonSerializer.Serialize("Invalid credentials"), json);
         }
-
     }
 }

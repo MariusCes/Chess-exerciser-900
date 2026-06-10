@@ -16,6 +16,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using backend.Controllers;
+using backend.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -86,7 +87,8 @@ builder.Services.AddAuthentication(options =>
 });
 
 builder.Services.AddScoped<IDatabaseUtilities, DatabaseUtilities>();
-builder.Services.AddScoped<IJwtService, JwtService>();;
+builder.Services.AddScoped<IJwtService, JwtService>();
+builder.Services.AddScoped<IGameService, GameService>();
 
 // Set up Serilog to log to a file
 Log.Logger = new LoggerConfiguration()
