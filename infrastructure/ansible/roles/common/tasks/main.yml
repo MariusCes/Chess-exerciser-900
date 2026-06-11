@@ -1,0 +1,20 @@
+---
+- name: Update apt cache and upgrade packages
+  ansible.builtin.apt:
+    update_cache: true
+    upgrade: safe
+    cache_valid_time: 3600
+
+- name: Install system dependencies
+  ansible.builtin.apt:
+    name:
+      - git
+      - g++
+      - make
+      - nginx
+      - python3-pip
+      - python3-pymysql
+      - unzip
+      - curl
+      - libicu-dev
+    state: present

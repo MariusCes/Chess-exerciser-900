@@ -1,0 +1,17 @@
+[Unit]
+Description=Chess Exerciser 900
+After=network.target mysqld.service
+
+[Service]
+Type=simple
+User={{ app_user }}
+WorkingDirectory={{ app_dir }}
+ExecStart=/usr/local/bin/dotnet {{ app_dir }}/backend.dll
+Restart=on-failure
+RestartSec=5
+Environment=ASPNETCORE_ENVIRONMENT=Production
+Environment=ASPNETCORE_URLS=http://localhost:{{ app_port }}
+Environment=DOTNET_ROOT={{ dotnet_dir }}
+
+[Install]
+WantedBy=multi-user.target

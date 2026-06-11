@@ -85,3 +85,11 @@
 .hidden {
   opacity: 0;
 }
+
+.square.selected {
+  background-color: rgba(255, 214, 0, 0.45);
+}
+
+.square.has-piece {
+  cursor: pointer;
+}

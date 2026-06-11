@@ -1,0 +1,11 @@
+---
+- name: Restart chess-exerciser
+  ansible.builtin.systemd:
+    name: chess-exerciser
+    state: restarted
+    daemon_reload: true
+
+- name: Reload nginx
+  ansible.builtin.systemd:
+    name: nginx
+    state: reloaded

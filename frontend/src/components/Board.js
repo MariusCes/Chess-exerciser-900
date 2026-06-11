@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import '../styles/Board.css';
 
 const pieceImages = {
@@ -31,10 +31,38 @@ const parseFEN = (fen) => {
   });
 };
 
-const Board = ({ fen, turnBlack }) => {
+const Board = ({ fen, turnBlack, onMove }) => {
+  const [selectedSquare, setSelectedSquare] = useState(null);
+
   const boardArray = parseFEN(fen);
   const columnLabels = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'];
   const rowLabels = ['8', '7', '6', '5', '4', '3', '2', '1'];
+
+  const squareToUCI = (rowIndex, colIndex) => {
+    const files = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'];
+    const file = files[colIndex];
+    const rank = (8 - rowIndex).toString();
+    return file + rank;
+  };
+
+  const handleSquareClick = (rowIndex, colIndex, piece) => {
+    if (!selectedSquare) {
+      if (piece) {
+        setSelectedSquare({ rowIndex, colIndex });
+      }
+    } else {
+      if (selectedSquare.rowIndex === rowIndex && selectedSquare.colIndex === colIndex) {
+        setSelectedSquare(null);
+      } else {
+        const from = squareToUCI(selectedSquare.rowIndex, selectedSquare.colIndex);
+        const to = squareToUCI(rowIndex, colIndex);
+        setSelectedSquare(null);
+        if (onMove) {
+          onMove(from + to);
+        }
+      }
+    }
+  };
 
   return (
     <div className="board-container">
@@ -55,15 +83,23 @@ const Board = ({ fen, turnBlack }) => {
           {boardArray.map((row, rowIndex) =>
             row.map((piece, colIndex) => {
               const isDarkSquare = (rowIndex + colIndex) % 2 === 1;
+              const isSelected = selectedSquare?.rowIndex === rowIndex && selectedSquare?.colIndex === colIndex;
               return (
                 <div
-                  className={`square ${isDarkSquare ? 'dark-square' : 'light-square'}`}
+                  className={[
+                    'square',
+                    isDarkSquare ? 'dark-square' : 'light-square',
+                    isSelected ? 'selected' : '',
+                    piece ? 'has-piece' : '',
+                  ].join(' ')}
                   key={`${rowIndex}-${colIndex}`}
-                > {piece && (
-                  <img
-                    src={pieceImages[piece]} alt={piece} className={`piece ${turnBlack ? 'hidden' : ''}`}
-                  />
-                )}
+                  onClick={() => handleSquareClick(rowIndex, colIndex, piece)}
+                >
+                  {piece && (
+                    <img
+                      src={pieceImages[piece]} alt={piece} className={`piece ${turnBlack ? 'hidden' : ''}`}
+                    />
+                  )}
                 </div>
               );
             })
