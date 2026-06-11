@@ -1,0 +1,49 @@
+---
+- name: Install MySQL server and Python MySQL library
+  ansible.builtin.apt:
+    name:
+      - mysql-server
+      - python3-pymysql
+    state: present
+    update_cache: true
+
+- name: Enable and start mysql
+  ansible.builtin.systemd:
+    name: mysql
+    enabled: true
+    state: started
+
+- name: Detect if MySQL root password is set
+  ansible.builtin.shell: >
+    mysql -u root -e 'SELECT 1'
+  register: _root_no_password
+  changed_when: false
+  failed_when: false
+
+- name: Set MySQL root password (fresh install)
+  community.mysql.mysql_user:
+    name: root
+    password: "{{ vault_mysql_root_password }}"
+    host: localhost
+    login_unix_socket: /var/run/mysqld/mysqld.sock
+    state: present
+  when: _root_no_password.rc == 0
+  no_log: true
+
+- name: Create application database
+  community.mysql.mysql_db:
+    name: "{{ mysql_db_name }}"
+    state: present
+    login_user: root
+    login_password: "{{ vault_mysql_root_password }}"
+
+- name: Create application database user
+  community.mysql.mysql_user:
+    name: "{{ mysql_app_user }}"
+    password: "{{ vault_mysql_app_password }}"
+    priv: "{{ mysql_db_name }}.*:ALL"
+    host: localhost
+    state: present
+    login_user: root
+    login_password: "{{ vault_mysql_root_password }}"
+  no_log: true

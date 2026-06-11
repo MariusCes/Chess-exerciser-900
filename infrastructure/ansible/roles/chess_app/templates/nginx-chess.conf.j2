@@ -1,0 +1,19 @@
+server {
+    listen 80 default_server;
+    root /opt/chess-exerciser/wwwroot;
+    index index.html;
+
+    # API → proxy to backend
+    location /api/ {
+        proxy_pass         http://localhost:{{ app_port }};
+        proxy_http_version 1.1;
+        proxy_set_header   Host              $host;
+        proxy_set_header   X-Forwarded-For   $proxy_add_x_forwarded_for;
+        proxy_set_header   X-Forwarded-Proto $scheme;
+    }
+
+    # Everything else → static files, SPA fallback
+    location / {
+        try_files $uri /index.html;
+    }
+}

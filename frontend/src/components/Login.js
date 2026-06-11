@@ -45,7 +45,7 @@ const Login = () => {
       // Simulate a minimum loading time
       await new Promise((resolve) => setTimeout(resolve, 1000));
 
-      if (data.token !== null) {
+      if (response.ok && data.token) {
         setToken(data.token);
         sessionStorage.setItem("isLoggedIn", "true");
 

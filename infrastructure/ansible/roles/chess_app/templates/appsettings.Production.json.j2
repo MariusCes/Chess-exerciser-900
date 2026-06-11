@@ -1,0 +1,23 @@
+{% set conn = "server=localhost;port=3306;database=" + mysql_db_name + ";uid=" + mysql_app_user + ";pwd=" + vault_mysql_app_password + ";" %}
+{% set jwt_str = vault_jwt_key %}
+{
+  "StockfishPath": "/usr/local/bin/stockfish",
+  "ConnectionStrings": {
+    "ChessPortal": {{ conn | tojson }}
+  },
+  "Jwt": {
+    "Key": {{ jwt_str | tojson }},
+    "Issuer": "ChessExerciser900",
+    "Audience": "ARE_YOU_NOT_ENTERTAINED"
+  },
+  "Cors": {
+    "Origins": "http://{{ inventory_hostname }};http://localhost:3000"
+  },
+  "Logging": {
+    "LogLevel": {
+      "Default": "Information",
+      "Microsoft.AspNetCore": "Warning"
+    }
+  },
+  "AllowedHosts": "*"
+}

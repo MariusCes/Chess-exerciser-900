@@ -1,0 +1,44 @@
+---
+- name: Install Stockfish build dependencies
+  ansible.builtin.apt:
+    name:
+      - g++
+      - make
+    state: present
+
+- name: Check if Stockfish is already installed
+  ansible.builtin.stat:
+    path: /usr/local/bin/stockfish
+  register: stockfish_binary
+
+- name: Clone Stockfish source at tag {{ stockfish_tag }}
+  ansible.builtin.git:
+    repo: https://github.com/official-stockfish/Stockfish.git
+    dest: /tmp/stockfish
+    version: "{{ stockfish_tag }}"
+    depth: 1
+  when: not stockfish_binary.stat.exists
+
+- name: Build Stockfish for {{ stockfish_arch }}
+  community.general.make:
+    chdir: /tmp/stockfish/src
+    target: build
+    params:
+      ARCH: "{{ stockfish_arch }}"
+  environment:
+    MAKEFLAGS: "-j{{ ansible_processor_vcpus | default(2) }}"
+  when: not stockfish_binary.stat.exists
+
+- name: Install Stockfish binary
+  ansible.builtin.copy:
+    src: /tmp/stockfish/src/stockfish
+    dest: /usr/local/bin/stockfish
+    mode: "0755"
+    remote_src: true
+  when: not stockfish_binary.stat.exists
+
+- name: Clean up Stockfish build directory
+  ansible.builtin.file:
+    path: /tmp/stockfish
+    state: absent
+  when: not stockfish_binary.stat.exists
