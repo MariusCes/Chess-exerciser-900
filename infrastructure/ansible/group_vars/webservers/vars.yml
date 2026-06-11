@@ -1,0 +1,12 @@
+---
+app_user:      chess-app
+app_dir:       /opt/chess-exerciser
+src_dir:       /opt/chess-exerciser-src
+dotnet_dir:    /opt/dotnet
+repo_url:      https://github.com/Audrius-Kr/Chess-exerciser-900.git
+repo_branch:   main
+stockfish_tag: sf_17
+stockfish_arch: armv8
+mysql_db_name: chess_exerciser
+mysql_app_user: chess_app
+app_port:      5030

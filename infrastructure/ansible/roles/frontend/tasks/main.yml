@@ -1,0 +1,29 @@
+---
+- name: Install Node.js 20 LTS (NodeSource)
+  ansible.builtin.shell: |
+    curl -fsSL https://deb.nodesource.com/setup_20.x | bash -
+    apt-get install -y nodejs
+  args:
+    creates: /usr/bin/node
+
+- name: Install npm dependencies
+  ansible.builtin.command:
+    cmd: npm ci
+    chdir: "{{ src_dir }}/frontend"
+
+- name: Build React app with relative API URL
+  ansible.builtin.command:
+    cmd: npm run build
+    chdir: "{{ src_dir }}/frontend"
+  environment:
+    REACT_APP_API_URL: ""
+    CI: ""
+
+- name: Copy build output to nginx root
+  ansible.builtin.copy:
+    src: "{{ src_dir }}/frontend/build/"
+    dest: "/opt/chess-exerciser/wwwroot/"
+    remote_src: true
+    owner: "{{ app_user }}"
+    group: "{{ app_user }}"
+    mode: "0755"

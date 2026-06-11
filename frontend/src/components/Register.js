@@ -52,7 +52,7 @@ const Register = () => {
       // Simulate a minimum loading time
       await new Promise((resolve) => setTimeout(resolve, 1000));
 
-      if (data.message !== null) {
+      if (response.ok && data.message) {
         showNotification("Registration successful! Redirecting...", "success");
 
         // Redirect after a short delay to show the success message

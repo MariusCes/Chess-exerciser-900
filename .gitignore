@@ -26,4 +26,9 @@ yarn-error.log*
 /backend/Migrations/
 /backend/obj/
 **/obj/
-.vs/
+.vs/backend/stockfish12.exe
+backend/stockfish12.exe
+infrastructure/.terraform/
+infrastructure/nb-key-pair.pem
+infrastructure/*.pem
+CLAUDE.md

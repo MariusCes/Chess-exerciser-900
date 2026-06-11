@@ -23,9 +23,6 @@ namespace backend.Data
             // User configuration
             modelBuilder.Entity<User>(entity =>
             {
-                entity.Property(u => u.ProfileLifespan)
-                    .HasDefaultValueSql("GETDATE()");
-
                 entity.HasOne(u => u.UserStats)
                     .WithOne(us => us.User)
                     .HasForeignKey<UserStats>(us => us.UserId);
@@ -51,7 +48,7 @@ namespace backend.Data
 
                 // Keep the MovesArraySerialized as requested
                 entity.Property(g => g.MovesArraySerialized)
-                    .HasColumnType("nvarchar(max)");
+                    .HasColumnType("longtext");
 
                 entity.HasOne(g => g.GameConfiguration)
                     .WithOne(gc => gc.Game)

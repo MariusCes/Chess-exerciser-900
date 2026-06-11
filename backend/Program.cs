@@ -16,43 +16,43 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using backend.Controllers;
+using backend.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add CORS policy
+// Add CORS policy — origins from config, semicolon-separated
+var corsOrigins = (builder.Configuration["Cors:Origins"] ?? "")
+    .Split(';', StringSplitOptions.RemoveEmptyEntries);
+if (corsOrigins.Length == 0)
+    corsOrigins = new[] { "http://localhost:3000" };
+
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowStaticWebApp",
-        builder =>
+        policy =>
         {
-            builder.WithOrigins("brave-river-0952dfb10-67.centralus.4.azurestaticapps.net")   // Allow all origins
-                   .AllowAnyMethod()   // Allow all HTTP methods (GET, POST, etc.)
-                   .AllowAnyHeader();  // Allow any headers
+            policy.WithOrigins(corsOrigins)
+                   .AllowAnyMethod()
+                   .AllowAnyHeader();
         });
 });
 
 // Read the Stockfish path from configuration (appsettings.json or environment variable)
 string stockfishPath = builder.Configuration["StockfishPath"] ?? "stockfish12.exe";
 
-// Register the IStockfish (Stockfish instance) as Singleton so that it's shared throughout the application
-builder.Services.AddScoped<Stockfish.NET.Stockfish>(provider =>
+// Register IStockfishService as Scoped — one Stockfish process per request
+builder.Services.AddScoped<IStockfishService>(provider =>
 {
     if (string.IsNullOrEmpty(stockfishPath))
     {
         throw new InvalidOperationException("Stockfish path is not configured.");
     }
-
-    return new Stockfish.NET.Stockfish(stockfishPath); // Stockfish is a static-like service
+    return new StockfishService(stockfishPath);
 });
 
-// Register IStockfishService (StockfishService) as Scoped so it's injected with a fresh instance per request
-builder.Services.AddScoped<IStockfishService>(provider =>
-{
-    var stockfish = provider.GetRequiredService<Stockfish.NET.Stockfish>(); // Get the singleton instance of Stockfish
-    return new StockfishService(stockfish); // Pass the singleton Stockfish to the StockfishService
-});
-
-builder.Services.AddDbContext<ChessDbContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("ChessPortal")));
+var connectionString = builder.Configuration.GetConnectionString("ChessPortal");
+builder.Services.AddDbContext<ChessDbContext>(options =>
+    options.UseMySql(connectionString, new MySqlServerVersion(new Version(8, 0, 0))));
 
 builder.Services.AddIdentity<User, IdentityRole>(options =>
 {
@@ -86,7 +86,8 @@ builder.Services.AddAuthentication(options =>
 });
 
 builder.Services.AddScoped<IDatabaseUtilities, DatabaseUtilities>();
-builder.Services.AddScoped<IJwtService, JwtService>();;
+builder.Services.AddScoped<IJwtService, JwtService>();
+builder.Services.AddScoped<IGameService, GameService>();
 
 // Set up Serilog to log to a file
 Log.Logger = new LoggerConfiguration()

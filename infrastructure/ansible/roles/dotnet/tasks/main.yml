@@ -1,0 +1,32 @@
+---
+- name: Check if .NET 7 is already installed
+  ansible.builtin.stat:
+    path: "{{ dotnet_dir }}/dotnet"
+  register: dotnet_binary
+
+- name: Download dotnet-install.sh
+  ansible.builtin.get_url:
+    url: https://dot.net/v1/dotnet-install.sh
+    dest: /tmp/dotnet-install.sh
+    mode: "0755"
+  when: not dotnet_binary.stat.exists
+
+- name: Install .NET 7 SDK
+  ansible.builtin.command:
+    cmd: /tmp/dotnet-install.sh --channel 7.0 --install-dir {{ dotnet_dir }}
+  when: not dotnet_binary.stat.exists
+
+- name: Add dotnet to system PATH
+  ansible.builtin.copy:
+    dest: /etc/profile.d/dotnet.sh
+    content: |
+      export PATH=$PATH:{{ dotnet_dir }}
+      export DOTNET_ROOT={{ dotnet_dir }}
+    mode: "0644"
+
+- name: Symlink dotnet to /usr/local/bin
+  ansible.builtin.file:
+    src: "{{ dotnet_dir }}/dotnet"
+    dest: /usr/local/bin/dotnet
+    state: link
+    force: true

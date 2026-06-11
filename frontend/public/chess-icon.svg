@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+  <rect width="64" height="64" rx="12" fill="#1a1a2e"/>
+  <g fill="none" stroke="#e8c547" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+    <!-- Knight body -->
+    <path d="M22 52 L21 48 Q20 36 26 32 L26 24 Q26 18 22 18 Q18 18 18 24 Q18 30 20 36 Q16 34 14 30 Q12 26 14 20 Q16 14 22 12 Q28 10 34 12 Q38 14 38 20 Q38 26 34 30 Q32 32 30 32 Q34 34 32 38 Q36 36 40 34 Q44 32 44 28 Q44 24 40 22 L42 18 Q46 20 48 26 Q48 32 42 34 Q38 34 34 36 Q38 38 38 42 L38 52Z"/>
+    <!-- Base -->
+    <path d="M14 52 H50 Q52 52 52 54 Q52 56 50 56 H14 Q12 56 12 54 Q12 52 14 52Z"/>
+    <!-- Eye -->
+    <circle cx="23" cy="21" r="2" fill="#e8c547"/>
+  </g>
+</svg>
